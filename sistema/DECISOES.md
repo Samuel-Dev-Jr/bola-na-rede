@@ -155,6 +155,16 @@ de explicar. Nenhum número tirado dessa base descreve o Centro real — as
 métricas de campo estão em `evidencias/caderno-de-campo.md` e são medidas no
 local.
 
+**É essa decisão que tornou possível hospedar o sistema.** A instância em
+https://bola-na-rede.onrender.com existe para o sistema poder ser aberto e
+avaliado de qualquer lugar. Se a base fosse o caderno real, subir seria tirar
+nome de criança, telefone de responsável e ficha médica da rede do Centro e
+colocar em servidor de terceiro — exatamente o que a seção 4 diz que não se faz.
+Com base fictícia, não há dado de ninguém lá.
+
+A regra que fica: **a instância hospedada nunca recebe o caderno real.** Se a
+coordenação usar o sistema para valer, aquilo roda no computador do Centro.
+
 ## 4. Login e papéis — a lacuna que era a mais séria, e como fechei
 
 Até a versão anterior esta seção começava com "não tem login", e era a limitação

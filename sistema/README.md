@@ -73,10 +73,15 @@ para não serem confundidos com cadastro real.
 Evento de jogo não vem por planilha: cria-se pela tela, em
 `Convocação → Novo evento`.
 
-## Hospedar no Render (vitrine)
+## No ar (vitrine)
 
-Existe uma configuração de deploy em `render.yaml`. Ela sobe uma **instância de
-demonstração**, e é importante entender o que isso significa antes de usar.
+**https://bola-na-rede.onrender.com** — entra com a conta de coordenação.
+
+A configuração de deploy está em `sistema/render.yaml`. Ela sobe uma **instância
+de demonstração**, e é importante entender o que isso significa antes de usar.
+
+> No Render, o campo *Blueprint Path* precisa apontar para `sistema/render.yaml`:
+> ele procura na raiz do repositório por padrão, e o arquivo está na subpasta.
 
 O plano gratuito do Render **não tem disco persistente**: o sistema de arquivos
 volta ao estado do deploy a cada reinício, e o banco é um arquivo. Ele é apagado.
