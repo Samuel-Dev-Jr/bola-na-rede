@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Centro de Cultura e Esporte — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([{'nome': 'Centro de Cultura e Esporte'}]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Centro de Cultura e Esporte</h1>
+<p class="subtitulo-pagina">
+  {{ painel.total.pessoas }} pessoas em {{ painel.total.matriculas }} matrículas.
+  {{ painel.total.pessoas_multi }} delas fazem mais de uma atividade.
+</p>
+
+{# Resumo do Centro inteiro, antes de entrar em qualquer modalidade. #}
+<section class="elenco">
+  <p class="elenco__etiqueta">O Centro hoje</p>
+
+  <div class="elenco__bloco">
+    <span class="elenco__numero">{{ painel.total.pessoas }}</span>
+    <span class="elenco__unidade">pessoas atendidas</span>
+  </div>
+
+  <p class="elenco__apoio">
+    {{ painel.total.matriculas }} matrículas somando as turmas ·
+    {{ painel.total.frequencia }}% de presença no mês
+  </p>
+
+  {% if painel.total.trazer_de_volta %}
+    <div class="elenco__acao">
+      <div>
+        <strong>
+          {{ painel.total.trazer_de_volta }}
+          {{ 'matrícula' if painel.total.trazer_de_volta == 1 else 'matrículas' }} para trazer de volta
+        </strong>
+        <p>
+          Somando todas as modalidades. Entre numa delas para ver quem são e
+          falar com a família.
+        </p>
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+<section class="secao">
+  <h2 class="secao__titulo">Modalidades</h2>
+
+  <div class="modalidades">
+    {% for m in painel.modalidades %}
+      <a class="modalidade modalidade--{{ m.genero|lower }}"
+         href="{{ url_for('painel', slug=m.slug) }}"
+         style="--modalidade: {{ m.cor }}">
+        <span class="modalidade__faixa"></span>
+        <div class="modalidade__topo">
+          <span class="modalidade__icone">{% include 'icones/' ~ m.icone ~ '.svg' %}</span>
+          <div>
+            <h3 class="modalidade__nome">{{ m.nome }}{% if m.genero != 'Misto' %}<span class="modalidade__genero">{{ m.genero }}</span>{% endif %}</h3>
+            <p class="modalidade__descricao">{{ m.descricao }}</p>
+          </div>
+        </div>
+
+        <p class="modalidade__horario">{{ m.horario }}</p>
+
+        <div class="modalidade__numeros">
+          <div>
+            <span class="modalidade__valor">{{ m.em_atividade }}</span>
+            <span class="modalidade__rotulo">em atividade</span>
+          </div>
+          <div>
+            <span class="modalidade__valor">{{ m.frequencia }}%</span>
+            <span class="modalidade__rotulo">presença</span>
+          </div>
+          <div>
+            <span class="modalidade__valor {{ 'modalidade__valor--alerta' if m.precisam_atencao }}">
+              {{ m.precisam_atencao }}
+            </span>
+            <span class="modalidade__rotulo">precisam atenção</span>
+          </div>
+        </div>
+
+        {% if m.trazer_de_volta %}
+          <p class="modalidade__alerta">
+            {{ m.trazer_de_volta }}
+            {{ 'matrícula' if m.trazer_de_volta == 1 else 'matrículas' }} para trazer de volta
+          </p>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{# Estes dois destinos vivem na barra de cima, que só aparece no desktop: a
+   barra de baixo existe apenas dentro de uma modalidade. Sem estes botões, no
+   celular a única saída daqui era tocar num cartão de modalidade, e Pessoas e
+   Configurações ficavam inalcançáveis. #}
+<section class="secao">
+  <h2 class="secao__titulo">Cadastro e ajustes</h2>
+  <div class="barra-acoes">
+    <a class="botao botao--discreto" href="{{ url_for('pessoas') }}">
+      Pessoas do Centro
+    </a>
+    <a class="botao botao--discreto" href="{{ url_for('configuracoes') }}">
+      Configurações
+    </a>
+    {# O "Sair" da barra de cima também desaparece no celular, junto com o resto
+       dela. Sem este botão, quem entra pelo telefone não tem como sair. #}
+    <form method="post" action="{{ url_for('logout') }}">
+      <button class="botao botao--discreto" type="submit">Sair</button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

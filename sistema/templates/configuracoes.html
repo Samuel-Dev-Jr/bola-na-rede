@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Configurações — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': 'Configurações'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Configurações</h1>
+<p class="subtitulo-pagina">
+  Importação de planilha e situação do banco.
+</p>
+
+{# O estado vem primeiro: antes de importar qualquer coisa, é bom saber o que
+   já está lá dentro. Foi o que me faltou nas primeiras vezes que eu importei
+   pelo terminal e não sabia se tinha duplicado. #}
+<section class="secao">
+  <h2 class="secao__titulo">O que está no banco agora</h2>
+  <div class="indicadores">
+    <div class="indicador">
+      <span class="indicador__valor">{{ estado.pessoas }}</span>
+      <span class="indicador__rotulo">Pessoas</span>
+    </div>
+    <div class="indicador">
+      <span class="indicador__valor">{{ estado.matriculas }}</span>
+      <span class="indicador__rotulo">Matrículas</span>
+    </div>
+    <div class="indicador">
+      <span class="indicador__valor">{{ estado.presencas }}</span>
+      <span class="indicador__rotulo">Presenças</span>
+    </div>
+    <div class="indicador">
+      <span class="indicador__valor">{{ estado.modalidades }}</span>
+      <span class="indicador__rotulo">Modalidades</span>
+    </div>
+    <div class="indicador">
+      <span class="indicador__valor">{{ estado.turmas }}</span>
+      <span class="indicador__rotulo">Turmas</span>
+    </div>
+    <div class="indicador">
+      <span class="indicador__valor">{{ estado.eventos }}</span>
+      <span class="indicador__rotulo">Eventos</span>
+    </div>
+  </div>
+
+  {% if estado.primeira_chamada %}
+    <p class="celula-secundaria" style="margin-top: 12px;">
+      Chamada registrada de {{ estado.primeira_chamada|data_br }}
+      até {{ estado.ultima_chamada|data_br }}.
+    </p>
+  {% else %}
+    <p class="celula-secundaria" style="margin-top: 12px;">
+      Nenhuma chamada registrada ainda.
+    </p>
+  {% endif %}
+</section>
+
+<section class="secao">
+  <h2 class="secao__titulo">Acessos ao sistema</h2>
+  <div class="cartao" style="padding: 18px;">
+    <p style="margin-top: 0;">
+      Quem entra no sistema, com que papel, e quem ainda não tem login.
+    </p>
+    <div class="barra-acoes" style="margin: 14px 0 0;">
+      <a class="botao" href="{{ url_for('usuarios') }}">Gerenciar acessos</a>
+    </div>
+  </div>
+</section>
+
+<section class="secao">
+  <h2 class="secao__titulo">Importar planilha</h2>
+
+  <form method="post" enctype="multipart/form-data"
+        action="{{ url_for('configuracoes') }}">
+    <div class="cartao grupo-formulario">
+      <div class="grade-formulario">
+        <div class="campo campo--todo">
+          <label for="planilha">Arquivo CSV</label>
+          <input type="file" id="planilha" name="planilha" accept=".csv,text/csv" required>
+          <span class="campo__ajuda">
+            Um arquivo por vez. Se o nome tiver <strong>presenc</strong>, eu trato
+            como planilha de chamada; qualquer outro nome, como planilha de
+            matrículas — os dois formatos são diferentes.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="barra-acoes barra-acoes--fim" style="margin-top: 18px;">
+      <button class="botao" type="submit">Importar</button>
+    </div>
+  </form>
+
+  <div class="cartao" style="padding: 18px; margin-top: 18px;">
+    <span class="etiqueta">A ordem importa</span>
+    <p style="margin: 8px 0 0;">
+      Importe as <strong>matrículas primeiro</strong> e a chamada depois. A
+      presença aponta pra matrícula, então uma chamada de alguém que ainda não
+      está matriculado não tem onde entrar — e vai aparecer como erro aqui
+      embaixo, com o nome da pessoa.
+    </p>
+    <p style="margin: 10px 0 0;">
+      Reimportar o mesmo arquivo não duplica nada. Se der erro em algumas linhas,
+      corrija a planilha e envie de novo: só o que estava errado entra.
+    </p>
+  </div>
+</section>
+
+{% if resultado %}
+  <section class="secao">
+    <h2 class="secao__titulo">Resultado da importação</h2>
+
+    {% if resultado.resumo %}
+      <pre class="mensagem-pronta">{{ resultado.resumo|join('\n') }}</pre>
+    {% endif %}
+
+    <div class="indicadores">
+      <div class="indicador">
+        <span class="indicador__valor">{{ resultado.pessoas_novas }}</span>
+        <span class="indicador__rotulo">Pessoas novas</span>
+      </div>
+      <div class="indicador">
+        <span class="indicador__valor">{{ resultado.matriculas }}</span>
+        <span class="indicador__rotulo">Matrículas</span>
+      </div>
+      <div class="indicador">
+        <span class="indicador__valor">{{ resultado.presencas }}</span>
+        <span class="indicador__rotulo">Presenças</span>
+      </div>
+      <div class="indicador">
+        <span class="indicador__valor">{{ resultado.erros|length }}</span>
+        <span class="indicador__rotulo">Erros</span>
+      </div>
+    </div>
+
+    {% if resultado.avisos %}
+      <div class="aviso aviso--erro" style="margin-top: 16px;">
+        <strong>{{ resultado.avisos|length }} aviso(s).</strong>
+        Isso <em>entrou</em> no banco, mas vale conferir.
+      </div>
+      <div class="cartao" style="padding: 14px 18px;">
+        <ul class="lista-mensagens">
+          {% for aviso in resultado.avisos %}<li>{{ aviso }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if resultado.erros %}
+      <div class="aviso aviso--erro" style="margin-top: 16px;">
+        <strong>{{ resultado.erros|length }} erro(s).</strong>
+        Essas linhas <em>não</em> entraram. Corrija a planilha e importe de novo.
+      </div>
+      <div class="cartao" style="padding: 14px 18px;">
+        <ul class="lista-mensagens">
+          {% for erro in resultado.erros %}<li>{{ erro }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if resultado.ok and not resultado.avisos %}
+      <div class="aviso aviso--sucesso" style="margin-top: 16px;">
+        Importado sem nenhum erro nem aviso.
+      </div>
+    {% endif %}
+  </section>
+{% endif %}
+
+{% endblock %}

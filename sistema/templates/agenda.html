@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Agenda do {{ modalidade.nome_exibicao }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao, 'url': url_for('painel', slug=modalidade.slug)},
+    {'nome': 'Agenda'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Agenda</h1>
+<p class="subtitulo-pagina">
+  {{ modalidade.nome_exibicao }} · {{ modalidade.horario }}.
+  Toque num dia com aula para abrir a chamada.
+</p>
+
+<div class="calendario-topo">
+  <a class="botao botao--discreto botao--pequeno"
+     href="{{ url_for('agenda', slug=modalidade.slug, mes=agenda.mes_anterior) }}"
+     aria-label="Mês anterior">←</a>
+  <strong class="calendario-topo__mes">{{ agenda.rotulo }}</strong>
+  <a class="botao botao--discreto botao--pequeno"
+     href="{{ url_for('agenda', slug=modalidade.slug, mes=agenda.mes_seguinte) }}"
+     aria-label="Próximo mês">→</a>
+</div>
+
+<div class="cartao" style="padding: 14px;">
+  <div class="calendario">
+    {% for nome in agenda.dias_semana %}
+      <div class="calendario__cabecalho">{{ nome }}</div>
+    {% endfor %}
+
+    {% for semana in agenda.semanas %}
+      {% for dia in semana %}
+        {% if not dia.no_mes %}
+          <div class="calendario__dia calendario__dia--fora"></div>
+
+        {% elif dia.tem_aula %}
+          {# Dia de aula vira link direto pra chamada daquela data. #}
+          <a class="calendario__dia calendario__dia--aula
+                    {{ 'calendario__dia--pendente' if not dia.futuro and not dia.chamada_feita }}
+                    {{ 'calendario__dia--hoje' if dia.hoje }}"
+             href="{{ url_for('chamada', slug=modalidade.slug, data=dia.data.isoformat()) }}">
+            <span class="calendario__numero">{{ dia.data.day }}</span>
+            {% if dia.chamada_feita %}
+              <span class="calendario__marca">{{ dia.presentes }}</span>
+            {% elif dia.futuro %}
+              <span class="calendario__marca calendario__marca--futuro">·</span>
+            {% else %}
+              <span class="calendario__marca calendario__marca--pendente">!</span>
+            {% endif %}
+            {% if dia.eventos %}<span class="calendario__evento"></span>{% endif %}
+          </a>
+
+        {% else %}
+          <div class="calendario__dia {{ 'calendario__dia--hoje' if dia.hoje }}">
+            <span class="calendario__numero">{{ dia.data.day }}</span>
+            {% if dia.eventos %}<span class="calendario__evento"></span>{% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+
+  <div class="calendario__legenda">
+    <span><span class="amostra amostra--aula"></span> tem {{ modalidade.termo_aula }}</span>
+    <span><span class="amostra amostra--pendente"></span> chamada não lançada</span>
+    <span><span class="amostra amostra--evento"></span> jogo ou torneio</span>
+    <span>o número dentro do dia é quantos compareceram</span>
+  </div>
+</div>
+
+{% if agenda.esquecidas %}
+  <section class="secao">
+    <div class="destaque-pendencia">
+      <strong>
+        {{ agenda.esquecidas|length }}
+        {{ modalidade.termo_aula if agenda.esquecidas|length == 1 else modalidade.termo_aula_pl }}
+        sem chamada lançada
+      </strong>
+      <p>
+        Aconteceram, mas ninguém registrou a presença. Sem esse registro o
+        aluno some do cálculo de frequência e o alerta de evasão atrasa.
+      </p>
+      <div class="barra-acoes" style="margin: 14px 0 0;">
+        {% for dia in agenda.esquecidas[:8] %}
+          <a class="botao botao--discreto botao--pequeno"
+             href="{{ url_for('chamada', slug=modalidade.slug, data=dia.data.isoformat()) }}">
+            {{ dia.data.strftime('%d/%m') }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% if agenda.eventos %}
+  <section class="secao">
+    <h2 class="secao__titulo">Jogos e torneios do mês</h2>
+    <div class="cartao">
+      {% for evento in agenda.eventos %}
+        <div class="linha-chamada">
+          <span class="linha-chamada__nome">
+            {{ evento.nome }}
+            <div class="celula-secundaria">
+              {{ evento.data|data_br }}
+              {%- if evento.turma_nome %} · {{ evento.turma_nome }}{% endif %}
+              {%- if evento.adversario %} · contra {{ evento.adversario }}{% endif %}
+            </div>
+          </span>
+          <a class="botao botao--discreto botao--pequeno"
+             href="{{ url_for('convocacao_detalhe', evento_id=evento.id) }}">Ver convocação</a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+<section class="secao">
+  <h2 class="secao__titulo">Rotina da semana</h2>
+  <div class="cartao" style="padding: 18px;">
+    <p style="margin: 0 0 10px;"><strong>{{ modalidade.horario }}</strong></p>
+    <p class="celula-secundaria" style="margin: 0;">
+      {{ agenda.total_aulas }}
+      {{ modalidade.termo_aula if agenda.total_aulas == 1 else modalidade.termo_aula_pl }}
+      em {{ agenda.rotulo|lower }}.
+    </p>
+  </div>
+</section>
+
+{% endblock %}

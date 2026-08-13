@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Acessos — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': 'Configurações', 'url': url_for('configuracoes')},
+    {'nome': 'Acessos'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Acessos ao sistema</h1>
+<p class="subtitulo-pagina">
+  Quem entra, com que papel, e quem ainda não tem acesso.
+</p>
+
+{# As senhas criadas em lote aparecem primeiro e só nesta resposta. O banco
+   guarda hash, então depois de sair desta tela não há como recuperá-las. #}
+{% if criadas %}
+  <div class="aviso aviso--erro">
+    <strong>Anote agora: estas senhas não aparecem de novo.</strong>
+    O sistema guarda só o hash — nem a coordenação consegue ler a senha de
+    ninguém depois. Se perder, é só definir uma nova.
+  </div>
+
+  <div class="cartao tabela-envolucro" style="padding: 0;">
+    <table>
+      <thead>
+        <tr><th>Pessoa</th><th>Login</th><th>Senha inicial</th></tr>
+      </thead>
+      <tbody>
+        {% for c in criadas %}
+          <tr>
+            <td>{{ c.nome }}</td>
+            <td><code>{{ c.login }}</code></td>
+            <td><code>{{ c.senha }}</code></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="barra-acoes" style="margin: 14px 0 0;">
+    <button class="botao" type="button" onclick="window.print()">
+      Imprimir esta lista
+    </button>
+  </div>
+{% endif %}
+
+{# ------------------------------------------------------ criar em lote #}
+{% if sem_acesso %}
+  <section class="secao">
+    <h2 class="secao__titulo">Quem ainda não tem acesso</h2>
+    <p class="subtitulo-pagina">
+      {{ sem_acesso|length }}
+      {{ 'pessoa' if sem_acesso|length == 1 else 'pessoas' }} com matrícula ativa
+      e sem login. Criar um por um na tela é trabalho que ninguém faz, então dá
+      para criar todos de uma vez, como jogador.
+    </p>
+
+    <div class="cartao" style="padding: 18px;">
+      {# Sem a classe pastilha aqui: ela pinta com var(--modalidade), que só
+         existe dentro de uma modalidade. Fora dela sairia sem cor nenhuma. #}
+      <p style="margin-top: 0;">
+        {{ sem_acesso[:12]|map(attribute='nome')|join(' · ') }}
+        {%- if sem_acesso|length > 12 %}
+          <span class="celula-secundaria">
+            · e mais {{ sem_acesso|length - 12 }}.
+          </span>
+        {%- endif %}
+      </p>
+      <form method="post" action="{{ url_for('usuarios_em_lote') }}"
+            style="margin: 14px 0 0;">
+        <button class="botao" type="submit">
+          Criar acesso para {{ sem_acesso|length }}
+          {{ 'pessoa' if sem_acesso|length == 1 else 'pessoas' }}
+        </button>
+      </form>
+    </div>
+  </section>
+{% endif %}
+
+{# ---------------------------------------------------------- criar um #}
+<section class="secao">
+  <h2 class="secao__titulo">Criar um acesso</h2>
+
+  <form method="post" action="{{ url_for('usuarios') }}">
+    <div class="cartao grupo-formulario">
+      <div class="grade-formulario">
+        <div class="campo">
+          <label for="login">Login</label>
+          <input type="text" id="login" name="login" required
+                 autocapitalize="none" spellcheck="false"
+                 placeholder="ex.: antonella.souza">
+        </div>
+
+        <div class="campo">
+          <label for="senha">Senha inicial</label>
+          <input type="text" id="senha" name="senha" required
+                 placeholder="mínimo 8 caracteres">
+          <span class="campo__ajuda">
+            Fica visível aqui de propósito: você precisa entregar ela para a
+            pessoa. Depois de salvar, só o hash é guardado.
+          </span>
+        </div>
+
+        <div class="campo">
+          <label for="papel">Papel</label>
+          <select id="papel" name="papel">
+            <option value="jogador">Jogador — vê só o que é dele</option>
+            <option value="admin">Administrador — vê e altera tudo</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="pessoa_id">Vincular a uma pessoa</label>
+          <select id="pessoa_id" name="pessoa_id">
+            <option value="">Sem vínculo (só administra)</option>
+            {% for p in sem_acesso %}
+              <option value="{{ p.id }}">{{ p.nome }}</option>
+            {% endfor %}
+          </select>
+          <span class="campo__ajuda">
+            É o vínculo que faz a área do jogador mostrar as atividades dele.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="barra-acoes barra-acoes--fim" style="margin-top: 18px;">
+      <button class="botao" type="submit">Criar acesso</button>
+    </div>
+  </form>
+</section>
+
+{# ---------------------------------------------------------- a lista #}
+<section class="secao">
+  <h2 class="secao__titulo">{{ usuarios|length }} acesso(s)</h2>
+
+  <div class="lista-pessoas">
+    {% for u in usuarios %}
+      <div class="pessoa-cartao">
+        <div class="pessoa-cartao__topo">
+          <span class="pessoa-cartao__nome">
+            <code>{{ u.login }}</code>
+            {% if u.id == usuario.id %}
+              <span class="selo selo--info">você</span>
+            {% endif %}
+          </span>
+          <span class="selo selo--{{ 'regular' if u.papel == 'admin' else 'evadido' }}">
+            {{ 'Administrador' if u.papel == 'admin' else 'Jogador' }}
+          </span>
+        </div>
+
+        <p class="pessoa-cartao__responsavel">
+          {{ u.pessoa_nome or 'sem pessoa vinculada' }}
+          · {{ 'ativo' if u.ativo else 'DESATIVADO' }}
+          · último acesso: {{ u.ultimo_acesso or 'nunca' }}
+        </p>
+
+        <div class="barra-acoes" style="margin: 12px 0 0;">
+          {# Trocar papel #}
+          <form method="post" action="{{ url_for('usuario_papel', usuario_id=u.id) }}">
+            <input type="hidden" name="papel"
+                   value="{{ 'jogador' if u.papel == 'admin' else 'admin' }}">
+            <button class="botao botao--discreto botao--pequeno" type="submit">
+              {{ 'Rebaixar a jogador' if u.papel == 'admin' else 'Promover a admin' }}
+            </button>
+          </form>
+
+          {# Nova senha. Vazio gera uma aleatória. #}
+          <form method="post" action="{{ url_for('usuario_senha', usuario_id=u.id) }}">
+            <button class="botao botao--discreto botao--pequeno" type="submit">
+              Sortear nova senha
+            </button>
+          </form>
+
+          {# Ativar ou desativar. Não apago: apagar perderia o histórico. #}
+          <form method="post" action="{{ url_for('usuario_ativo', usuario_id=u.id) }}">
+            <input type="hidden" name="ativo" value="{{ 0 if u.ativo else 1 }}">
+            <button class="botao botao--discreto botao--pequeno" type="submit">
+              {{ 'Desativar' if u.ativo else 'Reativar' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% endblock %}

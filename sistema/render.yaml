@@ -1,0 +1,52 @@
+# Configuração do deploy no Render, para o serviço nascer igual toda vez em vez
+# de depender de alguém lembrar o que preencheu no painel.
+#
+# LEIA ANTES DE SUBIR:
+#
+# O plano gratuito NÃO tem disco persistente. O banco é um arquivo e é apagado a
+# cada reinício, então o startCommand reconstrói a base de demonstração. Tudo que
+# for digitado na instância hospedada se perde no próximo reinício.
+#
+# Por isso esta instância é VITRINE, não uso real. Ela sobe com 62 pessoas
+# fictícias. O caderno real do Centro nunca entra aqui: dado de criança fica na
+# rede local, onde as escolhas de segurança da seção 4 do DECISOES.md fazem
+# sentido.
+#
+# A instância gratuita também hiberna depois de uns 15 minutos sem acesso e leva
+# perto de um minuto pra acordar. Antes de apresentar, abra o link uma vez.
+
+services:
+  - type: web
+    name: bola-na-rede
+    runtime: python
+    plan: free
+    region: oregon
+
+    # O código do sistema fica na pasta sistema/ do repositório.
+    rootDir: sistema
+
+    buildCommand: pip install -r requirements.txt
+
+    # Reconstrói a base e sobe o servidor. O gunicorn precisa do --bind porque o
+    # padrão dele é a porta 8000, e o Render entrega a porta em $PORT.
+    startCommand: python preparar_deploy.py && gunicorn app:app --bind 0.0.0.0:$PORT
+
+    envVars:
+      # Assina o cookie de sessão. O generateValue faz o Render sortear uma e
+      # guardar — melhor que eu escolher, e melhor que ficar no código.
+      # Consequência: a chave muda em cada deploy, então todo mundo é
+      # desconectado quando você publica de novo. Para uma vitrine, tudo bem.
+      - key: BOLA_NA_REDE_CHAVE
+        generateValue: true
+
+      - key: ADMIN_LOGIN
+        value: coordenacao
+
+      # Sem valor aqui de propósito: o Render vai pedir na primeira publicação.
+      # Senha de administrador escrita em arquivo que vai pro GitHub é senha
+      # pública.
+      - key: ADMIN_SENHA
+        sync: false
+
+      - key: PYTHON_VERSION
+        value: "3.13.4"

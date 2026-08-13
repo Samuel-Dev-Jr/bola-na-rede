@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+{% import "_marcas.html" as marcas %}
+
+{% block titulo %}{{ modalidade.nome_exibicao }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">{{ modalidade.nome_exibicao }}</h1>
+<p class="subtitulo-pagina">
+  {{ modalidade.horario }} · situação em {{ hoje|data_br }}, considerando
+  {{ modalidade.termo_aula_pl }} dos últimos 30 dias.
+</p>
+
+{# O número grande é quem está em atividade. O que falta vem depois, como tarefa. #}
+<section class="elenco">
+  <p class="elenco__etiqueta">O elenco hoje</p>
+
+  <div class="elenco__bloco">
+    <span class="elenco__numero">{{ resumo.ativas_de_fato }}</span>
+    <span class="elenco__unidade">
+      {{ modalidade.termo_aluno }}s em atividade
+    </span>
+  </div>
+
+  <p class="elenco__apoio">
+    de {{ resumo.matriculas }} matrículas · {{ resumo.frequencia_mes }}% de
+    presença no mês
+  </p>
+
+  {% if resumo.fantasmas %}
+    <div class="elenco__acao">
+      <div>
+        <strong>
+          {{ resumo.fantasmas }}
+          {{ 'matrícula' if resumo.fantasmas == 1 else 'matrículas' }} para trazer de volta
+        </strong>
+        <p>
+          Seguem matriculadas, mas não aparecem em {{ modalidade.artigo_aula }}
+          {{ modalidade.termo_aula }} há mais de 30 dias.
+        </p>
+      </div>
+      <a class="botao botao--claro"
+         href="{{ url_for('alunos', slug=modalidade.slug, nivel='evadido') }}">
+        Ver quem são
+      </a>
+    </div>
+  {% endif %}
+</section>
+
+<div class="indicadores">
+  <div class="indicador indicador--regular">
+    <span class="indicador__valor">{{ resumo.contagem.regular }}</span>
+    <span class="indicador__rotulo">Regulares</span>
+  </div>
+  <div class="indicador indicador--atencao">
+    <span class="indicador__valor">{{ resumo.contagem.atencao }}</span>
+    <span class="indicador__rotulo">Em atenção</span>
+  </div>
+  <div class="indicador indicador--risco">
+    <span class="indicador__valor">{{ resumo.contagem.risco }}</span>
+    <span class="indicador__rotulo">Risco de evasão</span>
+  </div>
+  <div class="indicador indicador--evadido">
+    <span class="indicador__valor">{{ resumo.contagem.evadido }}</span>
+    <span class="indicador__rotulo">Evadidos</span>
+  </div>
+  <div class="indicador">
+    <span class="indicador__valor">{{ resumo.frequencia_mes }}%</span>
+    <span class="indicador__rotulo">Frequência no mês</span>
+  </div>
+</div>
+
+<div class="barra-acoes" style="margin-top: 16px;">
+  <a class="botao botao--secundario"
+     href="{{ url_for('agenda', slug=modalidade.slug) }}">Ver agenda do mês</a>
+  {% if modalidade.tem_convocacao %}
+    <a class="botao botao--secundario"
+       href="{{ url_for('convocacoes', slug=modalidade.slug) }}">Convocações</a>
+  {% endif %}
+</div>
+
+{# lista de ação #}
+<section class="secao">
+  <h2 class="secao__titulo">Ligar esta semana</h2>
+  <p class="subtitulo-pagina">
+    {{ contatos|length }}
+    {{ 'pessoa' if contatos|length == 1 else 'pessoas' }} para contatar, em ordem
+    de urgência. Toque no telefone para ligar direto.
+  </p>
+
+  {% if contatos %}
+    <div class="cartao tabela-envolucro">
+      <table class="tabela-como-cartao">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Turma</th>
+            <th>Últim{{ "os" if modalidade.artigo_aula == "um" else "as" }} 12 {{ modalidade.termo_aula_pl }}</th>
+            <th>Situação</th>
+            <th>Motivo</th>
+            <th>Responsável</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for atleta in contatos %}
+            <tr>
+              <td>
+                <a class="celula-nome" href="{{ url_for('pessoa_detalhe', pessoa_id=atleta.pessoa_id) }}">
+                  {{ atleta.nome }}
+                </a>
+              </td>
+              <td data-rotulo="Turma" class="celula-dado">{{ atleta.turma_nome }}</td>
+              <td data-rotulo="Presença">{{ marcas.tira(atleta.marcas) }}</td>
+              <td data-rotulo="Situação">
+                <span class="selo selo--{{ atleta.avaliacao.nivel }}">{{ ROTULO_RISCO[atleta.avaliacao.nivel] }}</span>
+              </td>
+              <td data-rotulo="Motivo" class="celula-secundaria">{{ atleta.avaliacao.motivo }}</td>
+              <td data-rotulo="Contato" class="celula-dado">
+                <a href="tel:{{ atleta.responsavel_telefone|replace(' ', '')|replace('(', '')|replace(')', '')|replace('-', '') }}">
+                  {{ atleta.responsavel_telefone }}
+                </a>
+                <div class="celula-secundaria">{{ atleta.responsavel_parentesco }}</div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {{ marcas.legenda() }}
+  {% else %}
+    <div class="vazio">
+      <strong>Ninguém em risco no momento.</strong>
+      Nenhum aluno acumulou faltas suficientes para entrar na lista de contato.
+    </div>
+  {% endif %}
+</section>
+
+{# gráficos #}
+<div class="duas-colunas secao">
+  <section>
+    <h2 class="secao__titulo">Frequência mês a mês</h2>
+    <div class="cartao" style="padding: 18px;">
+      <div class="barras">
+        {% for mes in frequencia_mensal %}
+          <div class="barra">
+            <span class="barra__rotulo">{{ mes.rotulo }}</span>
+            <div class="barra__trilho">
+              <div class="barra__preenchimento" style="width: {{ mes.percentual }}%"></div>
+            </div>
+            <span class="barra__valor">{{ mes.percentual }}%</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="secao__titulo">Frequência por turma</h2>
+    <div class="cartao" style="padding: 18px;">
+      <div class="barras">
+        {% for turma in frequencia_turma %}
+          <div class="barra">
+            <span class="barra__rotulo">{{ turma.turma }}</span>
+            <div class="barra__trilho">
+              <div class="barra__preenchimento" style="width: {{ turma.percentual }}%"></div>
+            </div>
+            <span class="barra__valor">{{ turma.percentual }}%</span>
+          </div>
+        {% endfor %}
+      </div>
+      <p class="celula-secundaria" style="margin: 14px 0 0;">
+        Últimos 30 dias. Faltas justificadas ficam fora do cálculo.
+      </p>
+    </div>
+  </section>
+</div>
+
+{% endblock %}

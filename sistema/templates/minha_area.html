@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% import "_marcas.html" as marcas %}
+
+{% block titulo %}Minha área — Bola na Rede{% endblock %}
+
+{% block conteudo %}
+
+{% if pessoa is none %}
+  {# Usuário sem pessoa vinculada. Acontece com quem administra e não é aluno,
+     ou quando a conta foi criada sem escolher a pessoa. #}
+  <h1 class="titulo-pagina">Minha área</h1>
+  <div class="vazio">
+    <strong>Sua conta não está ligada a um cadastro do Centro.</strong>
+    Fale com a coordenação para vincular, e aí suas atividades e sua frequência
+    aparecem aqui.
+  </div>
+{% else %}
+  <h1 class="titulo-pagina">Olá, {{ pessoa.nome.split()[0] }}</h1>
+  <p class="subtitulo-pagina">
+    {{ pessoa.matriculas|length }}
+    {{ 'atividade' if pessoa.matriculas|length == 1 else 'atividades' }} no Centro.
+  </p>
+
+  {# Os jogos vêm primeiro: é a pergunta que o jogador abre o app pra responder. #}
+  {% if eventos %}
+    <section class="secao">
+      <h2 class="secao__titulo">Jogos</h2>
+      <div class="lista-pessoas">
+        {% for e in eventos %}
+          <div class="pessoa-cartao">
+            <div class="pessoa-cartao__topo">
+              <span class="pessoa-cartao__nome">{{ e.nome }}</span>
+              {% if e.convocado %}
+                <span class="selo selo--regular">Você está convocado</span>
+              {% else %}
+                <span class="selo selo--evadido">Não convocado</span>
+              {% endif %}
+            </div>
+            <p class="pessoa-cartao__responsavel">
+              {{ e.data|dia_semana }}, {{ e.data|data_br }}
+              {%- if e.adversario %} · contra {{ e.adversario }}{% endif %}
+              · {{ e.local }}
+            </p>
+            <p class="pessoa-cartao__responsavel">
+              {{ e.modalidade_nome }} · {{ e.minha_turma }}
+              {%- if e.numero %} · camisa {{ e.numero }}{% endif %}
+            </p>
+            {% if e.observacoes %}
+              <p class="pessoa-cartao__responsavel"><strong>{{ e.observacoes }}</strong></p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="secao">
+    <h2 class="secao__titulo">Minhas atividades</h2>
+    <div class="atividades">
+      {% for m in pessoa.matriculas %}
+        <div class="atividade" style="--modalidade: {{ m.modalidade_cor }}">
+          <div class="atividade__topo">
+            <div>
+              <span class="atividade__nome">{{ m.nome_exibicao }}</span>
+              <p class="atividade__turma">
+                {% if m.numero %}
+                  <span class="numero-camisa">{{ m.numero }}</span>
+                {% endif %}
+                {{ m.turma_nome }}
+                {% if m.matricula_status == 'encerrada' %}
+                  · <strong>matrícula encerrada</strong>
+                {% endif %}
+              </p>
+              {# O horário do treino é a segunda coisa que o participante abre o
+                 app pra ver, depois de "fui convocado?". #}
+              <p class="atividade__turma">{{ m.modalidade_horario }}</p>
+            </div>
+          </div>
+
+          <div class="atividade__marcas">{{ marcas.tira(m.marcas) }}</div>
+
+          <p class="atividade__leitura">
+            {{ m.total_presencas }} presenças em {{ m.total_aulas }} registros
+          </p>
+        </div>
+      {% endfor %}
+    </div>
+    {{ marcas.legenda() }}
+  </section>
+
+  {# Não mostro o nível de risco pro jogador. "Risco de evasão" é uma leitura
+     que a coordenação faz pra decidir com quem falar, não um rótulo pra pendurar
+     na criança quando ela abre o app. A frequência ela vê; o julgamento não. #}
+{% endif %}
+
+{# A barra de cima, com o Sair, só aparece no desktop. No celular este é o único
+   caminho pra sair da conta. #}
+<section class="secao">
+  <div class="barra-acoes">
+    <form method="post" action="{{ url_for('logout') }}">
+      <button class="botao botao--discreto" type="submit">Sair da conta</button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

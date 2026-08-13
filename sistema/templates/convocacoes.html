@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Convocação · {{ modalidade.nome_exibicao }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao, 'url': url_for('painel', slug=modalidade.slug)},
+    {'nome': 'Convocação'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Convocação · {{ modalidade.nome_exibicao }}</h1>
+<p class="subtitulo-pagina">
+  Monte a lista do jogo e gere a mensagem pronta para o grupo dos responsáveis.
+</p>
+
+<div class="barra-acoes">
+  <a class="botao" href="{{ url_for('convocacao_nova', slug=modalidade.slug) }}">Criar evento</a>
+</div>
+
+{% if eventos %}
+  <div class="cartao tabela-envolucro">
+    <table class="tabela-como-cartao">
+      <thead>
+        <tr>
+          <th>Evento</th>
+          <th>Data</th>
+          <th>Turma</th>
+          <th>Local</th>
+          <th>Convocados</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for evento in eventos %}
+          <tr>
+            <td>
+              <a class="celula-nome" href="{{ url_for('convocacao_detalhe', evento_id=evento.id) }}">
+                {{ evento.nome }}
+              </a>
+              {% if evento.adversario %}
+                <div class="celula-secundaria">contra {{ evento.adversario }}</div>
+              {% endif %}
+            </td>
+            <td data-rotulo="Data" class="celula-dado">
+              {{ evento.data|data_br }}
+              {% if evento.data >= hoje %}
+                <div><span class="selo selo--info">a realizar</span></div>
+              {% endif %}
+            </td>
+            <td data-rotulo="Turma" class="celula-dado">{{ evento.turma_nome }}</td>
+            <td data-rotulo="Local" class="celula-secundaria">{{ evento.local }}</td>
+            <td data-rotulo="Convocados" class="celula-dado">{{ evento.convocados }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="vazio">
+    <strong>Nenhum evento cadastrado.</strong>
+    Crie um evento para montar a primeira convocação.
+  </div>
+{% endif %}
+
+{% endblock %}

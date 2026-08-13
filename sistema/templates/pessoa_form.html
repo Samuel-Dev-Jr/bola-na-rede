@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}
+  {{ 'Editar ' + pessoa.nome if pessoa else 'Cadastrar pessoa' }} — Bola na Rede
+{% endblock %}
+
+{% set acao = url_for('pessoa_editar', pessoa_id=pessoa.id) if pessoa
+              else (url_for('pessoa_nova', slug=modalidade.slug) if modalidade
+                    else url_for('pessoa_nova')) %}
+{% set volta = url_for('pessoa_detalhe', pessoa_id=pessoa.id) if pessoa
+               else (url_for('alunos', slug=modalidade.slug) if modalidade
+                     else url_for('pessoas')) %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': 'Pessoas', 'url': url_for('pessoas')},
+    {'nome': pessoa.nome if pessoa else 'Nova pessoa'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="barra-acoes">
+  {{ nav.voltar(volta, 'Voltar') }}
+</div>
+
+<h1 class="titulo-pagina">{{ 'Editar ficha' if pessoa else 'Cadastrar pessoa' }}</h1>
+<p class="subtitulo-pagina">
+  A ficha é da pessoa, não da modalidade. Preencher aqui vale para todas as
+  atividades em que ela estiver.
+</p>
+
+<form method="post" action="{{ acao }}">
+
+  <div class="cartao grupo-formulario">
+    <h2 class="grupo-formulario__titulo">Dados pessoais</h2>
+    <div class="grade-formulario">
+      <div class="campo campo--todo">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" name="nome" required
+               value="{{ pessoa.nome if pessoa else '' }}">
+      </div>
+
+      <div class="campo">
+        <label for="data_nascimento">Data de nascimento</label>
+        <input type="date" id="data_nascimento" name="data_nascimento" required
+               value="{{ pessoa.data_nascimento.isoformat() if pessoa else '' }}">
+      </div>
+
+      {% if modalidade %}
+        <div class="campo">
+          <label for="turma_id">Turma em {{ modalidade.nome_exibicao }}</label>
+          <select id="turma_id" name="turma_id">
+            {% for t in turmas %}
+              <option value="{{ t.id }}">{{ t.nome }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="numero">Número da camisa</label>
+          <input type="number" id="numero" name="numero" min="1" max="99"
+                 inputmode="numeric" placeholder="opcional">
+          <span class="campo__ajuda">De 1 a 99, sem repetir na turma.</span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="cartao grupo-formulario">
+    <h2 class="grupo-formulario__titulo">Responsável e emergência</h2>
+    <div class="grade-formulario">
+      <div class="campo campo--todo">
+        <label for="responsavel_nome">Nome do responsável</label>
+        <input type="text" id="responsavel_nome" name="responsavel_nome" required
+               value="{{ pessoa.responsavel_nome if pessoa else '' }}">
+      </div>
+
+      <div class="campo">
+        <label for="responsavel_parentesco">Parentesco</label>
+        <input type="text" id="responsavel_parentesco" name="responsavel_parentesco"
+               placeholder="Mãe, pai, avó… ou Próprio aluno"
+               value="{{ pessoa.responsavel_parentesco if pessoa else '' }}">
+      </div>
+
+      <div class="campo">
+        <label for="responsavel_telefone">Telefone (WhatsApp)</label>
+        <input type="tel" id="responsavel_telefone" name="responsavel_telefone" required
+               placeholder="(11) 90000-0000"
+               value="{{ pessoa.responsavel_telefone if pessoa else '' }}">
+      </div>
+
+      <div class="campo">
+        <label for="emergencia_nome">Contato alternativo</label>
+        <input type="text" id="emergencia_nome" name="emergencia_nome"
+               value="{{ pessoa.emergencia_nome if pessoa and pessoa.emergencia_nome else '' }}">
+      </div>
+
+      <div class="campo">
+        <label for="emergencia_telefone">Telefone alternativo</label>
+        <input type="tel" id="emergencia_telefone" name="emergencia_telefone"
+               value="{{ pessoa.emergencia_telefone if pessoa and pessoa.emergencia_telefone else '' }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="cartao grupo-formulario">
+    <h2 class="grupo-formulario__titulo">Ficha médica</h2>
+    <div class="grade-formulario">
+      <div class="campo">
+        <label for="condicoes">Condições de saúde</label>
+        <input type="text" id="condicoes" name="condicoes"
+               placeholder="Asma, diabetes, hérnia de disco…"
+               value="{{ pessoa.condicoes if pessoa and pessoa.condicoes else '' }}">
+      </div>
+
+      <div class="campo">
+        <label for="alergias">Alergias</label>
+        <input type="text" id="alergias" name="alergias"
+               value="{{ pessoa.alergias if pessoa and pessoa.alergias else '' }}">
+      </div>
+
+      <div class="campo">
+        <label for="medicacao_continua">Medicação de uso contínuo</label>
+        <input type="text" id="medicacao_continua" name="medicacao_continua"
+               value="{{ pessoa.medicacao_continua if pessoa and pessoa.medicacao_continua else '' }}">
+      </div>
+
+      <div class="campo">
+        <label for="plano_saude">Atendimento de saúde</label>
+        <input type="text" id="plano_saude" name="plano_saude"
+               placeholder="SUS / UBS do bairro, convênio…"
+               value="{{ pessoa.plano_saude if pessoa and pessoa.plano_saude else '' }}">
+      </div>
+
+      <div class="campo campo--todo">
+        <label for="observacoes_medicas">Observações</label>
+        <textarea id="observacoes_medicas" name="observacoes_medicas">{{ pessoa.observacoes_medicas if pessoa and pessoa.observacoes_medicas else '' }}</textarea>
+      </div>
+
+      <div class="campo campo--todo">
+        <label class="caixa-marcacao">
+          <input type="checkbox" name="autoriza_imagem" value="1"
+                 {% if pessoa and pessoa.autoriza_imagem %}checked{% endif %}>
+          <span>O responsável autoriza o uso de imagem em fotos e vídeos do projeto.</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="barra-acoes barra-acoes--fim" style="margin-top: 18px;">
+    <a class="botao botao--discreto" href="{{ volta }}">Cancelar</a>
+    <button class="botao" type="submit">
+      {{ 'Salvar alterações' if pessoa else 'Cadastrar' }}
+    </button>
+  </div>
+</form>
+
+{% endblock %}

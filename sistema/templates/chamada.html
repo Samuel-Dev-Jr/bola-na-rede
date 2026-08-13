@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Chamada · {{ modalidade.nome_exibicao }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao, 'url': url_for('painel', slug=modalidade.slug)},
+    {'nome': 'Chamada'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Chamada</h1>
+<p class="subtitulo-pagina">
+  {{ modalidade.nome_exibicao }} · {{ modalidade.horario }}.
+  Marque a presença durante {{ "o" if modalidade.artigo_aula == "um" else "a" }}
+  {{ modalidade.termo_aula }}, pelo celular.
+  Reabrir a mesma data carrega o que já foi marcado.
+</p>
+
+<form class="filtros" method="get" action="{{ url_for('chamada', slug=modalidade.slug) }}">
+  <div class="campo">
+    <label for="turma">Turma</label>
+    <select id="turma" name="turma" onchange="this.form.submit()">
+      {% for turma in turmas %}
+        <option value="{{ turma.id }}"
+          {% if turma.id == turma_id %}selected{% endif %}>{{ turma.nome }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="campo">
+    <label for="data">Data d{{ "o" if modalidade.artigo_aula == "um" else "a" }} {{ modalidade.termo_aula }}</label>
+    <input type="date" id="data" name="data" value="{{ data.isoformat() }}"
+           onchange="this.form.submit()">
+  </div>
+
+  <button class="botao botao--discreto" type="submit">Carregar</button>
+</form>
+
+<form method="post" action="{{ url_for('chamada', slug=modalidade.slug) }}">
+  <input type="hidden" name="data" value="{{ data.isoformat() }}">
+  <input type="hidden" name="turma_id" value="{{ turma_id }}">
+
+  <div class="cartao">
+    <h2 class="grupo-formulario__titulo">
+      {{ turma_nome }} · {{ data|dia_semana }}, {{ data|data_br }}
+    </h2>
+
+    {% if matriculas %}
+      {% for m in matriculas %}
+        <div class="linha-chamada">
+          <span class="linha-chamada__nome">
+            {% if m.numero %}
+              <span class="numero-camisa" title="Camisa {{ m.numero }}">{{ m.numero }}</span>
+            {% endif %}
+            <a class="celula-nome" href="{{ url_for('pessoa_detalhe', pessoa_id=m.pessoa_id) }}">{{ m.nome }}</a>
+            {% if m.matricula_status == 'encerrada' %}
+              <span class="selo selo--evadido" style="margin-left:6px">encerrada</span>
+            {% endif %}
+          </span>
+
+          <div class="opcoes-presenca">
+            {% for valor, rotulo in [('presente','Presente'), ('falta','Falta'), ('justificada','Justif.')] %}
+              <input type="radio"
+                     id="matricula_{{ m.matricula_id }}_{{ valor }}"
+                     name="matricula_{{ m.matricula_id }}"
+                     value="{{ valor }}"
+                     {% if m.presenca == valor %}checked{% endif %}>
+              <label for="matricula_{{ m.matricula_id }}_{{ valor }}">{{ rotulo }}</label>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+
+      <div class="rodape-fixo">
+        <span class="celula-secundaria">
+          {{ matriculas|length }} em {{ turma_nome }}.
+          {{ matriculas|selectattr('presenca')|list|length }} já marcados.
+        </span>
+        <button class="botao" type="submit">Salvar chamada</button>
+      </div>
+    {% else %}
+      <div class="vazio">
+        <strong>Nenhuma matrícula nesta turma.</strong>
+        Cadastre alunos em {{ turma_nome }} para fazer a chamada.
+      </div>
+    {% endif %}
+  </div>
+</form>
+
+{% if datas_recentes %}
+  <section class="secao">
+    <h2 class="secao__titulo">{{ modalidade.termo_aula_pl|capitalize }} recentes</h2>
+    <div class="barra-acoes">
+      {% for dia in datas_recentes[:12] %}
+        <a class="botao botao--discreto botao--pequeno"
+           href="{{ url_for('chamada', slug=modalidade.slug, turma=turma_id, data=dia.isoformat()) }}">
+          {{ dia.strftime('%d/%m') }}
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block titulo %}Bola na Rede{% endblock %}</title>
+
+  {# Isso aqui é o que faz o navegador oferecer "instalar" e abrir sem a
+     barra de endereço, igual a um app baixado da loja. #}
+  <link rel="manifest" href="{{ url_for('manifest') }}">
+  <meta name="theme-color" content="{{ modalidade.cor if modalidade else '#0f7a3d' }}">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Bola na Rede">
+  <meta name="description" content="Gestão das atividades do Centro de Cultura e Esporte do Jardim Elizabete.">
+
+  <link rel="icon" href="{{ url_for('static', filename='icone.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icone-180.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+
+  {# Cada modalidade tem a sua cor. Em vez de escrever oito folhas de estilo,
+     troco só esta variável e o resto do CSS se vira. #}
+  {% if modalidade %}
+    <style>:root { --modalidade: {{ modalidade.cor }}; }</style>
+  {% endif %}
+</head>
+<body class="{% if modalidade %}com-modalidade{% endif %}">
+
+{% set rota = request.endpoint %}
+
+<header class="topo">
+  <div class="topo__interno">
+    <a class="marca" href="{{ url_for('centro') }}">
+      <img class="marca__escudo" src="{{ url_for('static', filename='icone.svg') }}" alt="">
+      <span>
+        Bola na Rede
+        <span class="marca__local">
+          {{ modalidade.nome_exibicao if modalidade else 'Centro de Cultura e Esporte' }}
+        </span>
+      </span>
+    </a>
+
+    <nav class="nav-topo">
+      {# Sem usuário logado (tela de entrar) não há menu nenhum: não faz sentido
+         oferecer destino pra quem não pode abrir nenhum. #}
+      {% if usuario and not e_admin %}
+        <a href="{{ url_for('minha_area') }}"
+           {% if rota == 'minha_area' %}aria-current="page"{% endif %}>Minha área</a>
+      {% elif usuario and modalidade %}
+        <a href="{{ url_for('centro') }}" class="nav-topo__voltar">← Centro</a>
+        <a href="{{ url_for('painel', slug=modalidade.slug) }}"
+           {% if rota == 'painel' %}aria-current="page"{% endif %}>Painel</a>
+        <a href="{{ url_for('alunos', slug=modalidade.slug) }}"
+           {% if rota in ('alunos', 'matricular') %}aria-current="page"{% endif %}>Alunos</a>
+        <a href="{{ url_for('chamada', slug=modalidade.slug) }}"
+           {% if rota == 'chamada' %}aria-current="page"{% endif %}>Chamada</a>
+        <a href="{{ url_for('agenda', slug=modalidade.slug) }}"
+           {% if rota == 'agenda' %}aria-current="page"{% endif %}>Agenda</a>
+        {% if modalidade.tem_convocacao %}
+          <a href="{{ url_for('convocacoes', slug=modalidade.slug) }}"
+             {% if rota and rota.startswith('convoca') %}aria-current="page"{% endif %}>Convocação</a>
+        {% endif %}
+      {% elif usuario %}
+        <a href="{{ url_for('centro') }}"
+           {% if rota == 'centro' %}aria-current="page"{% endif %}>Modalidades</a>
+        <a href="{{ url_for('pessoas') }}"
+           {% if rota and rota.startswith('pessoa') %}aria-current="page"{% endif %}>Pessoas</a>
+        <a href="{{ url_for('configuracoes') }}"
+           {% if rota == 'configuracoes' %}aria-current="page"{% endif %}>Configurações</a>
+      {% endif %}
+
+      {% if usuario %}
+        {# Sair é POST e não link: com GET, qualquer imagem ou link de fora
+           apontando pra /sair derrubaria a sessão de quem abrisse a página. #}
+        <form method="post" action="{{ url_for('logout') }}" class="forma-sair">
+          <button type="submit" class="nav-topo__sair"
+                  title="Sair da conta {{ usuario.login }}">Sair</button>
+        </form>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+<main class="pagina {% if not modalidade %}pagina--sem-nav{% endif %}">
+
+  {# Trilha de navegação. Mostra onde você está e deixa voltar pra qualquer
+     nível anterior com um toque, sem depender do botão do navegador — que no
+     app instalado nem existe, porque ele abre sem a barra de endereço. #}
+  {% block trilha %}{% endblock %}
+
+  {% with mensagens = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensagens %}
+      <div class="aviso aviso--{{ 'erro' if categoria == 'erro' else 'sucesso' }}">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  {% block conteudo %}{% endblock %}
+</main>
+
+<footer class="rodape">
+  Projeto Social Bola na Rede · Centro de Cultura e Esporte<br>
+  R. Manoel Maria Fernandes, 580, Jardim Elizabete, Taboão da Serra/SP
+</footer>
+
+{# A barra de baixo só aparece dentro de uma modalidade. Na tela do Centro a
+   página inteira já é o menu. #}
+{% if modalidade %}
+  <nav class="nav-baixo">
+    <a href="{{ url_for('centro') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/>
+      </svg>
+      Centro
+    </a>
+    <a href="{{ url_for('painel', slug=modalidade.slug) }}"
+       {% if rota == 'painel' %}aria-current="page"{% endif %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>
+      </svg>
+      Painel
+    </a>
+    <a href="{{ url_for('alunos', slug=modalidade.slug) }}"
+       {% if rota in ('alunos', 'matricular') %}aria-current="page"{% endif %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/>
+        <path d="M16.5 5.4a3.2 3.2 0 0 1 0 5.9"/><path d="M18 14.8c2 .7 3.5 2.5 3.5 5.2"/>
+      </svg>
+      Alunos
+    </a>
+    <a href="{{ url_for('chamada', slug=modalidade.slug) }}"
+       {% if rota == 'chamada' %}aria-current="page"{% endif %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 5h16v16H4z"/><path d="M4 9h16"/><path d="M8 3v3"/><path d="M16 3v3"/>
+        <path d="M8.5 14.5l2 2 4-4.5"/>
+      </svg>
+      Chamada
+    </a>
+    <a href="{{ url_for('agenda', slug=modalidade.slug) }}"
+       {% if rota == 'agenda' %}aria-current="page"{% endif %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M3.5 10h17"/>
+        <path d="M8 3v4"/><path d="M16 3v4"/>
+      </svg>
+      Agenda
+    </a>
+  </nav>
+{% endif %}
+
+<script>
+  // Registra o service worker, que é o que deixa o app abrir sem internet.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('{{ url_for("serviceworker") }}');
+    });
+  }
+</script>
+
+</body>
+</html>

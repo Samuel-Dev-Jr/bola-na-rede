@@ -1,0 +1,10 @@
+Flask==3.1.2
+
+# Só para a hospedagem. O servidor embutido do Flask avisa em toda inicialização
+# que não é pra produção, e ele fala sério: aguenta uma requisição por vez com
+# folga e nenhuma sob carga.
+#
+# O marcador de plataforma existe porque o gunicorn não roda no Windows (ele usa
+# fcntl, que é do Unix). No Windows o pip pula esta linha; no Linux do Render ele
+# instala. Assim o mesmo arquivo serve pra desenvolver aqui e pra subir lá.
+gunicorn==23.0.0; sys_platform != "win32"

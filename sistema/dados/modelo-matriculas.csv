@@ -1,0 +1,3 @@
+nome,data_nascimento,responsavel_nome,responsavel_parentesco,responsavel_telefone,emergencia_nome,emergencia_telefone,alergias,condicoes,medicacao_continua,plano_saude,observacoes_medicas,autoriza_imagem,modalidade_slug,turma,data_matricula,numero,status
+APAGUE ESTA LINHA - exemplo 1,2013-04-15,APAGUE - nome do responsavel,Mãe,(11) 90000-0000,,,,,,,,0,futebol-masculino,Sub-13,2026-07-01,10,ativa
+APAGUE ESTA LINHA - exemplo 2 mesma pessoa outra atividade,2013-04-15,APAGUE - nome do responsavel,Mãe,(11) 90000-0000,,,,,,,,0,basquete-masculino,Sub-14,2026-07-08,7,ativa

@@ -1,0 +1,13 @@
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- Karateca em posição de chute frontal. Tentei antes desenhar a faixa
+       amarrada e não funcionou: no tamanho do ícone a tira com o nó no meio
+       ficava parecendo um martelo. A silhueta do golpe é inconfundível. -->
+  <circle cx="9.8" cy="4.4" r="2.4" fill="currentColor" stroke="none"/>
+  <path d="M9.8 7.9v5.3"/>
+  <path d="M9.8 9.6l4.9 1.5"/>
+  <path d="M9.8 10.6l-3.9 2.2"/>
+  <path d="M9.8 13.2L6.4 20.4"/>
+  <path d="M9.8 13.6l8 2.8"/>
+  <path d="M17.8 16.4l2.4-1.4"/>
+</svg>

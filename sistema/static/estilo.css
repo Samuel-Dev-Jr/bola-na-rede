@@ -1,0 +1,1491 @@
+/*
+   Estilo do Bola na Rede.
+   Projeto de Extensão Curricularizada UniFECAF / ADS
+
+   Refiz tudo pensando em celular primeiro. A primeira versão eu tinha feito
+   com cara de painel de computador, com tudo em letra maiúscula e tabela
+   grande, e no celular do técnico ficava horrível. Agora é o contrário: penso
+   na tela pequena e no desktop só deixo mais largo.
+
+   O verde é a cor da marca e também do status "tudo certo". Isso não confunde
+   porque os selos têm o texto escrito dentro, então quem não enxerga bem cor
+   consegue ler mesmo assim.
+*/
+
+:root {
+  --verde:          #0f7a3d;
+  --verde-escuro:   #0a5c2e;
+  --verde-fundo:    #e6f4ec;
+
+  /* Esses tons eu escurecei depois de medir o contraste de verdade com o
+     navegador. Os valores antigos (#b4690e no âmbar, #6b7280 no cinza e
+     #8b9199 no texto apagado) ficavam entre 3 e 4,2 contra o fundo, abaixo
+     do mínimo de 4,5 que o WCAG pede pra texto normal. Já estavam errados
+     antes do vidro; o vidro só me fez medir. */
+  --ambar:          #8a5000;
+  --ambar-fundo:    #fdf0dc;
+
+  --vermelho:       #b02c24;
+  --vermelho-fundo: #fce9e7;
+
+  --cinza:          #545b66;
+  --cinza-fundo:    #eef0ee;
+
+  --fundo:          #f5f6f4;
+  --cartao:         #ffffff;
+  --borda:          #e3e6e1;
+
+  --texto:          #14171a;
+  --texto-fraco:    #545b64;
+  --texto-apagado:  #676e78;
+
+  --fonte: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  /* Guardei a fonte estreita só pros números grandes, que ficam com cara de
+     placar de jogo. No resto ela pesava demais. */
+  --fonte-placar: "Arial Narrow", "Segoe UI", system-ui, sans-serif;
+
+  --raio: 16px;
+  --raio-pequeno: 12px;
+
+  --sombra: 0 1px 2px rgba(20, 23, 26, .05), 0 2px 10px rgba(20, 23, 26, .04);
+
+  /* Camada de vidro.
+     Testei com transparência mais alta (0.35) e ficou bonito na foto mas
+     ilegível no sol, que é onde o técnico usa. Parei em 0.66: ainda dá pra
+     ver a cor do fundo atravessando, e o texto continua com contraste bom. */
+  --vidro:        rgba(255, 255, 255, .66);
+  --vidro-forte:  rgba(255, 255, 255, .82);
+  --vidro-borda:  rgba(255, 255, 255, .9);
+  --vidro-desfoque: saturate(1.5) blur(18px);
+  --vidro-sombra: 0 1px 1px rgba(20, 23, 26, .04),
+                  0 10px 28px -12px rgba(20, 23, 26, .22);
+
+  /* Altura da barra de navegação de baixo, pra eu descontar do fim da página
+     e o conteúdo não ficar escondido atrás dela. */
+  --altura-nav: 62px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Manchas de cor no fundo da página.
+   Sem isso o efeito de vidro não aparece: vidro só faz sentido quando tem
+   alguma coisa atrás pra desfocar. São bem fracas de propósito, só o
+   suficiente pra dar profundidade sem competir com o conteúdo. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -15%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(32% 26% at 12% 2%,  rgba(15, 122, 61, .30), transparent 72%),
+    radial-gradient(30% 24% at 88% 10%, rgba(29, 95, 191, .26), transparent 72%),
+    radial-gradient(28% 22% at 6% 78%,  rgba(109, 40, 217, .16), transparent 72%);
+  filter: blur(38px);
+}
+
+/* Dentro de uma modalidade, o fundo assume a cor dela. */
+body.com-modalidade::before {
+  background:
+    radial-gradient(36% 30% at 10% 0%,
+      color-mix(in srgb, var(--modalidade) 34%, transparent), transparent 72%),
+    radial-gradient(30% 26% at 92% 14%,
+      color-mix(in srgb, var(--modalidade) 22%, transparent), transparent 72%),
+    radial-gradient(38% 30% at 78% 92%,
+      color-mix(in srgb, var(--modalidade) 18%, transparent), transparent 72%);
+}
+
+a { color: var(--verde); }
+
+:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Barra de cima */
+
+.topo {
+  background: var(--vidro-forte);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border-bottom: 1px solid var(--vidro-borda);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.topo__interno {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 58px;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  color: var(--texto);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -.01em;
+  padding: 10px 0;
+}
+
+.marca__escudo {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 8px;
+}
+
+.marca__local {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--texto-apagado);
+}
+
+/* Navegação de cima, só no computador */
+.nav-topo {
+  display: none;
+  margin-left: auto;
+  gap: 4px;
+}
+
+.nav-topo a {
+  text-decoration: none;
+  color: var(--texto-fraco);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 9px 14px;
+  border-radius: var(--raio-pequeno);
+}
+
+.nav-topo a:hover { background: var(--fundo); color: var(--texto); }
+
+.nav-topo a[aria-current="page"] {
+  background: var(--verde-fundo);
+  color: var(--verde-escuro);
+  font-weight: 600;
+}
+
+/* Navegação de baixo, só no celular */
+
+.nav-baixo {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  background: var(--vidro-forte);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border-top: 1px solid var(--vidro-borda);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-baixo a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: var(--altura-nav);
+  text-decoration: none;
+  color: var(--texto-fraco);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 2px;
+}
+
+.nav-baixo a[aria-current="page"] {
+  color: var(--verde);
+  font-weight: 600;
+}
+
+.nav-baixo svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+/* Estrutura da página */
+
+.pagina {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px 16px calc(var(--altura-nav) + 28px);
+}
+
+.titulo-pagina {
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin: 0 0 4px;
+}
+
+.subtitulo-pagina {
+  color: var(--texto-fraco);
+  margin: 0 0 20px;
+  font-size: 15px;
+  max-width: 62ch;
+}
+
+.etiqueta {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--texto-apagado);
+}
+
+.cartao {
+  background: var(--vidro);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  border-radius: var(--raio);
+  box-shadow: var(--vidro-sombra);
+}
+
+.secao { margin-top: 28px; }
+
+.secao__titulo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  margin: 0 0 12px;
+}
+
+/* Cartão do elenco, que é a primeira coisa do painel.
+   Eu tinha começado esse cartão com a frase "X crianças sumiram sem ninguém
+   notar". Estava tecnicamente certo mas soava como acusação ao coordenador,
+   que é justamente quem vai abrir a tela todo dia. Virei a ordem: primeiro
+   quantas crianças estão em campo, e as que faltam viram uma tarefa de
+   "trazer de volta", não uma denúncia.
+
+   As listras de fundo são bem fracas de propósito, pra lembrar grama cortada
+   sem virar enfeite que atrapalha a leitura do número. */
+
+.elenco {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--raio);
+  padding: 22px;
+  color: #fff;
+  /* Puxa a cor da modalidade quando tem uma; na tela do Centro cai no verde. */
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, .035) 0 30px,
+      transparent 30px 60px),
+    linear-gradient(150deg,
+      color-mix(in srgb, var(--modalidade, #0f7a3d) 85%, white) 0%,
+      var(--modalidade, #0f7a3d) 45%,
+      color-mix(in srgb, var(--modalidade, #0f7a3d) 70%, black) 100%);
+  box-shadow: 0 2px 14px rgba(20, 23, 26, .18);
+}
+
+.elenco__etiqueta {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .72);
+}
+
+.elenco__bloco {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 10px 0 0;
+  flex-wrap: wrap;
+}
+
+.elenco__numero {
+  font-family: var(--fonte-placar);
+  font-size: 66px;
+  font-weight: 700;
+  line-height: .9;
+  letter-spacing: -.015em;
+  font-variant-numeric: tabular-nums;
+}
+
+.elenco__unidade {
+  font-size: 17px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, .95);
+}
+
+.elenco__apoio {
+  margin: 8px 0 0;
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, .82);
+}
+
+/* Bloco de baixo, separado por um fio branco. É a parte acionável. */
+.elenco__acao {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, .22);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.elenco__acao strong {
+  display: block;
+  font-size: 16.5px;
+  font-weight: 700;
+}
+
+.elenco__acao p {
+  margin: 3px 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, .78);
+  max-width: 42ch;
+}
+
+/* O botão claro que vai dentro deste cartão está definido lá embaixo, junto
+   com os outros botões. Tentei defini-lo aqui e não funcionou: como a regra
+   do .botao vem depois no arquivo, ela sobrescrevia a cor de fundo. */
+
+/* Calendário da agenda.
+   Fiz com grid de 7 colunas, uma por dia da semana. O que interessa de
+   verdade é o dia com aula que já passou e não teve chamada lançada: fica
+   com contorno vermelho, porque é ali que o registro de frequência furou. */
+
+.calendario-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.calendario-topo__mes { font-size: 17px; font-weight: 700; }
+
+.calendario {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.calendario__cabecalho {
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--texto-fraco);
+  padding-bottom: 4px;
+}
+
+.calendario__dia {
+  position: relative;
+  aspect-ratio: 1;
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  color: var(--texto-fraco);
+  text-decoration: none;
+}
+
+.calendario__dia--fora { visibility: hidden; }
+
+.calendario__numero { font-size: 14px; font-weight: 600; line-height: 1; }
+
+.calendario__marca {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dia com aula: fundo na cor da modalidade. */
+.calendario__dia--aula {
+  background: color-mix(in srgb, var(--modalidade, var(--verde)) 12%, transparent);
+  border-color: color-mix(in srgb, var(--modalidade, var(--verde)) 30%, transparent);
+  color: var(--modalidade, var(--verde));
+}
+
+.calendario__dia--aula:hover {
+  background: color-mix(in srgb, var(--modalidade, var(--verde)) 22%, transparent);
+}
+
+.calendario__marca--futuro { color: var(--texto-fraco); }
+
+/* Aula que já passou e ficou sem chamada. */
+.calendario__dia--pendente {
+  background: var(--vermelho-fundo);
+  border-color: var(--vermelho);
+  color: var(--vermelho);
+}
+
+.calendario__marca--pendente { color: var(--vermelho); }
+
+.calendario__dia--hoje { outline: 2px solid var(--texto); outline-offset: 1px; }
+
+/* Pontinho no canto marcando que tem jogo nesse dia. */
+.calendario__evento {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ambar);
+}
+
+.calendario__legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--borda);
+  font-size: 12.5px;
+  color: var(--texto-fraco);
+}
+
+.calendario__legenda span { display: inline-flex; align-items: center; gap: 6px; }
+
+.amostra { width: 14px; height: 14px; border-radius: 5px; flex: none; }
+
+.amostra--aula {
+  background: color-mix(in srgb, var(--modalidade, var(--verde)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--modalidade, var(--verde)) 30%, transparent);
+}
+
+.amostra--pendente { background: var(--vermelho-fundo); border: 1px solid var(--vermelho); }
+.amostra--evento { background: var(--ambar); width: 8px; height: 8px; border-radius: 999px; }
+
+.destaque-pendencia {
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-left: 4px solid var(--vermelho);
+  border-radius: var(--raio);
+  padding: 18px;
+  box-shadow: var(--sombra);
+}
+
+.destaque-pendencia strong { display: block; font-size: 16.5px; color: var(--vermelho); }
+.destaque-pendencia p { margin: 6px 0 0; color: var(--texto-fraco); font-size: 14.5px; }
+
+/* Botão de voltar pro Centro, no menu de cima. Fica separado dos outros por
+   uma linha, porque ele sai da modalidade em vez de navegar dentro dela. */
+.nav-topo__voltar {
+  padding-right: 16px !important;
+  margin-right: 6px;
+  border-right: 1px solid var(--borda);
+  border-radius: 0 !important;
+}
+
+.nav-topo__voltar:hover { background: transparent !important; color: var(--verde) !important; }
+
+/* Sair. É um form e não um link porque logout tem que ser POST — com GET, uma
+   imagem ou link de fora apontando pra /sair derrubaria a sessão de quem
+   abrisse a página. O botão é estilizado pra parecer com os outros itens do
+   menu, já que visualmente ele é um deles. */
+.forma-sair { display: contents; }
+
+.nav-topo__sair {
+  font-family: var(--fonte);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--texto-fraco);
+  background: transparent;
+  border: none;
+  padding: 9px 14px;
+  border-radius: var(--raio-pequeno);
+  cursor: pointer;
+  margin-left: 6px;
+  border-left: 1px solid var(--borda);
+}
+
+.nav-topo__sair:hover { background: var(--fundo); color: var(--texto); }
+
+/* Selo de gênero no cartão da modalidade.
+   O fundo é branco misturado com a cor, e não a cor com transparência: em
+   cima do vidro o transparente deixava o selo em 3.92:1, abaixo do mínimo.
+   O texto também escureci pra garantir contraste em todas as cinco cores. */
+.modalidade__genero {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--modalidade) 12%, white);
+  color: color-mix(in srgb, var(--modalidade) 72%, black);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Cartões das modalidades, na tela do Centro.
+   Cada um puxa a cor da própria modalidade pela variável --modalidade, que o
+   template define inline. Assim eu não preciso de uma classe por esporte. */
+
+.modalidades {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.modalidade {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--vidro);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  border-radius: var(--raio);
+  padding: 22px 18px 18px;
+  box-shadow: var(--vidro-sombra);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+/* Eu tinha posto um brilho radial na cor do esporte atravessando o cartão.
+   Dava profundidade, mas sujava: cada cartão ficava com uma mancha diferente
+   e a leitura dos números piorava. Tirei. O cartão agora é vidro limpo, e
+   quem dá a cor é a faixa do topo e a pastilha do ícone. */
+
+.modalidade:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 1px 1px rgba(20, 23, 26, .04),
+              0 16px 34px -14px color-mix(in srgb, var(--modalidade) 55%, transparent);
+}
+
+/* A faixa do topo é o que separa masculino de feminino.
+   Usei padrão em vez de cor: a cor continua sendo a do esporte, porque é ela
+   que identifica futebol, vôlei ou basquete. Se eu pintasse o feminino de
+   rosa, a cor deixaria de significar o esporte, e ainda seria clichê.
+   Masculino é faixa lisa, feminino é faixa listrada, como camisa de time. */
+.modalidade__faixa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--modalidade);
+}
+
+.modalidade--feminino .modalidade__faixa {
+  background: repeating-linear-gradient(
+    115deg,
+    var(--modalidade) 0 9px,
+    color-mix(in srgb, var(--modalidade) 38%, white) 9px 18px
+  );
+}
+
+.modalidade__topo { position: relative; display: flex; align-items: flex-start; gap: 13px; }
+
+/* Pastilha sólida na cor do esporte, com o ícone em branco por cima.
+   Antes era o contrário (ícone colorido sobre fundo clarinho) e sumia no
+   cartão de vidro. Sólido dá o contraste e ainda deixa mais cara de app
+   esportivo. */
+.modalidade__icone {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--modalidade);
+  color: #fff;
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--modalidade) 65%, transparent);
+}
+
+.modalidade__icone svg { width: 26px; height: 26px; }
+
+.modalidade__nome {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.modalidade__descricao { margin: 2px 0 0; font-size: 14px; color: var(--texto-fraco); }
+
+/* Estava em --texto-apagado e o contraste caiu pra 3.09:1 depois que o
+   cartão virou vidro, porque o fundo clareou. Subi pro tom mais escuro. */
+.modalidade__horario {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  color: var(--texto-fraco);
+}
+
+.modalidade__numeros {
+  display: flex;
+  gap: 22px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda);
+  flex-wrap: wrap;
+}
+
+.modalidade__valor {
+  display: block;
+  font-family: var(--fonte-placar);
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.modalidade__valor--alerta { color: var(--ambar); }
+
+.modalidade__rotulo { display: block; font-size: 12.5px; color: var(--texto-fraco); margin-top: 3px; }
+
+.modalidade__alerta {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--vermelho);
+}
+
+/* Cartões de número */
+
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.indicador {
+  background: var(--vidro);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  border-radius: var(--raio);
+  padding: 14px 16px;
+  box-shadow: var(--vidro-sombra);
+}
+
+.indicador__valor {
+  font-family: var(--fonte-placar);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+}
+
+.indicador__rotulo {
+  display: block;
+  font-size: 13px;
+  color: var(--texto-fraco);
+  margin-top: 2px;
+}
+
+.indicador--regular .indicador__valor { color: var(--verde); }
+.indicador--atencao .indicador__valor { color: var(--ambar); }
+.indicador--risco   .indicador__valor { color: var(--vermelho); }
+.indicador--evadido .indicador__valor { color: var(--cinza); }
+
+/* A tirinha de quadradinhos. São os 12 últimos treinos na ordem em que
+   aconteceram, igual aos tiques que a coordenação fazia no caderno.
+   Cheio = presente, vazio = falta, riscado = justificada. */
+
+.marcas {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.marca-treino {
+  width: 10px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1.5px solid var(--borda);
+  background: transparent;
+  flex: none;
+}
+
+.marca-treino--presente { background: var(--verde); border-color: var(--verde); }
+
+.marca-treino--falta { background: var(--cartao); border-color: var(--vermelho); }
+
+.marca-treino--justificada {
+  border-color: var(--ambar);
+  background: repeating-linear-gradient(-45deg, transparent 0 2px, var(--ambar) 2px 3.5px);
+}
+
+/* Teve treino e o atleta nem foi anotado. Deixei como um pontinho de
+   propósito: tem que dar pra ver que ali não tem nada, e não confundir com
+   falta, que é o quadradinho de contorno vermelho. */
+.marca-treino--sem_registro {
+  border-color: transparent;
+  background: radial-gradient(circle at center, #c9cdc7 0 1.6px, transparent 1.7px);
+}
+
+.marcas__legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+  color: var(--texto-fraco);
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.marcas__legenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Selos de status */
+
+.selo {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.selo--regular { background: var(--verde-fundo);    color: var(--verde-escuro); }
+.selo--atencao { background: var(--ambar-fundo);    color: var(--ambar); }
+.selo--risco   { background: var(--vermelho-fundo); color: var(--vermelho); }
+.selo--evadido { background: var(--cinza-fundo);    color: var(--cinza); }
+.selo--info    { background: var(--verde-fundo);    color: var(--verde-escuro); }
+
+/* Número da camisa */
+
+.numero-camisa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Largura mínima fixa pra 7 e 77 ocuparem o mesmo espaço. Sem isso a coluna
+     de nomes fica serrilhada, porque cada número empurra o nome pra um lugar
+     diferente. tabular-nums faz o mesmo dentro do número de dois dígitos. */
+  min-width: 30px;
+  padding: 3px 6px;
+  border-radius: var(--raio-pequeno);
+  background: var(--cinza-fundo);
+  color: var(--texto);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+/* Na chamada o número fica antes do nome e não pode encolher, senão em tela
+   estreita ele vira uma tarja fina e ilegível. */
+.linha-chamada .numero-camisa { margin-right: 8px; }
+
+/* Barras dos gráficos */
+
+.barras { display: grid; gap: 10px; }
+
+.barra {
+  display: grid;
+  grid-template-columns: 58px 1fr 44px;
+  align-items: center;
+  gap: 10px;
+}
+
+.barra__rotulo { font-size: 13px; color: var(--texto-fraco); text-align: right; }
+
+.barra__trilho {
+  background: var(--fundo);
+  height: 22px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.barra__preenchimento {
+  height: 100%;
+  background: var(--modalidade, var(--verde));
+  border-radius: 999px;
+}
+
+.barra__valor {
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tabelas.
+   No celular elas viram cartões empilhados, com o nome da coluna do lado
+   esquerdo de cada linha. É o data-rotulo que faz isso. */
+
+.tabela-envolucro { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; }
+
+thead th {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--texto-fraco);
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--borda);
+  white-space: nowrap;
+}
+
+tbody td { padding: 13px 16px; border-bottom: 1px solid var(--borda); vertical-align: middle; }
+
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr:hover { background: rgba(255, 255, 255, .5); }
+
+.celula-nome { font-weight: 600; color: var(--texto); text-decoration: none; }
+.celula-nome:hover { color: var(--verde); }
+
+.celula-dado { font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.celula-secundaria { color: var(--texto-fraco); font-size: 14px; }
+
+/* Botões */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--verde);
+  background: var(--verde);
+  color: #fff;
+  font-family: var(--fonte);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao:hover { background: var(--verde-escuro); border-color: var(--verde-escuro); }
+
+.botao--secundario { background: var(--cartao); color: var(--verde); }
+.botao--secundario:hover { background: var(--verde-fundo); }
+
+.botao--discreto {
+  background: var(--cartao);
+  color: var(--texto-fraco);
+  border-color: var(--borda);
+}
+.botao--discreto:hover { background: var(--fundo); color: var(--texto); }
+
+.botao--pequeno { min-height: 40px; padding: 8px 14px; font-size: 14px; }
+
+/* Botão que ocupa a largura do que o contém. Uso no login: com o formulário
+   estreito, um botão de 90px encostado num canto fica parecendo secundário
+   quando ele é a única ação da tela. */
+.botao--largo { width: 100%; }
+
+/* Coluna estreita da tela de entrar. O formulário tinha a largura da página
+   inteira — 1100px de campo de login, que faz a tela ler como página em vez de
+   como entrada. */
+.entrada {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Botão branco, usado só dentro do cartão verde do elenco: o botão verde
+   padrão sumiria no fundo verde. */
+.botao--claro {
+  background: #fff;
+  border-color: #fff;
+  color: var(--verde-escuro);
+}
+
+.botao--claro:hover {
+  background: rgba(255, 255, 255, .88);
+  border-color: rgba(255, 255, 255, .88);
+}
+
+.barra-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.barra-acoes--fim { justify-content: flex-end; }
+
+/* Formulários */
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  padding: 14px;
+  background: var(--vidro);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  border-radius: var(--raio);
+  box-shadow: var(--vidro-sombra);
+}
+
+.campo { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.campo--largo { flex: 1 1 220px; }
+
+.campo > label { font-size: 13px; font-weight: 600; color: var(--texto-fraco); }
+
+/* Texto de apoio embaixo do campo. Uso --texto-fraco e não --texto-apagado
+   porque o apagado já reprovou no teste de contraste uma vez. */
+.campo__ajuda { font-size: 13px; color: var(--texto-fraco); }
+
+/* Seletor de arquivo. Não tento estilizar o botão interno, que é diferente em
+   cada navegador: só igualo o tamanho de toque aos outros campos e travo a
+   largura, porque input de arquivo estoura a viewport no celular com facilidade
+   e o teste de layout pega isso. */
+input[type="file"] {
+  font-family: var(--fonte);
+  font-size: 15px;
+  color: var(--texto);
+  background: var(--cartao);
+  border: 1px dashed var(--borda);
+  border-radius: var(--raio-pequeno);
+  padding: 14px 13px;
+  min-height: 48px;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Lista de avisos e erros do importador. Pode ter dezenas de linhas, então rola
+   dentro do cartão em vez de esticar a página até o infinito. */
+.lista-mensagens {
+  margin: 0;
+  padding-left: 20px;
+  max-height: 320px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.lista-mensagens li + li { margin-top: 2px; }
+
+/* Esta lista já me deu trabalho duas vezes: esqueci o `number` quando fiz o
+   número da camisa, e o `password` quando fiz o login — nos dois casos o campo
+   saiu sem borda e sem altura, com a cara padrão do navegador, diferente dos
+   vizinhos. Se aparecer um tipo novo, ele entra aqui. */
+input[type="text"], input[type="date"], input[type="tel"],
+input[type="number"], input[type="password"], select, textarea {
+  font-family: var(--fonte);
+  font-size: 16px;
+  color: var(--texto);
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  padding: 12px 13px;
+  min-height: 48px;
+  width: 100%;
+  min-width: 0;
+}
+
+textarea { resize: vertical; min-height: 84px; }
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--verde);
+  outline: 3px solid var(--verde-fundo);
+}
+
+.grade-formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.grade-formulario .campo--todo { grid-column: 1 / -1; }
+
+.grupo-formulario + .grupo-formulario { margin-top: 16px; }
+
+.grupo-formulario__titulo {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 16px 18px;
+  margin: 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.caixa-marcacao {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.caixa-marcacao input { width: 22px; height: 22px; margin-top: 1px; flex: none; accent-color: var(--verde); }
+
+/* Ficha de emergência */
+
+.ficha-emergencia {
+  background: var(--vermelho-fundo);
+  border: 1px solid #f0cdc9;
+  border-radius: var(--raio);
+  padding: 18px;
+}
+
+.ficha-emergencia__titulo {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--vermelho);
+  margin: 0 0 14px;
+}
+
+.telefone-grande {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--texto);
+  text-decoration: none;
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+}
+
+.telefone-grande:hover { text-decoration: underline; }
+
+.lista-dados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+  padding: 18px;
+}
+
+.lista-dados div { min-width: 0; }
+
+.lista-dados dt { font-size: 12.5px; font-weight: 600; color: var(--texto-fraco); }
+.lista-dados dd { margin: 3px 0 0; overflow-wrap: anywhere; }
+
+/* Chamada */
+
+.linha-chamada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.linha-chamada:last-of-type { border-bottom: none; }
+
+.linha-chamada__nome { flex: 1 1 180px; font-weight: 600; }
+
+.opcoes-presenca { display: flex; gap: 6px; flex: none; }
+
+.opcoes-presenca input { position: absolute; opacity: 0; pointer-events: none; }
+
+.opcoes-presenca label {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 15px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  cursor: pointer;
+  color: var(--texto-fraco);
+  background: var(--cartao);
+  user-select: none;
+  min-width: 54px;
+}
+
+.opcoes-presenca input:focus-visible + label { outline: 2px solid var(--verde); outline-offset: 2px; }
+
+.opcoes-presenca input[value="presente"]:checked + label {
+  background: var(--verde); border-color: var(--verde); color: #fff;
+}
+.opcoes-presenca input[value="falta"]:checked + label {
+  background: var(--vermelho); border-color: var(--vermelho); color: #fff;
+}
+.opcoes-presenca input[value="justificada"]:checked + label {
+  background: var(--ambar); border-color: var(--ambar); color: #fff;
+}
+
+/* Barra que fica grudada embaixo com o botão de salvar. Some acima da
+   navegação de baixo pra os dois não se encavalarem. */
+.rodape-fixo {
+  position: sticky;
+  bottom: calc(var(--altura-nav) + 8px);
+  margin: 12px;
+  background: var(--vidro-forte);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  border-radius: var(--raio-pequeno);
+  padding: 12px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 18px rgba(20, 23, 26, .12);
+}
+
+/* Convocação */
+
+.mensagem-pronta {
+  font-family: Consolas, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 16px;
+  max-height: 400px;
+  overflow: auto;
+  margin: 0;
+}
+
+.duas-colunas { display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start; }
+
+/* Avisos e vazio */
+
+.aviso {
+  border-radius: var(--raio-pequeno);
+  padding: 13px 16px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  border: 1px solid;
+}
+
+.aviso--sucesso { background: var(--verde-fundo);    border-color: #bfe0cd; color: var(--verde-escuro); }
+.aviso--erro    { background: var(--vermelho-fundo); border-color: #f0cdc9; color: var(--vermelho); }
+
+.vazio {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--texto-fraco);
+  background: var(--cartao);
+  border: 1px dashed var(--borda);
+  border-radius: var(--raio);
+}
+
+.vazio strong { display: block; color: var(--texto); font-size: 16px; margin-bottom: 4px; }
+
+.rodape {
+  border-top: 1px solid var(--borda);
+  padding: 20px 16px;
+  color: var(--texto-fraco);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Computador */
+
+/* Na tela do Centro não tem barra embaixo, então não preciso do espaço extra. */
+.pagina--sem-nav { padding-bottom: 40px; }
+
+@media (min-width: 700px) {
+  .modalidades { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+}
+
+@media (min-width: 861px) {
+  .nav-topo { display: flex; }
+  .nav-baixo { display: none; }
+  :root { --altura-nav: 0px; }
+  .pagina { padding: 26px 20px 60px; }
+  .titulo-pagina { font-size: 30px; }
+  .destaque { padding: 26px; }
+  .destaque__numero { font-size: 54px; }
+  .duas-colunas { grid-template-columns: 1fr 1fr; }
+  .rodape-fixo { bottom: 12px; }
+}
+
+/* Celular: tabela vira lista de cartões */
+
+@media (max-width: 700px) {
+  .tabela-como-cartao thead { display: none; }
+
+  .tabela-como-cartao,
+  .tabela-como-cartao tbody,
+  .tabela-como-cartao tr,
+  .tabela-como-cartao td { display: block; width: 100%; }
+
+  .tabela-como-cartao tr {
+    border-bottom: 1px solid var(--borda);
+    padding: 14px 16px;
+  }
+
+  .tabela-como-cartao tr:last-child { border-bottom: none; }
+
+  .tabela-como-cartao td {
+    border: none;
+    padding: 3px 0;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tabela-como-cartao td::before {
+    content: attr(data-rotulo);
+    color: var(--texto-apagado);
+    font-size: 13px;
+    flex: none;
+  }
+
+  /* A primeira célula é o nome: fica sozinha em cima, sem rótulo. */
+  .tabela-como-cartao td:first-child { display: block; padding-bottom: 8px; }
+  .tabela-como-cartao td:first-child::before { content: none; }
+  .tabela-como-cartao td:first-child .celula-nome { font-size: 17px; }
+}
+
+@media (max-width: 420px) {
+  .marca__local { display: none; }
+  .opcoes-presenca { width: 100%; }
+  .opcoes-presenca label { flex: 1; }
+  .linha-chamada__nome { flex-basis: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+  .modalidade:hover { transform: none; }
+}
+
+/* Planos B do vidro.
+   1) Navegador sem backdrop-filter (Firefox antigo) mostraria um cartão
+      quase transparente com o texto ilegível por cima das manchas.
+   2) Quem liga "reduzir transparência" no sistema pediu explicitamente pra
+      não ver isso.
+   Nos dois casos eu volto pro fundo branco sólido. Perde o efeito, mas o
+   texto continua legível, que é o que importa. */
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --vidro: #ffffff;
+    --vidro-forte: #ffffff;
+    --vidro-borda: var(--borda);
+  }
+  body::before { display: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --vidro: #ffffff;
+    --vidro-forte: #ffffff;
+    --vidro-borda: var(--borda);
+  }
+  body::before { display: none; }
+}
+
+/* Impressão. O coordenador falou que às vezes precisa levar a lista no papel,
+   porque no campo o celular dele fica sem bateria. */
+@media print {
+  .topo, .nav-baixo, .nav-topo, .barra-acoes, .filtros, .rodape-fixo, .rodape { display: none; }
+  body { background: #fff; font-size: 12px; }
+  body::before { display: none; }
+  /* Vidro não imprime: sai como um borrão cinza. Achato tudo em branco. */
+  .cartao, .indicador, .modalidade, table {
+    background: #fff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border-color: #ccc !important;
+  }
+  .pagina { padding: 0; max-width: none; }
+}
+
+/* Trilha de navegação (breadcrumb).
+   No app instalado não existe barra de endereço nem botão de voltar do
+   navegador, então essa trilha é o único jeito de saber onde se está e subir
+   um nível. */
+
+.trilha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  margin-bottom: 14px;
+}
+
+.trilha a { color: var(--texto-fraco); text-decoration: none; }
+.trilha a:hover { color: var(--verde); text-decoration: underline; }
+.trilha__seta { color: var(--texto-apagado); }
+.trilha__atual { color: var(--texto); font-weight: 600; }
+
+.botao-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 8px 14px 8px 10px;
+  border-radius: var(--raio-pequeno);
+  background: var(--vidro);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  color: var(--texto-fraco);
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.botao-voltar:hover { color: var(--texto); }
+.botao-voltar svg { width: 18px; height: 18px; flex: none; }
+
+/* Lista de pessoas e de matrículas. Virou cartão em vez de tabela porque com
+   poucos alunos a tabela ficava vazia e larga, e no celular era pior ainda. */
+
+.lista-pessoas { display: grid; gap: 10px; }
+
+.pessoa-cartao {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--vidro);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  border-radius: var(--raio);
+  padding: 16px 18px;
+  box-shadow: var(--vidro-sombra);
+}
+
+a.pessoa-cartao:hover { border-color: var(--verde); }
+
+.pessoa-cartao__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.pessoa-cartao__nome {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--texto);
+  text-decoration: none;
+}
+
+a.pessoa-cartao__nome:hover { color: var(--verde); }
+
+.pessoa-cartao__idade { font-size: 13.5px; color: var(--texto-fraco); }
+
+.pessoa-cartao__atividades {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.pessoa-cartao__marcas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pessoa-cartao__responsavel {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  color: var(--texto-fraco);
+}
+
+/* Pastilha com o nome da modalidade, usada pra mostrar em que atividades a
+   pessoa está. Puxa a cor do esporte. */
+.pastilha {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--modalidade) 12%, white);
+  color: color-mix(in srgb, var(--modalidade) 72%, black);
+  border: 1px solid color-mix(in srgb, var(--modalidade) 22%, transparent);
+}
+
+/* Cartões de atividade na ficha da pessoa. */
+
+.atividades { display: grid; gap: 12px; }
+
+.atividade {
+  background: var(--vidro);
+  -webkit-backdrop-filter: var(--vidro-desfoque);
+  backdrop-filter: var(--vidro-desfoque);
+  border: 1px solid var(--vidro-borda);
+  border-left: 4px solid var(--modalidade);
+  border-radius: var(--raio);
+  padding: 16px 18px;
+  box-shadow: var(--vidro-sombra);
+}
+
+.atividade__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.atividade__nome {
+  font-size: 17px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--modalidade) 78%, black);
+  text-decoration: none;
+}
+
+.atividade__nome:hover { text-decoration: underline; }
+
+.atividade__turma { margin: 3px 0 0; font-size: 13.5px; color: var(--texto-fraco); }
+.atividade__marcas { margin-top: 12px; }
+.atividade__leitura { margin: 10px 0 0; font-size: 13.5px; color: var(--texto-fraco); }
+
+.ficha-emergencia__aviso {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  color: var(--vermelho);
+  font-weight: 600;
+}
+
+@media (min-width: 700px) {
+  .lista-pessoas { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+  .atividades { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+}

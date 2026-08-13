@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Bola na Rede">
+  <!-- Bola completa, para o ícone do app instalado (180, 192 e 512px). É deste
+       arquivo que os PNG são gerados.
+
+       A costura de uma bola de futebol NÃO irradia do centro: é um pentágono no
+       meio, hexágonos ao redor dele, e outros pentágonos depois dos hexágonos.
+       Vista de frente, os pentágonos de fora aparecem cortados pela silhueta —
+       e é esse corte que faz o desenho parecer esférico em vez de chapado.
+
+       Por isso os cinco externos ficam nos ângulos das ARESTAS do pentágono
+       central (-54 + k*72), e não dos vértices. Duas tentativas erradas antes
+       desta: raios saindo dos vértices viraram roda de navio, e coordenadas
+       digitadas à mão viraram borrão. Os pontos abaixo são calculados, com
+       R=21 r_centro=7.6 d=15.8 r_fora=7.2.
+
+       A versão para tamanho pequeno (cabeçalho, favicon) está em icone.svg. -->
+  <defs>
+    <clipPath id="silhueta"><circle cx="32" cy="32" r="21"/></clipPath>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="#0f7a3d"/>
+  <circle cx="32" cy="32" r="21" fill="#ffffff"/>
+
+  <g clip-path="url(#silhueta)" fill="#0a5c2e">
+    <polygon points="32.00,24.40 39.23,29.65 36.47,38.15 27.53,38.15 24.77,29.65"/>
+    <polygon points="45.52,13.39 48.13,21.44 41.29,26.42 34.44,21.44 37.05,13.39"/>
+    <polygon points="53.87,39.11 47.03,44.08 40.18,39.11 42.79,31.06 51.26,31.06"/>
+    <polygon points="32.00,55.00 25.15,50.02 27.77,41.98 36.23,41.98 38.85,50.02"/>
+    <polygon points="10.13,39.11 12.74,31.06 21.21,31.06 23.82,39.11 16.97,44.08"/>
+    <polygon points="18.48,13.39 26.95,13.39 29.56,21.44 22.71,26.42 15.87,21.44"/>
+  </g>
+</svg>

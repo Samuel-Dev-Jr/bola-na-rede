@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% import "_marcas.html" as marcas %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Alunos · {{ modalidade.nome_exibicao }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao, 'url': url_for('painel', slug=modalidade.slug)},
+    {'nome': 'Alunos'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Alunos · {{ modalidade.nome_exibicao }}</h1>
+<p class="subtitulo-pagina">
+  {{ matriculas|length }}
+  {{ 'matrícula' if matriculas|length == 1 else 'matrículas' }} nesta modalidade.
+  A ordem segue a urgência de contato, não o alfabeto.
+</p>
+
+<form class="filtros" method="get" action="{{ url_for('alunos', slug=modalidade.slug) }}">
+  <div class="campo campo--largo">
+    <label for="busca">Buscar por nome</label>
+    <input type="text" id="busca" name="busca" value="{{ busca }}"
+           placeholder="Nome do aluno ou do responsável">
+  </div>
+
+  <div class="campo">
+    <label for="turma">Turma</label>
+    <select id="turma" name="turma">
+      <option value="">Todas</option>
+      {% for t in turmas %}
+        <option value="{{ t.id }}" {% if t.id|string == turma_id %}selected{% endif %}>{{ t.nome }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="campo">
+    <label for="nivel">Situação</label>
+    <select id="nivel" name="nivel">
+      <option value="">Todas</option>
+      {% for chave, rotulo in ROTULO_RISCO.items() %}
+        <option value="{{ chave }}" {% if chave == nivel %}selected{% endif %}>{{ rotulo }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button class="botao" type="submit">Filtrar</button>
+  <a class="botao botao--discreto" href="{{ url_for('alunos', slug=modalidade.slug) }}">Limpar</a>
+  <a class="botao botao--secundario"
+     href="{{ url_for('matricular', slug=modalidade.slug) }}">Matricular</a>
+</form>
+
+{% if matriculas %}
+  <div class="lista-pessoas">
+    {% for m in matriculas %}
+      <div class="pessoa-cartao pessoa-cartao--linha">
+        <div class="pessoa-cartao__topo">
+          {% if m.numero %}
+            <span class="numero-camisa" title="Camisa {{ m.numero }}">{{ m.numero }}</span>
+          {% endif %}
+          <a class="pessoa-cartao__nome" href="{{ url_for('pessoa_detalhe', pessoa_id=m.pessoa_id) }}">
+            {{ m.nome }}
+          </a>
+          <span class="selo selo--{{ m.avaliacao.nivel }}">{{ ROTULO_RISCO[m.avaliacao.nivel] }}</span>
+        </div>
+
+        <p class="pessoa-cartao__responsavel">
+          {{ m.turma_nome }} · {{ m.idade }} anos
+          {% if m.matricula_status == 'encerrada' %}
+            · <strong>matrícula encerrada</strong>
+          {% endif %}
+        </p>
+
+        <div class="pessoa-cartao__marcas">
+          {{ marcas.tira(m.marcas) }}
+          <span class="celula-secundaria">{{ m.avaliacao.motivo }}</span>
+        </div>
+
+        {% if m.outras %}
+          {# Saber que a criança também faz outra atividade muda a conversa:
+             às vezes ela não sumiu, só bateu horário com a outra turma. #}
+          <div class="pessoa-cartao__atividades">
+            <span class="celula-secundaria">também faz:</span>
+            {% for a in m.outras %}
+              <span class="pastilha" style="--modalidade: {{ a.cor }}">{{ a.nome_exibicao }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <p class="pessoa-cartao__responsavel">
+          {{ m.responsavel_parentesco }}:
+          <a href="tel:{{ m.responsavel_telefone|replace(' ','')|replace('(','')|replace(')','')|replace('-','') }}">
+            {{ m.responsavel_telefone }}
+          </a>
+          {% if m.condicoes or m.alergias %}
+            <span class="selo selo--atencao" style="margin-left:6px">
+              {{ [m.condicoes, m.alergias]|select|join(' · ') }}
+            </span>
+          {% endif %}
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+  {{ marcas.legenda() }}
+{% else %}
+  <div class="vazio">
+    <strong>Nenhuma matrícula encontrada.</strong>
+    Ajuste a busca ou os filtros para ver outros resultados.
+  </div>
+{% endif %}
+
+{% endblock %}

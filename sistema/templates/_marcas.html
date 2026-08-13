@@ -1,0 +1,27 @@
+{# Deixei a tirinha aqui separada porque ela aparece em quatro telas
+   diferentes e eu não queria copiar e colar o mesmo HTML em todas.
+
+   Importante: são os últimos treinos DA ESCOLINHA, não os do atleta. Se eu
+   usasse os do atleta, quem sumiu apareceria todo verde. #}
+{% macro tira(marcas) %}
+  {% if marcas %}
+    <span class="marcas" role="img"
+          aria-label="Últimos {{ marcas|length }} treinos, do mais antigo ao mais recente: {{ marcas|map('replace', 'sem_registro', 'não anotado')|join(', ') }}">
+      {% for marca in marcas %}
+        <span class="marca-treino marca-treino--{{ marca }}"></span>
+      {% endfor %}
+    </span>
+  {% else %}
+    <span class="celula-secundaria">sem registros</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro legenda() %}
+  <div class="marcas__legenda">
+    <span><span class="marca-treino marca-treino--presente"></span> presente</span>
+    <span><span class="marca-treino marca-treino--falta"></span> falta</span>
+    <span><span class="marca-treino marca-treino--justificada"></span> falta justificada</span>
+    <span><span class="marca-treino marca-treino--sem_registro"></span> não anotado</span>
+    <span>— do treino mais antigo, à esquerda, ao mais recente</span>
+  </div>
+{% endmacro %}

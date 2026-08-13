@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% import "_marcas.html" as marcas %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}{{ pessoa.nome }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': 'Pessoas', 'url': url_for('pessoas')},
+    {'nome': pessoa.nome},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="barra-acoes">
+  {{ nav.voltar(url_for('pessoas'), 'Todas as pessoas') }}
+  <a class="botao botao--secundario botao--pequeno"
+     href="{{ url_for('pessoa_editar', pessoa_id=pessoa.id) }}"
+     style="margin-left:auto">Editar ficha</a>
+</div>
+
+<h1 class="titulo-pagina">{{ pessoa.nome }}</h1>
+<p class="subtitulo-pagina">
+  {{ pessoa.idade }} anos ·
+  {{ pessoa.matriculas|length }}
+  {{ 'atividade' if pessoa.matriculas|length == 1 else 'atividades' }} no Centro
+</p>
+
+{# As atividades da pessoa, uma por cartão, cada uma com a própria frequência.
+   Essa tela é a razão de eu ter separado pessoa de matrícula: dá pra ver de
+   uma vez que alguém é assíduo numa modalidade e está sumindo de outra. #}
+<section>
+  <h2 class="secao__titulo">Atividades</h2>
+
+  <div class="atividades">
+    {% for m in pessoa.matriculas %}
+      <div class="atividade" style="--modalidade: {{ m.modalidade_cor }}">
+        <div class="atividade__topo">
+          <div>
+            <a class="atividade__nome" href="{{ url_for('painel', slug=m.modalidade_slug) }}">
+              {{ m.nome_exibicao }}
+            </a>
+            <p class="atividade__turma">
+              {% if m.numero %}
+                <span class="numero-camisa" title="Camisa {{ m.numero }}">{{ m.numero }}</span>
+              {% endif %}
+              {{ m.turma_nome }} · desde {{ m.data_matricula|data_br }}
+              {% if m.matricula_status == 'encerrada' %}
+                · <strong>matrícula encerrada</strong>
+              {% endif %}
+            </p>
+          </div>
+          <span class="selo selo--{{ m.avaliacao.nivel }}">
+            {{ ROTULO_RISCO[m.avaliacao.nivel] }}
+          </span>
+        </div>
+
+        <div class="atividade__marcas">{{ marcas.tira(m.marcas) }}</div>
+
+        <p class="atividade__leitura">
+          {{ m.avaliacao.motivo }} · {{ m.total_presencas }} presenças
+          em {{ m.total_aulas }} registros
+        </p>
+
+        <div class="barra-acoes" style="margin: 14px 0 0;">
+          <a class="botao botao--discreto botao--pequeno"
+             href="{{ url_for('alunos', slug=m.modalidade_slug) }}">Ver a turma</a>
+          <form method="post"
+                action="{{ url_for('matricula_encerrar', matricula_id=m.matricula_id) }}"
+                style="margin:0">
+            <button class="botao botao--discreto botao--pequeno" type="submit">
+              {{ 'Reabrir matrícula' if m.matricula_status == 'encerrada' else 'Encerrar matrícula' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {{ marcas.legenda() }}
+</section>
+
+{# Ficha médica: uma só, da pessoa. Antes ela era copiada em cada modalidade e
+   vivia preenchida em uma e vazia na outra. #}
+<section class="secao">
+  <h2 class="secao__titulo">Em caso de emergência</h2>
+  <div class="ficha-emergencia">
+    <p class="ficha-emergencia__aviso">
+      Esta ficha vale para todas as atividades. Atualizar aqui atualiza em
+      todas as turmas em que {{ pessoa.nome.split()[0] }} está.
+    </p>
+
+    <div class="lista-dados" style="padding: 0;">
+      <div>
+        <dt>{{ pessoa.responsavel_parentesco }}</dt>
+        <dd>
+          {{ pessoa.responsavel_nome }}<br>
+          <a class="telefone-grande"
+             href="tel:{{ pessoa.responsavel_telefone|replace(' ','')|replace('(','')|replace(')','')|replace('-','') }}">
+            {{ pessoa.responsavel_telefone }}
+          </a>
+        </dd>
+      </div>
+
+      {% if pessoa.emergencia_telefone %}
+        <div>
+          <dt>Contato alternativo</dt>
+          <dd>
+            {{ pessoa.emergencia_nome }}<br>
+            <a class="telefone-grande"
+               href="tel:{{ pessoa.emergencia_telefone|replace(' ','')|replace('(','')|replace(')','')|replace('-','') }}">
+              {{ pessoa.emergencia_telefone }}
+            </a>
+          </dd>
+        </div>
+      {% endif %}
+
+      <div><dt>Condições de saúde</dt><dd>{{ pessoa.condicoes or 'Nenhuma registrada' }}</dd></div>
+      <div><dt>Alergias</dt><dd>{{ pessoa.alergias or 'Nenhuma registrada' }}</dd></div>
+      <div><dt>Medicação de uso contínuo</dt><dd>{{ pessoa.medicacao_continua or 'Nenhuma' }}</dd></div>
+      <div><dt>Atendimento de saúde</dt><dd>{{ pessoa.plano_saude or 'Não informado' }}</dd></div>
+      {% if pessoa.observacoes_medicas %}
+        <div style="grid-column: 1 / -1;">
+          <dt>Observações</dt><dd>{{ pessoa.observacoes_medicas }}</dd>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="secao">
+  <h2 class="secao__titulo">Cadastro</h2>
+  <div class="cartao">
+    <dl class="lista-dados">
+      <div>
+        <dt>Data de nascimento</dt>
+        <dd>{{ pessoa.data_nascimento|data_br }} ({{ pessoa.idade }} anos)</dd>
+      </div>
+      <div>
+        <dt>Uso de imagem</dt>
+        <dd>{{ 'Autorizado pelo responsável' if pessoa.autoriza_imagem else 'Não autorizado' }}</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+{% endblock %}

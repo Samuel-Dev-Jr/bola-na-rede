@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block titulo %}Sem internet — Bola na Rede{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Você está sem internet</h1>
+<p class="subtitulo-pagina">
+  O app abriu, mas não consegui buscar os dados mais recentes.
+</p>
+
+<div class="cartao" style="padding: 22px;">
+  <p style="margin-top: 0;">
+    As telas que você já abriu antes continuam disponíveis. O que <strong>não</strong>
+    dá para fazer agora é salvar chamada, matrícula ou convocação: isso precisa
+    chegar no servidor, e se eu deixasse salvar aqui você acharia que gravou sem
+    ter gravado.
+  </p>
+  <p style="margin-bottom: 0;">
+    Assim que o sinal voltar, atualize a página e siga normalmente.
+  </p>
+
+  <div class="barra-acoes" style="margin: 20px 0 0;">
+    <button class="botao" type="button" onclick="location.reload()">Tentar de novo</button>
+  </div>
+</div>
+
+{% endblock %}

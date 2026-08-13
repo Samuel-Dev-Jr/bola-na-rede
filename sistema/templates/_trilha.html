@@ -1,0 +1,26 @@
+{# Trilha de navegação (breadcrumb).
+   Cada item é um dicionário com nome e, opcionalmente, url. O último item é
+   sempre a página atual e não vira link. #}
+{% macro trilha(itens) %}
+  <nav class="trilha" aria-label="Você está em">
+    {% for item in itens %}
+      {% if item.url and not loop.last %}
+        <a href="{{ item.url }}">{{ item.nome }}</a>
+        <span class="trilha__seta" aria-hidden="true">›</span>
+      {% else %}
+        <span class="trilha__atual" aria-current="page">{{ item.nome }}</span>
+      {% endif %}
+    {% endfor %}
+  </nav>
+{% endmacro %}
+
+{# Botão de voltar, para o topo das telas de detalhe. #}
+{% macro voltar(url, texto) %}
+  <a class="botao-voltar" href="{{ url }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M15 5l-7 7 7 7"/>
+    </svg>
+    {{ texto }}
+  </a>
+{% endmacro %}

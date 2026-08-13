@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Matricular em {{ modalidade.nome_exibicao }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao, 'url': url_for('painel', slug=modalidade.slug)},
+    {'nome': 'Alunos', 'url': url_for('alunos', slug=modalidade.slug)},
+    {'nome': 'Matricular'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="barra-acoes">
+  {{ nav.voltar(url_for('alunos', slug=modalidade.slug), 'Alunos') }}
+</div>
+
+<h1 class="titulo-pagina">Matricular em {{ modalidade.nome_exibicao }}</h1>
+<p class="subtitulo-pagina">
+  Se a pessoa já é do Centro, escolha ela na lista: a ficha médica e o contato
+  do responsável vêm junto, sem precisar digitar de novo.
+</p>
+
+{% if pessoas %}
+  <form method="post" action="{{ url_for('matricular', slug=modalidade.slug) }}">
+    <div class="cartao grupo-formulario">
+      <h2 class="grupo-formulario__titulo">Quem vai entrar</h2>
+      <div class="grade-formulario">
+        <div class="campo campo--todo">
+          <label for="pessoa_id">Pessoa</label>
+          <select id="pessoa_id" name="pessoa_id" required>
+            <option value="">Escolha…</option>
+            {% for p in pessoas %}
+              <option value="{{ p.id }}">
+                {{ p.nome }} — {{ p.idade }} anos
+                {%- if p.atividades %} (já faz {{ p.atividades|map(attribute='nome_exibicao')|join(', ') }}){% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="turma_id">Turma</label>
+          <select id="turma_id" name="turma_id" required>
+            {% for t in turmas %}
+              <option value="{{ t.id }}">{{ t.nome }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="data_matricula">Data da matrícula</label>
+          <input type="date" id="data_matricula" name="data_matricula"
+                 value="{{ hoje.isoformat() }}">
+        </div>
+
+        <div class="campo">
+          <label for="numero">Número da camisa</label>
+          <input type="number" id="numero" name="numero" min="1" max="99"
+                 inputmode="numeric" placeholder="opcional">
+          <span class="campo__ajuda">
+            De 1 a 99, e não pode repetir dentro da turma.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="barra-acoes barra-acoes--fim" style="margin-top: 18px;">
+      <a class="botao botao--discreto"
+         href="{{ url_for('alunos', slug=modalidade.slug) }}">Cancelar</a>
+      <button class="botao" type="submit">Matricular</button>
+    </div>
+  </form>
+{% else %}
+  <div class="vazio">
+    <strong>Todo mundo do Centro já está nesta modalidade.</strong>
+    Para incluir alguém novo, cadastre a pessoa primeiro.
+  </div>
+{% endif %}
+
+<section class="secao">
+  <h2 class="secao__titulo">A pessoa ainda não é do Centro?</h2>
+  <div class="cartao" style="padding: 20px;">
+    <p style="margin-top: 0;">
+      Aí é cadastro novo: nome, responsável e ficha médica. Ela já entra
+      matriculada em {{ modalidade.nome_exibicao }}.
+    </p>
+    <a class="botao" href="{{ url_for('pessoa_nova', slug=modalidade.slug) }}">
+      Cadastrar pessoa nova
+    </a>
+  </div>
+</section>
+
+{% endblock %}

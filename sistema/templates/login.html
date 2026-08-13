@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block titulo %}Entrar — Bola na Rede{% endblock %}
+
+{% block conteudo %}
+
+<div class="entrada">
+
+<h1 class="titulo-pagina">Bola na Rede</h1>
+<p class="subtitulo-pagina">
+  Centro de Cultura e Esporte · Jardim Elizabete
+</p>
+
+{% if sem_usuarios %}
+  {# Sem nenhum usuário no banco, não tem como entrar — e eu não abro um
+     formulário de "crie o primeiro admin", que ficaria disponível na rede
+     local pra quem chegasse primeiro. Cria-se por linha de comando. #}
+  <div class="aviso aviso--erro">
+    <strong>Nenhum usuário cadastrado ainda.</strong>
+    Ninguém consegue entrar até existir o primeiro administrador.
+  </div>
+
+  <div class="cartao" style="padding: 20px;">
+    <span class="etiqueta">Como criar o primeiro acesso</span>
+    <p style="margin: 10px 0 0;">
+      No computador onde o sistema está instalado, abra o terminal na pasta
+      <code>sistema</code> e rode:
+    </p>
+    <pre class="mensagem-pronta">python criar_usuario.py</pre>
+    <p style="margin: 10px 0 0;">
+      Ele pergunta o login e a senha e cria a conta de coordenação. Depois disso,
+      novos usuários são criados aqui pela tela.
+    </p>
+  </div>
+{% else %}
+  <form method="post" action="{{ url_for('login') }}">
+    <input type="hidden" name="proximo" value="{{ proximo }}">
+
+    <div class="cartao grupo-formulario">
+      <div class="grade-formulario">
+        <div class="campo campo--todo">
+          <label for="login">Login</label>
+          <input type="text" id="login" name="login" required autofocus
+                 autocomplete="username" autocapitalize="none" spellcheck="false">
+        </div>
+
+        <div class="campo campo--todo">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" required
+                 autocomplete="current-password">
+        </div>
+
+        {# O botão fica DENTRO do cartão, com a largura dele: campos e ação são
+           uma coisa só, e não um formulário com o botão solto do lado de fora. #}
+        <div class="campo campo--todo">
+          <button class="botao botao--largo" type="submit">Entrar</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <p class="celula-secundaria" style="margin-top: 20px;">
+    Esqueceu a senha? Fale com a coordenação: quem administra o sistema pode
+    definir uma nova para você.
+  </p>
+{% endif %}
+
+</div>
+
+{% endblock %}

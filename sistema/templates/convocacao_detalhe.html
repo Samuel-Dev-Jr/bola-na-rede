@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+{% import "_marcas.html" as marcas %}
+
+{% block titulo %}{{ evento.nome }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': evento.modalidade_exibicao, 'url': url_for('painel', slug=evento.modalidade_slug)},
+    {'nome': 'Convocação', 'url': url_for('convocacoes', slug=evento.modalidade_slug)},
+    {'nome': evento.nome},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="barra-acoes">
+  <a class="botao botao--discreto" href="{{ url_for('convocacoes', slug=evento.modalidade_slug) }}">← Convocações</a>
+</div>
+
+<h1 class="titulo-pagina">{{ evento.nome }}</h1>
+<p class="subtitulo-pagina">
+  {{ evento.data|dia_semana }}, {{ evento.data|data_br }} · {{ evento.turma_nome }}
+  {%- if evento.adversario %} · contra {{ evento.adversario }}{% endif %} · {{ evento.local }}
+</p>
+
+<div class="duas-colunas">
+
+  {# seleção dos convocados #}
+  <section>
+    <h2 class="secao__titulo">Quem vai</h2>
+    <form method="post" action="{{ url_for('convocacao_detalhe', evento_id=evento.id) }}">
+      <div class="cartao">
+        {% for atleta in evento.elegiveis %}
+          <div class="linha-chamada">
+            <label class="caixa-marcacao linha-chamada__nome">
+              <input type="checkbox" name="convocado" value="{{ atleta.matricula_id }}"
+                     {% if atleta.convocado %}checked{% endif %}>
+              <span>
+                {% if atleta.numero %}
+                  <span class="numero-camisa" title="Camisa {{ atleta.numero }}">{{ atleta.numero }}</span>
+                {% endif %}
+                {{ atleta.nome }}
+                <div class="celula-secundaria">{{ atleta.avaliacao.motivo }}</div>
+              </span>
+            </label>
+            <span class="selo selo--{{ atleta.avaliacao.nivel }}">
+              {{ ROTULO_RISCO[atleta.avaliacao.nivel] }}
+            </span>
+            {{ marcas.tira(atleta.marcas) }}
+          </div>
+        {% endfor %}
+
+        <div class="rodape-fixo">
+          <span class="celula-secundaria">
+            {{ evento.convocados|length }} convocados de {{ evento.elegiveis|length }} em {{ evento.turma_nome }}.
+          </span>
+          <button class="botao" type="submit">Salvar convocação</button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  {# mensagem pronta #}
+  <section>
+    <h2 class="secao__titulo">Mensagem para o grupo</h2>
+    <p class="subtitulo-pagina">
+      Copie e cole no grupo dos responsáveis. Salvar a convocação atualiza o texto.
+    </p>
+
+    <pre class="mensagem-pronta" id="mensagem">{{ mensagem }}</pre>
+
+    <div class="barra-acoes" style="margin-top: 14px;">
+      <button class="botao" type="button" id="copiar">Copiar mensagem</button>
+      <span class="celula-secundaria" id="aviso-copia" role="status"></span>
+    </div>
+
+    {% if evento.observacoes %}
+      <div class="cartao" style="padding: 16px 18px;">
+        <span class="etiqueta">Instruções registradas</span>
+        <p style="margin: 6px 0 0;">{{ evento.observacoes }}</p>
+      </div>
+    {% endif %}
+  </section>
+</div>
+
+<script>
+  document.getElementById('copiar').addEventListener('click', async function () {
+    const texto = document.getElementById('mensagem').textContent;
+    const aviso = document.getElementById('aviso-copia');
+    try {
+      await navigator.clipboard.writeText(texto);
+      aviso.textContent = 'Mensagem copiada.';
+    } catch {
+      // Sem permissão de área de transferência: seleciona o texto para o
+      // usuário copiar manualmente com Ctrl+C.
+      const faixa = document.createRange();
+      faixa.selectNodeContents(document.getElementById('mensagem'));
+      const selecao = window.getSelection();
+      selecao.removeAllRanges();
+      selecao.addRange(faixa);
+      aviso.textContent = 'Texto selecionado. Use Ctrl+C para copiar.';
+    }
+  });
+</script>
+
+{% endblock %}

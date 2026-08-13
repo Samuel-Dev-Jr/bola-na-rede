@@ -1,0 +1,32 @@
+# Banco de dados. Fica FORA do repositório de propósito, por dois motivos:
+#
+# 1. Se um dia a coordenação usar o sistema para valer, o arquivo passa a conter
+#    nome de criança, telefone de responsável e ficha médica. Commitar isso
+#    publica dado sensível de menor, e o git guarda para sempre — apagar depois
+#    não desfaz.
+# 2. Na hospedagem ele é reconstruído pelo preparar_deploy.py a cada início, e um
+#    banco versionado só criaria conflito com o que o deploy monta.
+#
+# Para recriar: python configurar.py
+sistema/bola_na_rede.db
+sistema/*.db
+sistema/*.db-journal
+sistema/*.db-wal
+
+# Cache do Python. Regenera sozinho e não serve pra nada em outra máquina.
+__pycache__/
+*.pyc
+*.pyo
+
+# Evidências: prints e caderno de campo. São entregáveis da faculdade, não código
+# do sistema — e a pasta versao-anterior tem prints de telas que foram retiradas.
+evidencias/
+
+# Entregáveis com dado de terceiro: a carta de recomendação preenchida tem nome
+# de pessoa da coordenação.
+entregaveis/
+
+# Modelos da faculdade e material da disciplina.
+*.pptx
+*.docx
+*.pdf

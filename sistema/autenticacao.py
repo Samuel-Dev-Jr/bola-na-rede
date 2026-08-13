@@ -1,0 +1,349 @@
+"""
+Login, papéis e proteção das rotas.
+
+Deixei num arquivo separado pelo mesmo motivo do risco.py: é regra de negócio
+que precisa ser lida e conferida sozinha. Quem revisa segurança não deveria ter
+que procurar as verificações espalhadas entre as rotas.
+
+São dois papéis:
+
+  admin     a coordenação. Enxerga e altera tudo.
+  jogador   o participante. Enxerga o que é dele e o que é público da turma.
+            NÃO enxerga ficha médica nem telefone de outra pessoa.
+
+Essa segunda linha é a que importa. A lista de pessoas do Centro mostra nome
+completo de menor, telefone do responsável e condição de saúde. Se eu deixasse
+jogador entrar ali, eu teria construído exatamente o problema que o DECISOES.md
+diz que o sistema evita.
+
+A senha nunca é guardada: guardo o hash do werkzeug, que já vem com o Flask e
+usa sal por senha.
+"""
+
+import functools
+import os
+import secrets
+import unicodedata
+from datetime import datetime
+
+from flask import flash, g, redirect, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
+
+# Quem pode entrar sem estar logado. Só o necessário pra fazer login e pro app
+# instalado não quebrar sem sessão.
+ROTAS_PUBLICAS = {
+    "login", "manifest", "serviceworker", "offline", "static",
+}
+
+# Rotas que um jogador pode abrir. TUDO o que não está aqui é só admin — a lista
+# é de permissão, não de proibição, de propósito: se eu criar uma rota nova e
+# esquecer de classificar, ela nasce fechada em vez de aberta.
+ROTAS_DO_JOGADOR = {
+    "minha_area", "logout",
+}
+
+# Por que a lista é tão curta: na primeira versão eu tinha posto `painel` e
+# `centro` aqui, pensando "é só leitura". Errado. O painel da modalidade tem o
+# bloco "Ligar esta semana", com nome completo, nível de risco e TELEFONE DO
+# RESPONSÁVEL de quem está faltando. Abrir isso pro jogador seria publicar, pra
+# turma inteira, quem está em risco de evasão e o telefone da mãe.
+#
+# A lição: tela de admin não se reaproveita pro jogador só porque é leitura. O
+# que o participante precisa ver — as atividades dele, o horário, os jogos, se
+# está convocado — vive em telas próprias, que mostram só o dele.
+
+CHAVE_SESSAO = "usuario_id"
+VARIAVEL_CHAVE = "BOLA_NA_REDE_CHAVE"
+
+# Mínimo de caracteres na senha. Oito é pouco para a internet, mas isto roda na
+# rede local do Centro e a senha vai ser digitada por criança no celular. Está
+# anotado como limite conhecido na seção 4 do DECISOES.md.
+MINIMO_SENHA = 8
+
+
+def chave_secreta() -> str:
+    """
+    A chave que assina o cookie de sessão.
+
+    Antes isso era uma string fixa no código, com um comentário meu dizendo que
+    tinha que sair de lá no dia que existisse login. Esse dia chegou: com login,
+    chave conhecida deixa qualquer um forjar um cookie de admin.
+
+    Em produção vem da variável de ambiente. Sem ela eu gero uma aleatória, o
+    que é seguro mas derruba as sessões a cada reinício — e é justamente esse
+    incômodo que faz alguém configurar a variável.
+    """
+    definida = os.environ.get(VARIAVEL_CHAVE)
+    if definida:
+        return definida
+    return secrets.token_hex(32)
+
+
+def hash_da_senha(senha: str) -> str:
+    return generate_password_hash(senha)
+
+
+def senha_confere(senha_hash: str, senha: str) -> bool:
+    return check_password_hash(senha_hash, senha)
+
+
+def buscar_por_login(conexao, login: str):
+    return conexao.execute(
+        "SELECT * FROM usuario WHERE login = ? AND ativo = 1", (login.strip(),)
+    ).fetchone()
+
+
+def buscar_por_id(conexao, usuario_id: int):
+    return conexao.execute(
+        "SELECT * FROM usuario WHERE id = ? AND ativo = 1", (usuario_id,)
+    ).fetchone()
+
+
+def existe_algum_usuario(conexao) -> bool:
+    return conexao.execute("SELECT 1 FROM usuario LIMIT 1").fetchone() is not None
+
+
+def entrar(conexao, usuario) -> None:
+    # Troco o identificador da sessão no login pra não permitir fixação de
+    # sessão: um cookie obtido antes de entrar não vale depois.
+    session.clear()
+    session[CHAVE_SESSAO] = usuario["id"]
+    session.permanent = False
+    conexao.execute(
+        "UPDATE usuario SET ultimo_acesso = ? WHERE id = ?",
+        (datetime.now().isoformat(timespec="seconds"), usuario["id"]),
+    )
+    conexao.commit()
+
+
+def sair() -> None:
+    session.clear()
+
+
+def usuario_atual():
+    return g.get("usuario")
+
+
+def e_admin() -> bool:
+    usuario = usuario_atual()
+    return usuario is not None and usuario["papel"] == "admin"
+
+
+def carregar_usuario(conexao) -> None:
+    """Põe o usuário logado em g.usuario. Chamado a cada requisição."""
+    g.usuario = None
+    usuario_id = session.get(CHAVE_SESSAO)
+    if usuario_id is None:
+        return
+    usuario = buscar_por_id(conexao, usuario_id)
+    if usuario is None:
+        # Conta apagada ou desativada com a sessão ainda aberta.
+        session.clear()
+        return
+    g.usuario = usuario
+
+
+def rota_permitida(endpoint: str | None) -> bool:
+    """
+    Decide se o usuário atual pode abrir este endpoint.
+
+    Não uso decorador em cada rota: com 22 rotas já existentes, decorador é
+    fácil de esquecer numa rota nova, e esquecer significa deixar aberto. Aqui a
+    verificação é central e o padrão é NEGAR.
+    """
+    if endpoint in ROTAS_PUBLICAS:
+        return True
+
+    usuario = usuario_atual()
+    if usuario is None:
+        return False
+
+    if usuario["papel"] == "admin":
+        return True
+
+    return endpoint in ROTAS_DO_JOGADOR
+
+
+def exigir_login():
+    """
+    Guarda de requisição. Devolve um redirect quando o acesso é negado, ou None.
+
+    Usado no before_request, depois de carregar_usuario.
+    """
+    endpoint = request.endpoint
+    if rota_permitida(endpoint):
+        return None
+
+    if usuario_atual() is None:
+        # Guardo pra onde a pessoa queria ir, pra levar ela lá depois do login.
+        destino = request.full_path if request.query_string else request.path
+        return redirect(url_for("login", proximo=destino))
+
+    flash("Essa parte do sistema é da coordenação.", "erro")
+    return redirect(url_for("minha_area"))
+
+
+# ------------------------------------------------------ gestão de usuários
+
+
+def listar_usuarios(conexao) -> list[dict]:
+    return [dict(l) for l in conexao.execute(
+        """
+        SELECT u.*, p.nome AS pessoa_nome
+        FROM usuario u
+        LEFT JOIN pessoa p ON p.id = u.pessoa_id
+        ORDER BY u.ativo DESC, u.papel, u.login
+        """
+    )]
+
+
+def sobra_outro_admin(conexao, usuario_id: int) -> bool:
+    """
+    Se este usuário parar de ser admin ativo, ainda existe outro?
+
+    É a trava que impede a coordenação de se trancar fora do próprio sistema.
+    Sem ela, rebaixar ou desativar o último admin deixaria o sistema sem ninguém
+    capaz de administrar — e o conserto só por linha de comando.
+    """
+    return conexao.execute(
+        "SELECT COUNT(*) c FROM usuario "
+        "WHERE papel = 'admin' AND ativo = 1 AND id <> ?",
+        (usuario_id,),
+    ).fetchone()["c"] > 0
+
+
+def sem_acento(texto: str) -> str:
+    normalizado = unicodedata.normalize("NFKD", texto)
+    return "".join(c for c in normalizado if not unicodedata.combining(c))
+
+
+def sugerir_login(conexao, nome: str) -> str:
+    """
+    Monta um login a partir do nome: primeiro nome + último sobrenome.
+
+    "Antonella Oliveira Souza" -> "antonella.souza". Em caso de repetição, vai
+    somando número. Sem acento e sem espaço, porque login é coisa que se digita
+    no celular com pressa.
+    """
+    partes = [p for p in sem_acento(nome).casefold().split() if p]
+    if not partes:
+        base = "usuario"
+    elif len(partes) == 1:
+        base = partes[0]
+    else:
+        base = f"{partes[0]}.{partes[-1]}"
+
+    base = "".join(c for c in base if c.isalnum() or c == ".")
+
+    candidato, contador = base, 1
+    while conexao.execute("SELECT 1 FROM usuario WHERE login = ?",
+                          (candidato,)).fetchone():
+        contador += 1
+        candidato = f"{base}{contador}"
+    return candidato
+
+
+def pessoas_sem_usuario(conexao) -> list[dict]:
+    """Quem tem matrícula ativa e ainda não tem acesso ao sistema."""
+    return [dict(l) for l in conexao.execute(
+        """
+        SELECT DISTINCT p.id, p.nome, p.data_nascimento
+        FROM pessoa p
+        JOIN matricula ma ON ma.pessoa_id = p.id AND ma.status = 'ativa'
+        WHERE p.id NOT IN (SELECT pessoa_id FROM usuario WHERE pessoa_id IS NOT NULL)
+        ORDER BY p.nome
+        """
+    )]
+
+
+def senha_aleatoria() -> str:
+    """
+    Senha inicial legível, para ser entregue de boca ou no papel.
+
+    Uso token_urlsafe e corto: é aleatório de verdade, mas curto o suficiente
+    pra alguém digitar no celular sem errar. A pessoa troca depois.
+    """
+    return secrets.token_urlsafe(9)
+
+
+def criar_usuario(conexao, login: str, senha: str, papel: str,
+                  pessoa_id: int | None) -> str | None:
+    """Cria o usuário. Devolve mensagem de erro, ou None se deu certo."""
+    login = (login or "").strip()
+    if not login:
+        return "O login não pode ficar vazio."
+    if " " in login:
+        return "O login não pode ter espaço."
+    if papel not in ("admin", "jogador"):
+        return f"Papel desconhecido: {papel}."
+    if len(senha or "") < MINIMO_SENHA:
+        return f"A senha precisa de pelo menos {MINIMO_SENHA} caracteres."
+
+    # Confiro antes de gravar pra dar mensagem boa. O banco também pegaria, pelo
+    # UNIQUE COLLATE NOCASE, mas com um erro que não ajuda quem está na tela.
+    if conexao.execute("SELECT 1 FROM usuario WHERE login = ?", (login,)).fetchone():
+        return f"Já existe um acesso com o login {login!r}."
+
+    conexao.execute(
+        "INSERT INTO usuario (login, senha_hash, papel, pessoa_id) VALUES (?,?,?,?)",
+        (login, hash_da_senha(senha), papel, pessoa_id),
+    )
+    conexao.commit()
+    return None
+
+
+def definir_papel(conexao, usuario_id: int, papel: str) -> str | None:
+    if papel not in ("admin", "jogador"):
+        return f"Papel desconhecido: {papel}."
+
+    atual = conexao.execute("SELECT * FROM usuario WHERE id = ?",
+                            (usuario_id,)).fetchone()
+    if atual is None:
+        return "Esse acesso não existe."
+    if atual["papel"] == "admin" and papel != "admin" \
+            and not sobra_outro_admin(conexao, usuario_id):
+        return ("Esse é o único administrador ativo. Promova outra pessoa antes "
+                "de rebaixar este, senão ninguém consegue administrar o sistema.")
+
+    conexao.execute("UPDATE usuario SET papel = ? WHERE id = ?", (papel, usuario_id))
+    conexao.commit()
+    return None
+
+
+def definir_ativo(conexao, usuario_id: int, ativo: bool) -> str | None:
+    if not ativo and not sobra_outro_admin(conexao, usuario_id):
+        atual = conexao.execute("SELECT papel FROM usuario WHERE id = ?",
+                                (usuario_id,)).fetchone()
+        if atual and atual["papel"] == "admin":
+            return ("Esse é o único administrador ativo. Desativar ele deixaria "
+                    "o sistema sem ninguém para administrar.")
+
+    conexao.execute("UPDATE usuario SET ativo = ? WHERE id = ?",
+                    (1 if ativo else 0, usuario_id))
+    conexao.commit()
+    return None
+
+
+def definir_senha(conexao, usuario_id: int, senha: str) -> str | None:
+    if len(senha or "") < MINIMO_SENHA:
+        return f"A senha precisa de pelo menos {MINIMO_SENHA} caracteres."
+    conexao.execute("UPDATE usuario SET senha_hash = ? WHERE id = ?",
+                    (hash_da_senha(senha), usuario_id))
+    conexao.commit()
+    return None
+
+
+def somente_admin(funcao):
+    """
+    Reforço para rotas sensíveis, além da guarda central.
+
+    Redundante de propósito: a guarda central já barra, mas se alguém mexer na
+    lista de rotas do jogador por engano, estas continuam fechadas.
+    """
+    @functools.wraps(funcao)
+    def envelope(*args, **kwargs):
+        if not e_admin():
+            flash("Essa parte do sistema é da coordenação.", "erro")
+            return redirect(url_for("minha_area"))
+        return funcao(*args, **kwargs)
+    return envelope

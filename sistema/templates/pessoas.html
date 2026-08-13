@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Pessoas — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': 'Pessoas'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Pessoas do Centro</h1>
+<p class="subtitulo-pagina">
+  {{ pessoas|length }} {{ 'pessoa' if pessoas|length == 1 else 'pessoas' }}.
+  Cada uma aparece <strong>uma vez só</strong>, com todas as atividades que faz.
+</p>
+
+<form class="filtros" method="get" action="{{ url_for('pessoas') }}">
+  <div class="campo campo--largo">
+    <label for="busca">Buscar</label>
+    <input type="text" id="busca" name="busca" value="{{ busca }}"
+           placeholder="Nome da pessoa ou do responsável">
+  </div>
+  <button class="botao" type="submit">Buscar</button>
+  <a class="botao botao--discreto" href="{{ url_for('pessoas') }}">Limpar</a>
+  <a class="botao botao--secundario" href="{{ url_for('pessoa_nova') }}">Cadastrar pessoa</a>
+</form>
+
+{% if pessoas %}
+  <div class="lista-pessoas">
+    {% for p in pessoas %}
+      <a class="pessoa-cartao" href="{{ url_for('pessoa_detalhe', pessoa_id=p.id) }}">
+        <div class="pessoa-cartao__topo">
+          <span class="pessoa-cartao__nome">{{ p.nome }}</span>
+          <span class="pessoa-cartao__idade">{{ p.idade }} anos</span>
+        </div>
+
+        <div class="pessoa-cartao__atividades">
+          {% for a in p.atividades %}
+            <span class="pastilha" style="--modalidade: {{ a.cor }}">{{ a.nome_exibicao }}</span>
+          {% else %}
+            <span class="celula-secundaria">sem atividade no momento</span>
+          {% endfor %}
+        </div>
+
+        <p class="pessoa-cartao__responsavel">
+          {{ p.responsavel_parentesco }}: {{ p.responsavel_nome }} ·
+          {{ p.responsavel_telefone }}
+          {% if p.condicoes or p.alergias %}
+            <span class="selo selo--atencao" style="margin-left:6px">ficha médica</span>
+          {% endif %}
+        </p>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="vazio">
+    <strong>Nenhuma pessoa encontrada.</strong>
+    Ajuste a busca ou cadastre alguém novo.
+  </div>
+{% endif %}
+
+{% endblock %}
