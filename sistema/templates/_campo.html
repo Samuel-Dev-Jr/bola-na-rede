@@ -1,0 +1,82 @@
+{# O campo com os jogadores nas posições.
+
+   A interação é POR TOQUE, não arrastar. Arrastar em celular é frágil, não tem
+   caminho por teclado e o técnico está com uma mão no telefone na beira do
+   campo, com sol na tela. Aqui: toca na posição, abre a lista de quem pode
+   entrar, escolhe. Funciona no dedo, no mouse e no teclado, sem biblioteca.
+
+   Cada posição é um <details>, que é o próprio HTML fazendo abrir e fechar —
+   sem JavaScript nenhum. #}
+
+{% macro campo(evento, tipo_quadra, posicoes) %}
+<div class="quadra quadra--{{ tipo_quadra }}">
+  {# As linhas do campo são desenhadas no CSS, não com imagem: assim
+     acompanham o tamanho da tela e não pesam no carregamento. #}
+  <div class="quadra__linhas" aria-hidden="true"></div>
+
+  {% for codigo, curto, nome, x, y in posicoes %}
+    {% set quem = evento.escalados.get(codigo) %}
+    {# Na metade de baixo do campo o menu tem que abrir PRA CIMA, senão ele cai
+       fora da tela: o goleiro fica a 88% da altura e o menu tem 320px. Descobri
+       tirando print — o menu do gol simplesmente não aparecia. #}
+    <details class="posicao {% if quem %}posicao--ocupada{% endif %}
+                    {% if y > 52 %}posicao--menu-acima{% endif %}"
+             style="left: {{ x }}%; top: {{ y }}%;">
+      <summary title="{{ nome }}{% if quem %} — {{ quem.nome }}{% endif %}">
+        {% if quem %}
+          <span class="posicao__numero">{{ quem.numero or curto }}</span>
+          <span class="posicao__nome">{{ quem.nome.split()[0] }}</span>
+        {% else %}
+          <span class="posicao__vazia">{{ curto }}</span>
+        {% endif %}
+      </summary>
+
+      <div class="posicao__menu">
+        <p class="posicao__titulo">{{ nome }}</p>
+
+        {% if quem %}
+          <form method="post"
+                action="{{ url_for('convocacao_escalar', evento_id=evento.id) }}">
+            <input type="hidden" name="matricula_id" value="{{ quem.matricula_id }}">
+            <input type="hidden" name="posicao" value="">
+            <button class="botao botao--discreto botao--pequeno botao--largo"
+                    type="submit">Tirar {{ quem.nome.split()[0] }}</button>
+          </form>
+        {% endif %}
+
+        <ul class="posicao__lista">
+          {% for pessoa in evento.elegiveis %}
+            {% if not quem or pessoa.matricula_id != quem.matricula_id %}
+              <li>
+                <form method="post"
+                      action="{{ url_for('convocacao_escalar', evento_id=evento.id) }}">
+                  <input type="hidden" name="matricula_id" value="{{ pessoa.matricula_id }}">
+                  <input type="hidden" name="posicao" value="{{ codigo }}">
+                  <button type="submit">
+                    {% if pessoa.numero %}
+                      <span class="numero-camisa">{{ pessoa.numero }}</span>
+                    {% endif %}
+                    {# Nome e observação empilhados, não lado a lado: em 250px de
+                       menu eles disputavam a largura e a observação quebrava em
+                       três linhas, deixando cada fileira torta. #}
+                    <span class="posicao__pessoa">
+                      <span class="posicao__pessoa-nome">{{ pessoa.nome }}</span>
+                      {% if pessoa.posicao %}
+                        <span class="posicao__pessoa-obs">
+                          já está em {{ pessoa.posicao }}
+                        </span>
+                      {% elif not pessoa.convocado %}
+                        <span class="posicao__pessoa-obs">não convocado</span>
+                      {% endif %}
+                    </span>
+                  </button>
+                </form>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </details>
+  {% endfor %}
+</div>
+{% endmacro %}

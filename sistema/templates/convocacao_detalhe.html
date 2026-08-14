@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% import "_trilha.html" as nav %}
 {% import "_marcas.html" as marcas %}
+{% import "_campo.html" as campo_em %}
 
 {% block titulo %}{{ evento.nome }} — Bola na Rede{% endblock %}
 
@@ -24,6 +25,50 @@
   {{ evento.data|dia_semana }}, {{ evento.data|data_br }} · {{ evento.turma_nome }}
   {%- if evento.adversario %} · contra {{ evento.adversario }}{% endif %} · {{ evento.local }}
 </p>
+
+{# ------------------------------------------------------------ escalação #}
+{% if posicoes %}
+  <section class="secao">
+    <h2 class="secao__titulo">Escalação</h2>
+    <p class="subtitulo-pagina">
+      Toque numa posição para escolher quem joga ali. Quem está convocado e sem
+      posição fica no banco.
+    </p>
+
+    {{ campo_em.campo(evento, tipo_quadra, posicoes) }}
+
+    <div class="barra-acoes" style="margin-top: 14px;">
+      <span class="celula-secundaria">
+        {{ evento.escalados|length }} de {{ posicoes|length }} em campo ·
+        {{ evento.reservas|length }} no banco
+      </span>
+      {% if evento.escalados %}
+        <form method="post"
+              action="{{ url_for('convocacao_limpar_escalacao', evento_id=evento.id) }}">
+          <button class="botao botao--discreto botao--pequeno" type="submit">
+            Limpar escalação
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+    {% if evento.reservas %}
+      <div class="cartao" style="padding: 16px 18px; margin-top: 14px;">
+        <span class="etiqueta">No banco</span>
+        <div class="banco">
+          {% for r in evento.reservas %}
+            <span class="banco__pessoa">
+              {% if r.numero %}
+                <span class="numero-camisa">{{ r.numero }}</span>
+              {% endif %}
+              {{ r.nome }}
+            </span>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </section>
+{% endif %}
 
 <div class="duas-colunas">
 

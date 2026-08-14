@@ -9,6 +9,7 @@ enxergo olhando a tela.
 ```bash
 python testes/testar_risco.py       # a regra de evasão, sem banco e sem site
 python testes/testar_acesso.py      # quem pode abrir o quê (login e papéis)
+python testes/testar_escalacao.py   # escalar, substituir e as travas do campo
 pip install playwright          # só o pacote; uso o Chrome que já está instalado
 python testes/testar_escritas.py    # cadastro, matrícula, chamada, convocação
 python testes/testar_layout.py      # estouro horizontal em 3 larguras
@@ -55,6 +56,16 @@ tenta quais logins existem.
 > Só que o painel tem o bloco "Ligar esta semana", com nome, nível de risco e
 > **telefone do responsável** de quem está faltando. Este teste é o que garante
 > que isso não volte.
+
+**`testar_escalacao.py`** — o campo, do lado do banco de dados. O caso que mais
+importa é o 8: mexer na lista de convocados **não** pode apagar o time montado.
+A primeira versão do `salvar_convocacao` apagava tudo e regravava, o que era
+inofensivo antes de existir escalação e passou a destruir o trabalho do técnico
+depois.
+
+> O caso 3 também é de gente, não de código: quando o técnico troca o goleiro, o
+> antigo vai pro **banco**, não pra fora da convocação. Ele continua indo ao
+> jogo — só não começa jogando.
 
 **`testar_escritas.py`** — exercita as rotas que gravam no banco e confere o
 efeito direto no SQLite. Confere, entre outras coisas, que refazer a chamada não

@@ -123,6 +123,11 @@ Cada módulo saiu de uma dor que a coordenação me contou:
 | Agenda | Treino que aconteceu e ninguém lançou a chamada: o aluno sai do cálculo de frequência e o alerta de evasão atrasa |
 | Convocação | Convocação bagunçada no WhatsApp, criança faltando no dia do jogo |
 
+A **escalação**, dentro da tela de convocação, é a única parte que não saiu de
+uma conversa com a coordenação: foi ideia minha, e está marcada assim de
+propósito. Ela mostra o time no campo, com número da camisa e posição, e quem
+está no banco. Se eles usarem e disserem que não serve, sai.
+
 As decisões de projeto — por que pessoa e matrícula são tabelas separadas, de
 onde saíram os números da regra de risco, por que não tem cobrança e o que o
 LGPD exigiria antes de usar isto para valer — estão em [DECISOES.md](DECISOES.md).

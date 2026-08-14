@@ -174,8 +174,22 @@ CREATE TABLE convocacao (
     evento_id    INTEGER NOT NULL REFERENCES evento (id) ON DELETE CASCADE,
     matricula_id INTEGER NOT NULL REFERENCES matricula (id) ON DELETE CASCADE,
 
+    -- A ESCALAÇÃO mora aqui, e não em tabela nova, porque ela é uma propriedade
+    -- da convocação: quem foi chamado e onde joga.
+    --
+    -- posicao é o código do lugar em campo ('GOL', 'ZAG-D', 'LEV'...), definido
+    -- em escalacao.py por esporte. Fica NULO pra quem está no banco de reservas:
+    -- convocado sem posição É o reserva, sem precisar de coluna separada.
+    posicao      TEXT,
+
     UNIQUE (evento_id, matricula_id)
 );
+
+-- Duas pessoas no mesmo lugar do campo, não. O índice é parcial pelo mesmo
+-- motivo do número da camisa: a maioria dos convocados é reserva, com posicao
+-- nula, e sem o WHERE o segundo reserva seria recusado como repetido.
+CREATE UNIQUE INDEX idx_convocacao_posicao
+    ON convocacao (evento_id, posicao) WHERE posicao IS NOT NULL;
 
 -- O USUÁRIO. Esta tabela só passou a existir quando o sistema saiu de "roda na
 -- rede local e todo mundo vê tudo" para "cada um entra com o seu login". Ver a

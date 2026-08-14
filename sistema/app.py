@@ -40,6 +40,7 @@ from flask import (
 import autenticacao
 import consultas
 import db
+import escalacao
 import importar
 from risco import ROTULO_RISCO
 
@@ -576,7 +577,10 @@ def convocacao_nova(slug: str):
 @app.route("/convocacao/<int:evento_id>", methods=["GET", "POST"])
 def convocacao_detalhe(evento_id: int):
     if request.method == "POST":
-        ids = [int(v) for v in request.form.getlist("convocado")]
+        # Ignoro o que não for número em vez de estourar. Antes era int(v) direto,
+        # e um valor inesperado no formulário devolvia 500 com stack trace — o que
+        # é feio em qualquer lugar e é pior agora que o sistema está na internet.
+        ids = [int(v) for v in request.form.getlist("convocado") if v.isdigit()]
         consultas.salvar_convocacao(g.conexao, evento_id, ids)
         flash(f"Convocação salva com {len(ids)} alunos.", "sucesso")
         return redirect(url_for("convocacao_detalhe", evento_id=evento_id))
@@ -584,11 +588,59 @@ def convocacao_detalhe(evento_id: int):
     evento = consultas.obter_evento(g.conexao, evento_id)
     if evento is None:
         abort(404)
+
+    tipo_quadra, posicoes = escalacao.para_modalidade(evento["modalidade_slug"])
     return render_template(
         "convocacao_detalhe.html", evento=evento,
         modalidade=consultas.obter_modalidade(g.conexao, evento["modalidade_slug"]),
         mensagem=consultas.mensagem_whatsapp(evento),
+        tipo_quadra=tipo_quadra, posicoes=posicoes,
     )
+
+
+@app.route("/convocacao/<int:evento_id>/escalar", methods=["POST"])
+@autenticacao.somente_admin
+def convocacao_escalar(evento_id: int):
+    """
+    Põe alguém numa posição, ou manda pro banco.
+
+    Uma requisição por movimento, e não um formulário gigante com o time todo:
+    assim o técnico mexe numa peça de cada vez e nunca perde o que já montou se
+    o celular cair no meio.
+    """
+    evento = consultas.obter_evento(g.conexao, evento_id)
+    if evento is None:
+        abort(404)
+
+    bruto = request.form.get("matricula_id", "")
+    if not bruto.isdigit():
+        flash("Requisição inválida: matrícula não informada.", "erro")
+        return redirect(url_for("convocacao_detalhe", evento_id=evento_id))
+    matricula_id = int(bruto)
+    posicao = request.form.get("posicao", "").strip() or None
+
+    # Posição inventada não entra. Sem isso, um formulário adulterado gravaria
+    # qualquer texto na coluna e o campo mostraria um buraco.
+    if posicao and posicao not in escalacao.codigos_validos(evento["modalidade_slug"]):
+        flash(f"Posição desconhecida: {posicao}.", "erro")
+        return redirect(url_for("convocacao_detalhe", evento_id=evento_id))
+
+    # Quem escala tem que ser da lista de elegíveis deste evento — senão daria
+    # pra escalar alguém de outra modalidade mexendo no formulário.
+    if matricula_id not in {e["matricula_id"] for e in evento["elegiveis"]}:
+        flash("Essa pessoa não está entre os elegíveis deste jogo.", "erro")
+        return redirect(url_for("convocacao_detalhe", evento_id=evento_id))
+
+    consultas.escalar(g.conexao, evento_id, matricula_id, posicao)
+    return redirect(url_for("convocacao_detalhe", evento_id=evento_id))
+
+
+@app.route("/convocacao/<int:evento_id>/limpar-escalacao", methods=["POST"])
+@autenticacao.somente_admin
+def convocacao_limpar_escalacao(evento_id: int):
+    consultas.limpar_escalacao(g.conexao, evento_id)
+    flash("Escalação limpa. Todo mundo voltou pro banco.", "sucesso")
+    return redirect(url_for("convocacao_detalhe", evento_id=evento_id))
 
 
 # ------------------------------------------------------------------- login

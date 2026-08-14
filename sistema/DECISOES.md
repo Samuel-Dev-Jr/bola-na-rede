@@ -165,6 +165,43 @@ Com base fictícia, não há dado de ninguém lá.
 A regra que fica: **a instância hospedada nunca recebe o caderno real.** Se a
 coordenação usar o sistema para valer, aquilo roda no computador do Centro.
 
+## 3c. A escalação, e por que ela é toque em vez de arrastar
+
+A escalação mostra o time no campo — pentágono de posições, número da camisa,
+quem está no banco. Ela vive na `convocacao` e não em tabela nova, porque é uma
+propriedade da convocação: quem foi chamado e onde joga. **Convocado sem posição
+É o reserva**, sem precisar de coluna pra isso.
+
+Cada esporte tem geometria própria, em `escalacao.py`: 11 no futebol num 4-4-2,
+6 no vôlei na rotação numerada de 1 a 6, 5 no basquete por função. Karatê e
+pilates não escalam, e nem têm convocação.
+
+**Toque, não arrastar.** Arrastar é o que parece natural num editor de escalação,
+e eu não fiz assim de propósito: arrastar em celular é frágil, não tem caminho
+por teclado, e o técnico está com uma mão no telefone na beira do campo com sol
+na tela. Toque numa posição abre a lista de quem pode entrar. O abre-e-fecha é
+`<details>` do HTML puro — zero JavaScript, zero biblioteca.
+
+Três coisas que eu só descobri testando:
+
+1. **Substituir tem que mandar o antigo pro banco, não pra fora.** Quando o
+   técnico troca o goleiro, o goleiro antigo continua indo ao jogo. O lugar é que
+   é único, não a pessoa.
+2. **Salvar a lista de convocados apagava o time inteiro.** O `salvar_convocacao`
+   apagava tudo e regravava — inofensivo antes de existir escalação, destrutivo
+   depois: mexer num nome apagaria o time que o técnico acabou de montar. Agora
+   ele só remove quem saiu e acrescenta quem entrou.
+3. **O menu do goleiro abria fora da tela.** Ele fica a 88% da altura do campo, e
+   o menu de 320px descia pra fora. Posições da metade de baixo agora abrem pra
+   cima. Isso apareceu num print, não num teste — e é por isso que eu tiro print.
+
+E um defeito que era da BASE, não do código: a demonstração espalhava 62 pessoas
+por 24 turmas, dando umas quatro por turma. Só que time de futebol precisa de 11
+**na mesma turma**. O Sub-13 ficou com 4 elegíveis pra 11 posições e um jogo
+apontava pra turma vazia — a tela abria parecendo quebrada. Agora a base é
+gerada por alvo, e o `preparar_deploy.py` avisa quando um jogo tem menos
+elegíveis que posições.
+
 ## 4. Login e papéis — a lacuna que era a mais séria, e como fechei
 
 Até a versão anterior esta seção começava com "não tem login", e era a limitação

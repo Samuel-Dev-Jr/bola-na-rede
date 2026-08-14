@@ -1178,6 +1178,205 @@ input:focus, select:focus, textarea:focus {
 
 .duas-colunas { display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start; }
 
+/* Campo de escalação.
+
+   O desenho é CSS puro, sem imagem: acompanha o tamanho da tela sem perder
+   nitidez e não pesa no carregamento — o técnico abre isso no celular na beira
+   do campo, às vezes com sinal ruim.
+
+   aspect-ratio mantém a proporção do campo em qualquer largura, o que evita o
+   jogador escorregar de lugar quando a tela muda. */
+
+.quadra {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--raio);
+  overflow: visible;
+  background:
+    repeating-linear-gradient(180deg,
+      #157a44 0 7.6%, #12703d 7.6% 15.2%);
+  border: 2px solid rgba(255, 255, 255, .5);
+}
+
+.quadra--volei,
+.quadra--basquete {
+  aspect-ratio: 4 / 5;
+  background: repeating-linear-gradient(180deg,
+    #b4632c 0 9%, #a95c28 9% 18%);
+}
+
+/* As marcações: círculo central, linha do meio e área. Desenho com pseudo
+   elementos pra não encher o HTML de div decorativa. */
+.quadra__linhas {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--raio);
+  pointer-events: none;
+}
+
+.quadra__linhas::before {
+  /* linha do meio */
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  border-top: 2px solid rgba(255, 255, 255, .5);
+}
+
+.quadra__linhas::after {
+  /* círculo central */
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 30%; aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 255, 255, .5);
+  border-radius: 50%;
+}
+
+/* No vôlei o círculo central não existe: a linha do meio é a rede. */
+.quadra--volei .quadra__linhas::after { display: none; }
+
+.posicao {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+/* Quando um menu abre, ele sobe acima dos outros jogadores. Sem isso o menu
+   ficava atrás do jogador de baixo e não dava pra clicar nos últimos nomes. */
+.posicao[open] { z-index: 20; }
+
+.posicao > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 54px;
+  min-height: 54px;
+  padding: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .22);
+  border: 2px dashed rgba(255, 255, 255, .65);
+  color: #fff;
+  text-align: center;
+}
+
+.posicao > summary::-webkit-details-marker { display: none; }
+
+.posicao--ocupada > summary {
+  background: #ffffff;
+  border: 2px solid var(--verde-escuro);
+  color: var(--texto);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+}
+
+.posicao__numero {
+  font-family: var(--fonte-placar);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.posicao__nome {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.1;
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posicao__vazia { font-size: 13px; font-weight: 700; }
+
+.posicao__menu {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 6px);
+  transform: translateX(-50%);
+  width: 250px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .22);
+  padding: 10px;
+  text-align: left;
+}
+
+/* Posições da metade de baixo abrem o menu pra cima. Sem isso o menu do goleiro
+   (88% da altura) caía inteiro fora da tela. */
+.posicao--menu-acima .posicao__menu {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+.posicao__titulo {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-fraco);
+}
+
+.posicao__lista { list-style: none; margin: 8px 0 0; padding: 0; }
+
+.posicao__lista button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: var(--raio-pequeno);
+  font-family: var(--fonte);
+  font-size: 14px;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+}
+
+.posicao__lista button:hover { background: var(--fundo); }
+
+.posicao__pessoa { display: flex; flex-direction: column; min-width: 0; }
+
+.posicao__pessoa-nome {
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.posicao__pessoa-obs {
+  font-size: 12px;
+  color: var(--texto-fraco);
+  line-height: 1.3;
+}
+
+/* Banco de reservas */
+
+.banco { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+.banco__pessoa {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  font-size: 14px;
+}
+
 /* Avisos e vazio */
 
 .aviso {

@@ -711,10 +711,13 @@ def obter_evento(conexao: sqlite3.Connection, evento_id: int) -> Optional[dict]:
     if linha is None:
         return None
 
-    convocados_ids = {
-        r["matricula_id"] for r in conexao.execute(
-            "SELECT matricula_id FROM convocacao WHERE evento_id = ?", (evento_id,))
+    # matricula_id -> posição escalada (ou None, que significa banco de reservas)
+    convocacoes = {
+        r["matricula_id"]: r["posicao"] for r in conexao.execute(
+            "SELECT matricula_id, posicao FROM convocacao WHERE evento_id = ?",
+            (evento_id,))
     }
+    convocados_ids = set(convocacoes)
 
     # Mostro o risco de cada um aqui também, porque o técnico costuma querer
     # chamar justamente quem está faltando, pra trazer o aluno de volta.
@@ -732,7 +735,11 @@ def obter_evento(conexao: sqlite3.Connection, evento_id: int) -> Optional[dict]:
         elegiveis.append({
             **dict(m), "avaliacao": avaliacao, "marcas": marcas,
             "convocado": m["matricula_id"] in convocados_ids,
+            "posicao": convocacoes.get(m["matricula_id"]),
         })
+
+    convocados = [e for e in elegiveis if e["convocado"]]
+    escalados = {e["posicao"]: e for e in convocados if e["posicao"]}
 
     return {
         **dict(linha),
@@ -741,7 +748,12 @@ def obter_evento(conexao: sqlite3.Connection, evento_id: int) -> Optional[dict]:
             else f"{linha['modalidade_nome']} {linha['modalidade_genero']}"
         ),
         "elegiveis": elegiveis,
-        "convocados": [e for e in elegiveis if e["convocado"]],
+        "convocados": convocados,
+        # posição -> quem está nela, pro template não precisar varrer a lista
+        # inteira em cada lugar do campo.
+        "escalados": escalados,
+        # Convocado sem posição é reserva. Não precisa de coluna pra isso.
+        "reservas": [e for e in convocados if not e["posicao"]],
     }
 
 
@@ -781,13 +793,69 @@ def eventos_da_pessoa(conexao: sqlite3.Connection, pessoa_id: int,
 
 def salvar_convocacao(conexao: sqlite3.Connection, evento_id: int,
                       matricula_ids: list[int]) -> None:
-    # Apago e regravo tudo. A lista é pequena, então não compensou complicar
-    # comparando quem entrou e quem saiu.
-    conexao.execute("DELETE FROM convocacao WHERE evento_id = ?", (evento_id,))
-    conexao.executemany(
-        "INSERT INTO convocacao (evento_id, matricula_id) VALUES (?,?)",
-        [(evento_id, m) for m in matricula_ids],
+    """
+    Grava quem foi convocado, PRESERVANDO a escalação de quem continua na lista.
+
+    Antes eu apagava tudo e regravava. Com a escalação isso passou a ser
+    destrutivo: mexer num único nome na lista de convocados apagaria o time
+    inteiro que o técnico tinha acabado de montar. Agora só removo quem saiu e
+    acrescento quem entrou.
+    """
+    marcados = set(matricula_ids)
+    atuais = {
+        r["matricula_id"] for r in conexao.execute(
+            "SELECT matricula_id FROM convocacao WHERE evento_id = ?", (evento_id,))
+    }
+
+    saiu = atuais - marcados
+    if saiu:
+        conexao.executemany(
+            "DELETE FROM convocacao WHERE evento_id = ? AND matricula_id = ?",
+            [(evento_id, m) for m in saiu],
+        )
+
+    entrou = marcados - atuais
+    if entrou:
+        conexao.executemany(
+            "INSERT INTO convocacao (evento_id, matricula_id) VALUES (?,?)",
+            [(evento_id, m) for m in entrou],
+        )
+    conexao.commit()
+
+
+def escalar(conexao: sqlite3.Connection, evento_id: int, matricula_id: int,
+            posicao: Optional[str]) -> None:
+    """
+    Põe alguém numa posição, ou manda pro banco quando posicao é None.
+
+    Duas regras que o SQL sozinho não daria:
+
+    1. Se a posição já tem dono, o antigo vai pro banco. É o que "substituir"
+       significa em campo — o lugar é que é único, não a pessoa.
+    2. Quem vai escalar precisa estar convocado. Se não estiver, convoco junto:
+       arrastar alguém pro campo já quer dizer que ele vai.
+    """
+    if posicao:
+        conexao.execute(
+            "UPDATE convocacao SET posicao = NULL "
+            "WHERE evento_id = ? AND posicao = ? AND matricula_id <> ?",
+            (evento_id, posicao, matricula_id),
+        )
+
+    conexao.execute(
+        """
+        INSERT INTO convocacao (evento_id, matricula_id, posicao) VALUES (?,?,?)
+        ON CONFLICT (evento_id, matricula_id) DO UPDATE SET posicao = excluded.posicao
+        """,
+        (evento_id, matricula_id, posicao),
     )
+    conexao.commit()
+
+
+def limpar_escalacao(conexao: sqlite3.Connection, evento_id: int) -> None:
+    """Manda todo mundo pro banco, sem desconvocar ninguém."""
+    conexao.execute(
+        "UPDATE convocacao SET posicao = NULL WHERE evento_id = ?", (evento_id,))
     conexao.commit()
 
 
@@ -802,14 +870,35 @@ def mensagem_whatsapp(evento: dict) -> str:
     ]
     if evento.get("turma_nome"):
         partes.append(f"👕 Turma: {evento['turma_nome']}")
-    partes += ["", f"*Convocados ({len(evento['convocados'])}):*"]
-    # Quem tem camisa aparece pelo número, que é como convocação é lida em
-    # campo. Mantenho a ordem alfabética e não a numérica de propósito: é a
-    # mesma ordem da tela que o técnico está olhando enquanto confere a lista.
-    partes += [
-        f"{c['numero']} - {c['nome']}" if c.get("numero") else c["nome"]
-        for c in evento["convocados"]
-    ]
+    def com_numero(pessoa):
+        # Quem tem camisa aparece pelo número, que é como convocação é lida em
+        # campo.
+        return (f"{pessoa['numero']} - {pessoa['nome']}"
+                if pessoa.get("numero") else pessoa["nome"])
+
+    escalados = evento.get("escalados") or {}
+    if escalados:
+        # Com time montado, a mensagem sai na ORDEM DO CAMPO — goleiro primeiro,
+        # depois defesa, meio e ataque. Ordem alfabética aqui não ajudaria
+        # ninguém: quem lê quer conferir o time, não achar um nome.
+        from escalacao import para_modalidade
+
+        _tipo, posicoes = para_modalidade(evento["modalidade_slug"])
+        partes += ["", f"*Escalação ({len(escalados)}):*"]
+        for codigo, _curto, nome_posicao, _x, _y in posicoes:
+            pessoa = escalados.get(codigo)
+            if pessoa:
+                partes.append(f"{nome_posicao}: {com_numero(pessoa)}")
+
+        reservas = evento.get("reservas") or []
+        if reservas:
+            partes += ["", f"*No banco ({len(reservas)}):*"]
+            partes += [com_numero(r) for r in reservas]
+    else:
+        partes += ["", f"*Convocados ({len(evento['convocados'])}):*"]
+        # Sem escalação, mantenho a ordem alfabética: é a mesma ordem da tela que
+        # o técnico está olhando enquanto confere a lista.
+        partes += [com_numero(c) for c in evento["convocados"]]
 
     if evento["observacoes"]:
         partes += ["", f"ℹ️ {evento['observacoes']}"]

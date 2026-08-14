@@ -31,6 +31,7 @@ from pathlib import Path
 import autenticacao
 import configurar
 import db
+import escalacao
 import importar
 
 PASTA_DADOS = Path(__file__).resolve().parent / "dados"
@@ -54,12 +55,18 @@ def criar_eventos(conexao) -> int:
     defeito.
     """
     hoje = date.today()
+
+    # A TURMA de cada jogo tem que ser uma que TENHA GENTE. Eu tinha posto o
+    # amistoso feminino no Sub-15, que na base ficou vazio: o evento existia, a
+    # tela abria, e a escalação mostrava 11 posições sem ninguém pra escolher —
+    # parecia defeito do sistema. Depois de conferir a base, os dois jogos de
+    # futebol vão pro Sub-13, que é onde os times fecham.
     jogos = [
         ("futebol-masculino", "Sub-13", "Copa Regional de Base — 1ª rodada",
          "Grêmio do Jardim Maria Rosa", hoje + timedelta(days=9),
          "Campo do Centro de Cultura e Esporte",
          "Chegar 40 minutos antes, uniforme completo."),
-        ("futebol-feminino", "Sub-15", "Amistoso de preparação",
+        ("futebol-feminino", "Sub-13", "Amistoso de preparação",
          "Meninas do Parque Pinheiros", hoje + timedelta(days=16),
          "Quadra da Escola Estadual Jardim Record", None),
         ("volei-masculino", None, "Torneio interbairros — fase de grupos",
@@ -100,12 +107,12 @@ def criar_eventos(conexao) -> int:
         if turma_id:
             elegiveis = conexao.execute(
                 "SELECT id FROM matricula WHERE turma_id = ? AND status = 'ativa' "
-                "LIMIT 12", (turma_id,)
+                "LIMIT 14", (turma_id,)
             ).fetchall()
         else:
             elegiveis = conexao.execute(
                 """SELECT ma.id FROM matricula ma JOIN turma t ON t.id = ma.turma_id
-                   WHERE t.modalidade_id = ? AND ma.status = 'ativa' LIMIT 12""",
+                   WHERE t.modalidade_id = ? AND ma.status = 'ativa' LIMIT 14""",
                 (modalidade["id"],),
             ).fetchall()
 
@@ -113,6 +120,25 @@ def criar_eventos(conexao) -> int:
             "INSERT INTO convocacao (evento_id, matricula_id) VALUES (?,?)",
             [(cursor.lastrowid, e["id"]) for e in elegiveis],
         )
+
+        # Confere se dá pra montar o time. Se não der, avisa em vez de deixar a
+        # tela de escalação com posições vazias parecendo defeito. Foi exatamente
+        # isso que aconteceu quando um jogo apontou pra turma sem gente.
+        _quadra, posicoes = escalacao.para_modalidade(slug)
+        if posicoes and len(elegiveis) < len(posicoes):
+            print(f"  AVISO: {nome} tem {len(elegiveis)} elegíveis para "
+                  f"{len(posicoes)} posições — o time não fecha.")
+
+        # O PRIMEIRO jogo já sobe escalado, pra vitrine mostrar o campo montado.
+        # Os outros ficam com todo mundo no banco, que é como o técnico encontra
+        # um jogo novo antes de escalar.
+        if criados == 1 and posicoes:
+            for (codigo, _c, _n, _x, _y), pessoa in zip(posicoes, elegiveis):
+                conexao.execute(
+                    "UPDATE convocacao SET posicao = ? "
+                    "WHERE evento_id = ? AND matricula_id = ?",
+                    (codigo, cursor.lastrowid, pessoa["id"]),
+                )
 
     conexao.commit()
     print(f"  {criados} evento(s) de exemplo, com convocação")
