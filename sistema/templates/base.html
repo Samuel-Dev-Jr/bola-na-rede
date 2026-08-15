@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="Bola na Rede">
   <meta name="description" content="Gestão das atividades do Centro de Cultura e Esporte do Jardim Elizabete.">
 
-  <link rel="icon" href="{{ url_for('static', filename='icone.svg') }}" type="image/svg+xml">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icone-180.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 
@@ -33,7 +33,12 @@
 <header class="topo">
   <div class="topo__interno">
     <a class="marca" href="{{ url_for('centro') }}">
-      <img class="marca__escudo" src="{{ url_for('static', filename='icone.svg') }}" alt="">
+      {# marca.png e não logo.png: é a mesma imagem, gerada a 128px em vez de
+         640. O cabeçalho aparece em TODA página, e o arquivo grande custaria
+         meio mega por tela num sistema que é usado no celular à beira do campo.
+         O de 640 fica só na tela de entrar, onde ele aparece uma vez. #}
+      <img class="marca__escudo" src="{{ url_for('static', filename='marca.png') }}"
+           alt="" width="128" height="128">
       <span>
         Bola na Rede
         <span class="marca__local">

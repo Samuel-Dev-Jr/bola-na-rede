@@ -151,11 +151,17 @@ a { color: var(--verde); }
   padding: 10px 0;
 }
 
+/* 38px, e não os 28 de antes. O brasão do Centro tem cinco esportes dentro; a
+   28px ele era uma mancha. 38 é o teto: o .topo__interno tem 58px de altura
+   mínima e o .marca reserva 10px de respiro em cima e embaixo — 38 + 20 = 58,
+   então a barra não cresce.
+   Sem border-radius: o arredondamento existia pro ícone antigo, que era um
+   quadrado verde. O brasão tem contorno próprio e fundo transparente. */
 .marca__escudo {
-  width: 28px;
-  height: 28px;
+  width: 38px;
+  height: 38px;
   flex: none;
-  border-radius: 8px;
+  object-fit: contain;
 }
 
 .marca__local {
