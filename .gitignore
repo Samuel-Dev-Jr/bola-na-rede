@@ -30,3 +30,8 @@ entregaveis/
 *.pptx
 *.docx
 *.pdf
+
+# Anotações de trabalho minhas, fora do sistema. Não são código nem entregável,
+# e sem esta linha um `git add .` levaria elas junto pro repositório.
+MEMORY.md
+memory/
