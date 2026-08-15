@@ -349,16 +349,28 @@ e 75%. Depois de corrigir, repeti o exercício com as 6 constantes da regra e as
 
 ## 7. Limites conhecidos
 
-- **Não tem login.** Ver a seção 4, com o que faltaria.
+- ~~**Não tem login.**~~ **Resolvido.** Esta linha ficou aqui contradizendo a
+  seção 4 inteira, que descreve o login implementado com dois papéis. Deixo o
+  registro em vez de apagar em silêncio: lista de limites que não é revisada
+  junto com o código vira ficção, e esta passou a mentir a favor — dizia que o
+  sistema era pior do que ele é.
 - **O cálculo de risco carrega todas as presenças na memória.** O custo cresce
   com o número de presenças, não de pessoas, então é o histórico acumulado que
   aperta primeiro. Não tenho a medição com a base real ainda; o `metricas.py`
   mede quando ela estiver carregada.
 - **Não tem controle financeiro nenhum**, de propósito. Ver a seção 3.
-- **Não dá para trocar o número da camisa depois.** Ele é definido no momento da
-  matrícula, ou em lote pela planilha (reimportar atualiza). Falta uma tela de
-  editar matrícula, que hoje não existe para nada — nem para número, nem para
-  turma. Quem precisar trocar o 10 pelo 9 corrige a planilha e reimporta.
+- ~~**Não dá para trocar o número da camisa depois.**~~ **Resolvido.** Existe a
+  tela de editar matrícula, em `/matriculas/<id>/editar`, que troca número e
+  turma. O detalhe que importa: mudar de turma **não** mexe na presença já
+  registrada, porque `presenca` aponta para `matricula` e não para turma — quem
+  sobe do Sub-13 para o Sub-15 leva a frequência junto, e o nível de risco não
+  zera do nada.
+- **Os dias de treino e o texto do horário não se amarram.** A tela de horário
+  grava as duas coisas separadas: os dias marcados, que a chamada e a agenda
+  usam, e o texto livre que aparece para quem lê. Dá para marcar segunda e
+  escrever "Ter e Qui" — o sistema aceita. Amarrar exigiria gerar o texto a
+  partir dos dias, e aí se perderia o "Sáb, 8h às 11h" que a coordenação escreve
+  à mão.
 - **A chamada valida o status, mas não a data.** O `salvar_chamada` só aceita
   `presente`, `falta` ou `justificada`, e descarta qualquer outra coisa que
   chegue no formulário. A data, não: dá para lançar presença em um dia que não
