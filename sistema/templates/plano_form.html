@@ -2,7 +2,7 @@
 {% import "_trilha.html" as nav %}
 
 {% block titulo %}
-  {{ 'Editar plano' if plano else 'Publicar plano' }} — Bola na Rede
+  {{ 'Editar plano' if plano else 'Publicar plano' }} — Centro de Cultura e Esporte
 {% endblock %}
 
 {% set acao = url_for('plano_editar', plano_id=plano.id) if plano

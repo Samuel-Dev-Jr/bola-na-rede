@@ -3,7 +3,7 @@ Calcula as métricas de impacto do projeto, lendo o banco na hora.
 
 Eu fiz este script em vez de escrever os números num documento porque número
 escrito à mão em relatório ninguém consegue conferir. Aqui é só rodar
-`python metricas.py` e ele recalcula tudo do `bola_na_rede.db` na frente de
+`python metricas.py` e ele recalcula tudo do `centro.db` na frente de
 quem estiver olhando.
 
 A procedência de cada número está declarada junto dele, porque isso muda o peso

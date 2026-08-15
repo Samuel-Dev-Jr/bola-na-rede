@@ -36,7 +36,7 @@ services:
       # guardar — melhor que eu escolher, e melhor que ficar no código.
       # Consequência: a chave muda em cada deploy, então todo mundo é
       # desconectado quando você publica de novo. Para uma vitrine, tudo bem.
-      - key: BOLA_NA_REDE_CHAVE
+      - key: CENTRO_CHAVE
         generateValue: true
 
       - key: ADMIN_LOGIN

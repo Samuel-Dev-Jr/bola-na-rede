@@ -53,7 +53,7 @@ ROTAS_DO_JOGADOR = {
 # está convocado — vive em telas próprias, que mostram só o dele.
 
 CHAVE_SESSAO = "usuario_id"
-VARIAVEL_CHAVE = "BOLA_NA_REDE_CHAVE"
+VARIAVEL_CHAVE = "CENTRO_CHAVE"
 
 # Mínimo de caracteres na senha. Oito é pouco para a internet, mas isto roda na
 # rede local do Centro e a senha vai ser digitada por criança no celular. Está

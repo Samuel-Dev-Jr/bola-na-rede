@@ -5,7 +5,7 @@ from datetime import date
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-CAMINHO_BANCO = BASE_DIR / "bola_na_rede.db"
+CAMINHO_BANCO = BASE_DIR / "centro.db"
 CAMINHO_SCHEMA = BASE_DIR / "schema.sql"
 CAMINHO_MIGRACOES = BASE_DIR / "migracoes.sql"
 

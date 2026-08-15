@@ -1,4 +1,4 @@
--- Banco do Projeto Social Bola na Rede
+-- Banco do Centro de Cultura e Esporte — Jardim Elizabete
 -- Extensão Curricularizada UniFECAF / Análise e Desenvolvimento de Sistemas
 --
 -- A tabela mensalidade eu TIREI de propósito. O projeto é um grupo comunitário

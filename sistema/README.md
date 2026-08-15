@@ -1,11 +1,11 @@
-# Bola na Rede
+# Centro de Cultura e Esporte
 
 Sistema de gestão da escolinha de futebol comunitária.
 
 Projeto de Extensão Curricularizada — UniFECAF
 Análise e Desenvolvimento de Sistemas — 2026
 
-Projeto Social Bola na Rede — Centro de Cultura e Esporte
+Centro de Cultura e Esporte — Jardim Elizabete
 R. Manoel Maria Fernandes, 580, Jardim Elizabete, Taboão da Serra/SP
 
 ## Como rodar
@@ -37,11 +37,11 @@ Em uso de verdade, defina a chave que assina a sessão — sem ela o sistema sor
 uma nova a cada início e todo mundo é desconectado quando o servidor reinicia:
 
 ```bash
-set BOLA_NA_REDE_CHAVE=uma-string-longa-e-aleatoria
+set CENTRO_CHAVE=uma-string-longa-e-aleatoria
 ```
 
 Não precisa de Node, nem de servidor de banco, nem de internet. O banco é um
-arquivo só (`bola_na_rede.db`) e as fontes são as que já vêm no computador,
+arquivo só (`centro.db`) e as fontes são as que já vêm no computador,
 porque o técnico usa o sistema na beira do campo, onde às vezes não pega sinal.
 
 O `configurar.py` cria o banco com as 8 modalidades e as 24 turmas do Centro, e
@@ -104,7 +104,7 @@ O que precisa estar definido no Render:
 |---|---|
 | `ADMIN_SENHA` | senha do administrador. Sem ela o deploy aborta de propósito |
 | `ADMIN_LOGIN` | login do administrador (padrão `coordenacao`) |
-| `BOLA_NA_REDE_CHAVE` | assina o cookie de sessão. O `render.yaml` pede pro Render sortear |
+| `CENTRO_CHAVE` | assina o cookie de sessão. O `render.yaml` pede pro Render sortear |
 
 Duas coisas a saber: a instância gratuita **hiberna** depois de ~15 minutos sem
 acesso e leva perto de um minuto pra acordar — abra o link antes de apresentar. E

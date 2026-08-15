@@ -2,7 +2,7 @@
 {% import "_trilha.html" as nav %}
 
 {% block titulo %}
-  {{ 'Editar ' + pessoa.nome if pessoa else 'Cadastrar pessoa' }} — Bola na Rede
+  {{ 'Editar ' + pessoa.nome if pessoa else 'Cadastrar pessoa' }} — Centro de Cultura e Esporte
 {% endblock %}
 
 {% set acao = url_for('pessoa_editar', pessoa_id=pessoa.id) if pessoa

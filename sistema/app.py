@@ -1,5 +1,5 @@
 """
-Bola na Rede - sistema de gestão do Centro de Cultura e Esporte.
+Centro de Cultura e Esporte - sistema de gestão da escolinha comunitária.
 
 Projeto de Extensão Curricularizada - UniFECAF
 Análise e Desenvolvimento de Sistemas
@@ -54,9 +54,9 @@ app.config["MAX_CONTENT_LENGTH"] = 4 * 1024 * 1024
 # A chave que assina o cookie de sessão. Ela ficava fixa aqui, com um comentário
 # meu dizendo que tinha que sair do código no dia que existisse login. Esse dia
 # chegou: com login, chave conhecida deixa qualquer um forjar cookie de admin.
-# Agora vem de BOLA_NA_REDE_CHAVE, e sem ela é sorteada a cada início — seguro,
+# Agora vem de CENTRO_CHAVE, e sem ela é sorteada a cada início — seguro,
 # mas derruba as sessões quando o servidor reinicia.
-#     Windows:  set BOLA_NA_REDE_CHAVE=<string longa e aleatória>
+#     Windows:  set CENTRO_CHAVE=<string longa e aleatória>
 app.secret_key = autenticacao.chave_secreta()
 
 # Campos de texto da ficha da pessoa. Uso essa lista pra montar o INSERT e o
@@ -163,8 +163,11 @@ def manifest():
     return app.response_class(
         json.dumps(
             {
-                "name": "Bola na Rede",
-                "short_name": "Bola na Rede",
+                "name": "Centro de Cultura e Esporte",
+                # short_name é o rótulo embaixo do ícone na tela de início, e o celular
+                # corta o que passa de uns 12 caracteres. O nome inteiro
+                # viraria "Centro de Cul...".
+                "short_name": "Centro CE",
                 "description": "Gestão das atividades do Centro de Cultura e "
                                "Esporte do Jardim Elizabete.",
                 "start_url": "/",
@@ -1201,8 +1204,8 @@ if __name__ == "__main__":
     #    5000 ao mesmo tempo, de dias diferentes, e uma tela nova respondendo 404
     #    porque a requisição caiu num servidor velho.
     #
-    # Pra desenvolver com recarga automática:  set BOLA_NA_REDE_DEBUG=1
-    debug = os.environ.get("BOLA_NA_REDE_DEBUG") == "1"
+    # Pra desenvolver com recarga automática:  set CENTRO_DEBUG=1
+    debug = os.environ.get("CENTRO_DEBUG") == "1"
 
     # PORT é o que a hospedagem define. HOST em 0.0.0.0 aceita conexão de outros
     # aparelhos; localhost só da própria máquina.

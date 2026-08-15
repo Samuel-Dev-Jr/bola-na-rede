@@ -1,5 +1,5 @@
 @echo off
-REM Bola na Rede - atalho para subir o sistema.
+REM Centro de Cultura e Esporte - atalho para subir o sistema.
 REM Basta dar dois cliques neste arquivo.
 
 cd /d "%~dp0"
@@ -19,7 +19,7 @@ if errorlevel 1 (
     python -m pip install -r requirements.txt --quiet
 )
 
-if not exist "bola_na_rede.db" (
+if not exist "centro.db" (
     echo  Primeira execucao: criando o banco com as modalidades e turmas...
     python configurar.py
     echo.
@@ -27,7 +27,7 @@ if not exist "bola_na_rede.db" (
 
 echo.
 echo  ====================================================
-echo   Bola na Rede esta subindo em http://localhost:5000
+echo   Centro de Cultura e Esporte esta subindo em http://localhost:5000
 echo   Feche esta janela ou tecle Ctrl+C para parar.
 echo  ====================================================
 echo.

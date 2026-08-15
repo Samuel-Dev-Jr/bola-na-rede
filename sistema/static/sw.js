@@ -1,5 +1,5 @@
 /*
-  Service worker do Bola na Rede.
+  Service worker do sistema do Centro de Cultura e Esporte.
 
   É o que faz o app funcionar sem internet. O técnico usa na quadra do Centro
   de Cultura e Esporte, onde o sinal cai direto, então precisava abrir mesmo

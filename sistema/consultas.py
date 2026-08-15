@@ -52,8 +52,8 @@ DIAS_SEMANA_CURTO = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
 #
 # A variável de ambiente existe pra uma coisa só: travar a data na hora de tirar
 # os prints ou gravar o vídeo, pra a tela não mudar entre uma captura e outra.
-#     Windows:  set BOLA_NA_REDE_HOJE=2026-08-12
-VARIAVEL_DATA_FIXA = "BOLA_NA_REDE_HOJE"
+#     Windows:  set CENTRO_HOJE=2026-08-12
+VARIAVEL_DATA_FIXA = "CENTRO_HOJE"
 
 # 12 aulas dá mais ou menos um mês. Testei com 8 e com 20: 8 era pouco pra dar
 # pra perceber a queda, 20 não cabia na tabela.
@@ -906,7 +906,7 @@ def mensagem_whatsapp(evento: dict) -> str:
     partes += [
         "",
         "Responsáveis, confirmem a presença respondendo aqui no grupo.",
-        "_Projeto Social Bola na Rede — Jardim Elizabete_",
+        "_Centro de Cultura e Esporte — Jardim Elizabete_",
     ]
     return "\n".join(partes)
 

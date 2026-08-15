@@ -1,4 +1,4 @@
-# Decisões de projeto — Bola na Rede
+# Decisões de projeto — Centro de Cultura e Esporte
 
 Projeto de Extensão Curricularizada — UniFECAF
 Análise e Desenvolvimento de Sistemas — 2026
@@ -118,7 +118,7 @@ A primeira versão tinha uma tela de mensalidades, com valor arrecadado no mês 
 situação de pagamento de cada criança. Eu tirei, e essa é uma decisão que eu
 defendo, não uma funcionalidade que faltou.
 
-O Bola na Rede é um grupo comunitário informal, **sem CNPJ**, e as atividades
+O Centro de Cultura e Esporte é um grupo comunitário informal, **sem CNPJ**, e as atividades
 são gratuitas. Um sistema que controla cobrança daria a entender que existe
 pessoa jurídica por trás, e não existe. Além disso, a tela marcava criança por
 criança quem estava com pagamento em aberto e quem era isento por

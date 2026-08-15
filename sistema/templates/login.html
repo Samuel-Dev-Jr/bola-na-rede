@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block titulo %}Entrar — Bola na Rede{% endblock %}
+{% block titulo %}Entrar — Centro de Cultura e Esporte{% endblock %}
 
 {% block conteudo %}
 
@@ -11,15 +11,13 @@
    como a porta de um sistema. O texto é o que o sistema faz — sem promessa que
    ele não cumpre. #}
 <div class="entrada__marca">
-  {# A logo do Centro entra aqui e não no cabeçalho porque é onde ela cabe: ela
-     tem cinco esportes, um livro e duas linhas de texto dentro, e nada disso
-     sobrevive aos 28px da barra de cima. Esta é a porta do sistema — o lugar
-     onde identificar a instituição importa e há espaço pra isso. #}
+  {# Aqui a logo vai grande, em 640px, e não a marca de 128 do cabeçalho: esta é
+     a única tela em que ela aparece uma vez só, então pode pesar. É também a
+     porta do sistema, onde identificar a instituição é o que importa. #}
   <img class="entrada__escudo" src="{{ url_for('static', filename='logo.png') }}"
-       alt="Centro de Cultura e Esporte — Jardim Elizabete"
-       width="640" height="640">
-  <h1 class="entrada__titulo">Bola na Rede</h1>
-  <p class="entrada__local">Centro de Cultura e Esporte · Jardim Elizabete</p>
+       alt="" width="640" height="640">
+  <h1 class="entrada__titulo">Centro de Cultura e Esporte</h1>
+  <p class="entrada__local">Jardim Elizabete · Taboão da Serra/SP</p>
   <p class="entrada__resumo">
     Cadastro, chamada, frequência e convocação das atividades do Centro.
   </p>
