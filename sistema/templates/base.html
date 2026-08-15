@@ -24,9 +24,11 @@
     <style>:root { --modalidade: {{ modalidade.cor }}; }</style>
   {% endif %}
 </head>
-<body class="{% if modalidade %}com-modalidade{% endif %}">
-
 {% set rota = request.endpoint %}
+
+{# A tela de entrar não é ferramenta de trabalho, é a porta: ela foge do layout
+   das outras, e o CSS precisa saber disso já no body. #}
+<body class="{% if modalidade %}com-modalidade{% endif %}{% if rota == 'login' %} tela-entrada{% endif %}">
 
 <header class="topo">
   <div class="topo__interno">

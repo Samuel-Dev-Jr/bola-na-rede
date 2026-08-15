@@ -909,12 +909,111 @@ tbody tr:hover { background: rgba(255, 255, 255, .5); }
    quando ele é a única ação da tela. */
 .botao--largo { width: 100%; }
 
-/* Coluna estreita da tela de entrar. O formulário tinha a largura da página
+/* ------------------------------------------------------------ tela de entrar
+
+   A tela de entrar é a única que não é ferramenta de trabalho: é a porta. Ela
+   foge do layout das outras de propósito.
+
+   Primeiro problema, já resolvido antes: o formulário tinha a largura da página
    inteira — 1100px de campo de login, que faz a tela ler como página em vez de
-   como entrada. */
+   como entrada. Daí a coluna estreita.
+
+   Segundo problema, este: no celular a coluna estreita ficava certa, mas no
+   computador o cartão encostava no topo e sobravam mil pixels de nada embaixo.
+   Parecia que ele tinha caído ali. Agora a tela ocupa a altura da janela e,
+   quando tem largura, vira duas colunas — quem somos à esquerda, o formulário
+   à direita. */
+
+body.tela-entrada {
+  min-height: 100vh;
+  min-height: 100dvh;   /* no celular a barra do navegador come os 100vh */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fora as manchas de cor. Nas telas de trabalho elas existem porque o efeito de
+   vidro precisa de alguma coisa atrás pra desfocar; aqui não há conteúdo atrás
+   de nada — só o cartão no vazio — e elas apareciam como três borrões soltos
+   nos cantos, que era exatamente o que incomodava. */
+body.tela-entrada::before { display: none; }
+
+/* A barra de cima repetiria o nome do projeto, que nesta tela já está grande na
+   coluna da esquerda, e o menu dela é vazio pra quem ainda não entrou. */
+body.tela-entrada .topo { display: none; }
+
+body.tela-entrada .pagina {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  max-width: 940px;
+  padding: 32px 20px;
+}
+
+/* Tirando as manchas, o vidro ficou sem nada pra desfocar: o cartão virava um
+   retângulo quase da cor do fundo, e a tela lia como se não tivesse acabado de
+   carregar. Aqui ele é branco sólido com sombra de verdade — é o único objeto
+   da tela, então pode ter peso. */
+body.tela-entrada .cartao {
+  background: #fff;
+  border-color: var(--borda);
+  box-shadow:
+    0 1px 2px rgba(20, 23, 26, .04),
+    0 12px 32px rgba(20, 23, 26, .08);
+}
+
 .entrada {
+  width: 100%;
   max-width: 400px;
   margin: 0 auto;
+}
+
+.entrada__escudo {
+  display: block;
+  width: 52px;
+  height: 52px;
+}
+
+.entrada__titulo {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin: 16px 0 6px;
+}
+
+.entrada__local {
+  margin: 0;
+  color: var(--texto-fraco);
+}
+
+.entrada__resumo {
+  margin: 16px 0 26px;
+  color: var(--texto-fraco);
+  max-width: 36ch;
+}
+
+.entrada__ajuda {
+  margin: 18px 0 0;
+  color: var(--texto-fraco);
+  font-size: 13.5px;
+}
+
+/* No computador as duas colunas. 396px na direita é a largura que o cartão já
+   tinha; o resto do espaço fica com a apresentação, em vez de virar vazio. */
+@media (min-width: 861px) {
+  .entrada {
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr 396px;
+    align-items: center;
+    gap: 72px;
+  }
+
+  .entrada__escudo { width: 64px; height: 64px; }
+  .entrada__titulo { font-size: 44px; margin-top: 20px; }
+  .entrada__local  { font-size: 17px; }
+
+  /* Lado a lado, o resumo não precisa empurrar mais nada pra baixo. */
+  .entrada__resumo { margin-bottom: 0; }
 }
 
 /* Botão branco, usado só dentro do cartão verde do elenco: o botão verde

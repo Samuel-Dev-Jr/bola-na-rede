@@ -6,10 +6,20 @@
 
 <div class="entrada">
 
-<h1 class="titulo-pagina">Bola na Rede</h1>
-<p class="subtitulo-pagina">
-  Centro de Cultura e Esporte · Jardim Elizabete
-</p>
+{# Coluna da esquerda no computador, cabeçalho no celular. Ela existe porque um
+   cartão de 400px sozinho numa tela de 1500 lê como formulário perdido, e não
+   como a porta de um sistema. O texto é o que o sistema faz — sem promessa que
+   ele não cumpre. #}
+<div class="entrada__marca">
+  <img class="entrada__escudo" src="{{ url_for('static', filename='icone.svg') }}" alt="">
+  <h1 class="entrada__titulo">Bola na Rede</h1>
+  <p class="entrada__local">Centro de Cultura e Esporte · Jardim Elizabete</p>
+  <p class="entrada__resumo">
+    Cadastro, chamada, frequência e convocação das atividades do Centro.
+  </p>
+</div>
+
+<div class="entrada__acesso">
 
 {% if sem_usuarios %}
   {# Sem nenhum usuário no banco, não tem como entrar — e eu não abro um
@@ -59,12 +69,13 @@
     </div>
   </form>
 
-  <p class="celula-secundaria" style="margin-top: 20px;">
+  <p class="entrada__ajuda">
     Esqueceu a senha? Fale com a coordenação: quem administra o sistema pode
     definir uma nova para você.
   </p>
 {% endif %}
 
+</div>
 </div>
 
 {% endblock %}
