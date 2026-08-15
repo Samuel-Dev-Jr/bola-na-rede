@@ -11,11 +11,11 @@ import db
 
 BASE = "http://127.0.0.1:5000"
 
-# O caminho do banco estava escrito à mão aqui, apontando pra C:\PROJETOS — a
+# O caminho do banco estava escrito à mão aqui, apontando pra C:\PROJETOS, a
 # pasta do MEU computador. Em qualquer outra máquina o sqlite3 não reclamava:
 # ele CRIA um arquivo vazio com esse nome e o teste morria em "no such table:
 # turma", como se o banco estivesse quebrado. Erro que mente sobre a causa é
-# pior que erro nenhum. Agora vem do db.py, que é quem sabe onde o banco fica —
+# pior que erro nenhum. Agora vem do db.py, que é quem sabe onde o banco fica:
 # o mesmo caminho que o sistema usa, em qualquer sistema operacional.
 BANCO = db.CAMINHO_BANCO
 

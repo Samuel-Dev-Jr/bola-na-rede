@@ -150,17 +150,12 @@ def criar_eventos(conexao) -> int:
 
 def criar_planos(conexao) -> int:
     """
-    Publica planos de treino de exemplo, pelo mesmo motivo dos eventos.
+    Planos de treino de exemplo, pelo mesmo motivo dos eventos: senão a tela
+    sobe vazia e o módulo não mostra pra que serve.
 
-    A tela de planos subiria vazia na vitrine, e quem abrisse veria o botão de
-    publicar em cima de um "nenhum plano publicado ainda" — o módulo existiria
-    sem mostrar o que ele faz.
-
-    Um de cada tipo, de propósito: um da modalidade inteira, um de uma turma só
-    (pra dar pra ver que o filtro existe) e um de modalidade que chama a coisa
-    de "aula" em vez de "treino". As datas são relativas a hoje pelo mesmo
-    motivo dos jogos — plano de treino da semana passada parece sistema
-    abandonado.
+    Pus um de cada tipo — da modalidade inteira, de uma turma só, e um de karatê
+    pra aparecer o "aula" no lugar de "treino". Datas relativas a hoje, senão
+    plano da semana passada parece sistema abandonado.
     """
     hoje = date.today()
 
@@ -253,28 +248,15 @@ def criar_demo(conexao) -> int:
     """
     Conta de demonstração da vitrine, com senha conhecida.
 
-    Sem ela ninguém consegue abrir a instância hospedada pra ver o sistema — nem
-    eu, nem o professor, nem alguém a quem a coordenação queira mostrar o
-    projeto. A senha do admin de verdade não está escrita em lugar nenhum do
-    repositório, de propósito, e continua assim: quem quiser entrar como
-    administrador de fato precisa do valor de ADMIN_SENHA, que só existe no
-    painel da hospedagem.
+    Sem ela ninguém abre a instância hospedada pra ver o sistema, porque o único
+    acesso era o ADMIN_SENHA que só existe no painel do Render.
 
-    Por que esta senha PODE estar aqui, e a do admin não:
+    Sei que isso contradiz o criar_admin aí em cima, e não contradiz: este
+    arquivo só roda no Render. No computador do Centro, onde tem nome de criança
+    e telefone de responsável, ele nunca executa — lá é o configurar.py e o
+    criar_usuario.py. A base daqui é inventada e some no próximo reinício.
 
-    - Este arquivo roda só no startCommand do Render (ver render.yaml). No
-      computador do Centro, onde existe nome de criança e telefone de
-      responsável, ele nunca executa. Lá o banco é criado pelo configurar.py e
-      os acessos pelo criar_usuario.py.
-    - A base que esta conta administra é INVENTADA. Os 62 nomes são fictícios.
-      Não há dado de ninguém pra vazar.
-    - O que ela alterar se perde no próximo reinício, que acontece a cada ~15
-      minutos de ociosidade. O estrago possível se desfaz sozinho.
-
-    Ou seja: não é a senha de um sistema, é a chave de uma maquete. Se um dia a
-    vitrine passar a ter dado real — o que não deve acontecer, ver o topo deste
-    arquivo — esta função sai antes.
-
+    Se um dia a vitrine tiver dado real, apagar esta função vem antes.
     Pra desligar sem mexer no código: DEMO_ATIVA=0 no painel.
     """
     if os.environ.get("DEMO_ATIVA", "1") == "0":
@@ -288,7 +270,7 @@ def criar_demo(conexao) -> int:
     if erro:
         # Não derruba o deploy por causa da conta de demonstração: o sistema
         # ainda sobe e o admin de verdade continua entrando. Só avisa.
-        print(f"  AVISO: conta de demonstração não criada — {erro}")
+        print(f"  AVISO: conta de demonstração não criada: {erro}")
         return 0
 
     print(f"  conta de demonstração {login!r} criada (base fictícia)")

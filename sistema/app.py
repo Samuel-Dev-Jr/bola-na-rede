@@ -54,7 +54,7 @@ app.config["MAX_CONTENT_LENGTH"] = 4 * 1024 * 1024
 # A chave que assina o cookie de sessão. Ela ficava fixa aqui, com um comentário
 # meu dizendo que tinha que sair do código no dia que existisse login. Esse dia
 # chegou: com login, chave conhecida deixa qualquer um forjar cookie de admin.
-# Agora vem de CENTRO_CHAVE, e sem ela é sorteada a cada início — seguro,
+# Agora vem de CENTRO_CHAVE, e sem ela é sorteada a cada início. Seguro,
 # mas derruba as sessões quando o servidor reinicia.
 #     Windows:  set CENTRO_CHAVE=<string longa e aleatória>
 app.secret_key = autenticacao.chave_secreta()
@@ -72,7 +72,7 @@ CAMPOS_PESSOA = [
 ROTAS_SEM_BANCO = {"manifest", "serviceworker", "offline", "static"}
 
 # As tabelas que nasceram depois do schema original entram aqui, uma vez, no
-# início do processo. É aditivo e não apaga nada — ver db.aplicar_migracoes().
+# início do processo. É aditivo e não apaga nada (ver db.aplicar_migracoes()).
 # Fica fora do before_request de propósito: rodar a cada requisição seria
 # desperdício, e uma vez por processo basta. Se o banco ainda não existe, o
 # before_request já devolve 503 pedindo pra rodar o configurar.
@@ -164,9 +164,9 @@ def manifest():
         json.dumps(
             {
                 "name": "Centro de Cultura e Esporte",
-                # short_name é o rótulo embaixo do ícone na tela de início, e o celular
-                # corta o que passa de uns 12 caracteres. O nome inteiro
-                # viraria "Centro de Cul...".
+                # O short_name é o rótulo embaixo do ícone na tela de início.
+                # O celular corta o que passa de uns 12 caracteres, então o
+                # nome inteiro apareceria como "Centro de Cul...".
                 "short_name": "Centro CE",
                 "description": "Gestão das atividades do Centro de Cultura e "
                                "Esporte do Jardim Elizabete.",
@@ -179,8 +179,8 @@ def manifest():
                 "lang": "pt-BR",
                 # O maskable é ARQUIVO SEPARADO, e antes não era: eu apontava o
                 # mesmo icone-512 nos dois. O Android recorta o maskable no
-                # formato que o fabricante quiser — círculo, losango, quadrado
-                # arredondado — e só garante os 80% centrais. Com a logo do
+                # formato que o fabricante quiser (círculo, losango, quadrado
+                # arredondado) e só garante os 80% centrais. Com a logo do
                 # Centro isso passou a doer de verdade: o recorte comia a faixa
                 # de baixo e o ícone ficava sem "JARDIM ELIZABETE". A versão
                 # maskable entra a 70% num fundo sólido, com folga pro corte.
@@ -249,23 +249,15 @@ def modalidade_horario(slug: str):
     """
     Edita os dias e o horário de uma modalidade pela tela.
 
-    Isso vivia no configurar.py, em código. Trocar o horário do vôlei exigia
-    editar Python e rodar o configurar de novo — e o configurar RECRIA o schema,
-    ou seja, apagava o cadastro inteiro pra mudar uma linha de texto. Na prática
-    o horário era imutável depois da primeira matrícula, e a coordenação
-    dependia de mim pra uma coisa que muda sozinha: quadra emprestada, professor
-    que troca de turno, horário de verão.
+    Isso vivia no configurar.py, em código, e o configurar recria o schema —
+    ou seja, pra trocar o horário do vôlei eu apagava o cadastro inteiro. Na
+    prática o horário era imutável depois da primeira matrícula, e a coordenação
+    me ligava por causa de quadra emprestada e professor trocando de turno.
 
-    São dois campos com papéis diferentes, e é importante não confundir:
-
-    - `dias_aula` é máquina. Sai daqui como "0,2,4" porque é o formato que
-      proxima_data_de_aula() e agenda_do_mes() já leem. Mexer nele muda a data
-      que a chamada sugere e quais quadradinhos a agenda pinta como dia de aula.
-    - `horario` é gente. É texto livre, escrito pra ser lido — "Seg e Qua, 18h
-      às 20h" — e aparece no painel, na chamada, na agenda e na área do jogador.
-
-    Nada disso reescreve o passado: presença já lançada continua lá igual, e o
-    nível de risco sai das presenças, não daqui.
+    Os dois campos fazem coisas diferentes e eu confundi na primeira versão:
+    dias_aula é o que o sistema lê (sai como "0,2,4", que é o formato que a
+    chamada e a agenda já esperam) e horario é texto livre, escrito pra pessoa
+    ler. Presença já lançada não é afetada por nenhum dos dois.
     """
     modalidade = carregar_modalidade(slug)
 
@@ -392,15 +384,12 @@ def matricula_editar(matricula_id: int):
     """
     Corrige a turma e o número da camisa de quem já está matriculado.
 
-    Faltava, e o buraco era feio: depois de matricular, trocar a camisa ou subir
-    o menino de categoria só dava pra fazer corrigindo a planilha e importando
-    de novo. Menino faz aniversário e muda de categoria todo ano — isso não é
-    exceção, é o funcionamento normal do Centro.
+    Antes disso, trocar a camisa ou subir o menino de categoria só dava pra
+    fazer corrigindo a planilha e reimportando. Menino faz aniversário todo ano,
+    então isso não é exceção, é o normal do Centro.
 
-    Trocar de turma NÃO mexe na presença já registrada: presenca aponta pra
-    matricula, não pra turma, então a frequência dele sobe junto com ele. Era o
-    que eu queria — quem passou do Sub-13 pro Sub-15 continua sendo a mesma
-    pessoa, com o mesmo histórico, e o nível de risco não zera do nada.
+    Trocar de turma não mexe na presença já registrada, porque presenca aponta
+    pra matricula e não pra turma. A frequência sobe junto com ele.
     """
     matricula = consultas.obter_matricula(g.conexao, matricula_id)
     if matricula is None:
@@ -433,7 +422,7 @@ def _matricula_do_form(matricula: dict, modalidade_id: int):
     """
     Valida a turma e a camisa vindas do formulário de editar matrícula.
 
-    Devolve (erro, turma_id, numero) — com erro preenchido, os outros dois não
+    Devolve (erro, turma_id, numero). Com erro preenchido, os outros dois não
     valem nada.
     """
     turma = g.conexao.execute(
@@ -598,7 +587,7 @@ def _numero_de_camisa(turma_id: int, ignorar_matricula_id: int | None = None):
 
     `ignorar_matricula_id` existe por causa da tela de editar matrícula: sem
     ele, abrir a matrícula do menino que é camisa 10, mudar só a turma e salvar
-    devolveria "a camisa 10 já é de Fulano nessa turma" — e o Fulano seria ele
+    devolveria "a camisa 10 já é de Fulano nessa turma", e o Fulano seria ele
     mesmo. A matrícula que está sendo editada não pode competir consigo.
     """
     bruto = request.form.get("numero", "").strip()
@@ -776,13 +765,12 @@ def _salvar_plano(modalidade_id: int, plano_id: int | None = None) -> str | None
     """
     Grava o plano vindo do formulário. Devolve a mensagem de erro, ou None.
 
-    Criar e editar preenchem os mesmos campos com as mesmas regras, então a
-    validação mora aqui em vez de duplicada nas duas rotas — foi duplicando esse
-    tipo de coisa que eu já deixei o cadastro aceitar o que a edição recusava.
+    Criar e editar usam os mesmos campos, então deixo a validação aqui em vez de
+    escrever duas vezes. Já me queimei duplicando validação e deixando o
+    cadastro aceitar o que a edição recusava.
 
-    A turma é opcional e vem como texto vazio quando o professor escolhe "todas
-    as turmas". Gravo NULL nesse caso, que é o que planos_da_pessoa() lê como
-    "vale pra modalidade inteira".
+    Turma vazia vira NULL, que é como o planos_da_pessoa() lê "vale pra
+    modalidade inteira".
     """
     titulo = request.form.get("titulo", "").strip()
     conteudo = request.form.get("conteudo", "").strip()
@@ -790,7 +778,7 @@ def _salvar_plano(modalidade_id: int, plano_id: int | None = None) -> str | None
     bruto_turma = request.form.get("turma_id", "").strip()
 
     if not titulo:
-        return "O plano precisa de um título — é o que aparece na lista."
+        return "O plano precisa de um título: é o que aparece na lista."
     if not conteudo:
         return "Escreva o que vai ser feito no treino."
 

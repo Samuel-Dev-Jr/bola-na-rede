@@ -917,18 +917,13 @@ tbody tr:hover { background: rgba(255, 255, 255, .5); }
 
 /* ------------------------------------------------------------ tela de entrar
 
-   A tela de entrar é a única que não é ferramenta de trabalho: é a porta. Ela
-   foge do layout das outras de propósito.
+   Esta tela foge do layout das outras de propósito: ela é a porta, não uma
+   ferramenta de trabalho.
 
-   Primeiro problema, já resolvido antes: o formulário tinha a largura da página
-   inteira — 1100px de campo de login, que faz a tela ler como página em vez de
-   como entrada. Daí a coluna estreita.
-
-   Segundo problema, este: no celular a coluna estreita ficava certa, mas no
-   computador o cartão encostava no topo e sobravam mil pixels de nada embaixo.
-   Parecia que ele tinha caído ali. Agora a tela ocupa a altura da janela e,
-   quando tem largura, vira duas colunas — quem somos à esquerda, o formulário
-   à direita. */
+   No celular a coluna estreita já ficava certa, mas no computador o cartão
+   encostava no topo e sobrava um monte de espaço vazio embaixo — parecia que
+   ele tinha caído ali. Agora ocupa a altura da janela e, quando tem largura,
+   vira duas colunas. */
 
 body.tela-entrada {
   min-height: 100vh;
@@ -939,7 +934,7 @@ body.tela-entrada {
 
 /* Fora as manchas de cor. Nas telas de trabalho elas existem porque o efeito de
    vidro precisa de alguma coisa atrás pra desfocar; aqui não há conteúdo atrás
-   de nada — só o cartão no vazio — e elas apareciam como três borrões soltos
+   de nada, só o cartão no vazio, e elas apareciam como três borrões soltos
    nos cantos, que era exatamente o que incomodava. */
 body.tela-entrada::before { display: none; }
 
@@ -947,15 +942,11 @@ body.tela-entrada::before { display: none; }
    coluna da esquerda, e o menu dela é vazio pra quem ainda não entrou. */
 body.tela-entrada .topo { display: none; }
 
-/* COLUNA, não linha. Aqui eu errei feio na primeira versão: pus `display: flex`
-   com a direção padrão pra centralizar o conteúdo na vertical, esquecendo que o
-   .pagina não tem só o conteúdo dentro — tem a trilha e, principalmente, as
-   mensagens de erro do flash, que o base.html imprime ANTES do bloco.
-   Resultado: ao errar a senha, o aviso "Login ou senha não conferem" virava
-   irmão do formulário na mesma linha e aparecia FORA, à esquerda, espremendo o
-   título em duas linhas. Só dava pra ver errando a senha de propósito, que foi
-   o que eu não fiz.
-   Em coluna, o aviso volta pro lugar dele: acima, e o conjunto todo centralizado. */
+/* COLUNA, e não linha, e aqui eu errei feio. Pus flex sem definir a direção pra
+   centralizar na vertical, esquecendo que o .pagina também recebe as mensagens
+   de erro. Aí quem errasse a senha via o "Login ou senha não conferem" do LADO
+   do formulário, espremendo o título. Testei a tela em três larguras e só no
+   estado feliz — o erro só apareceu quando erraram a senha de verdade. */
 body.tela-entrada .pagina {
   flex: 1;
   display: flex;
@@ -975,7 +966,7 @@ body.tela-entrada .aviso {
 
 /* Tirando as manchas, o vidro ficou sem nada pra desfocar: o cartão virava um
    retângulo quase da cor do fundo, e a tela lia como se não tivesse acabado de
-   carregar. Aqui ele é branco sólido com sombra de verdade — é o único objeto
+   carregar. Aqui ele é branco sólido com sombra de verdade, porque é o único
    da tela, então pode ter peso. */
 body.tela-entrada .cartao {
   background: #fff;
@@ -1762,7 +1753,7 @@ a.pessoa-cartao__nome:hover { color: var(--verde); }
 }
 
 /* O texto do plano de treino. Vem em cor cheia, e não na cor fraca das linhas
-   de apoio, porque É o conteúdo do cartão — o resto é etiqueta.
+   de apoio, porque É o conteúdo do cartão. O resto é etiqueta.
    pre-wrap porque o professor escreve o treino em linhas ("aquecimento /
    passe / coletivo"), e sem isso tudo virava um parágrafo só. */
 .pessoa-cartao__texto {

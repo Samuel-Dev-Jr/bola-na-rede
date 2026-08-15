@@ -958,7 +958,7 @@ def planos_da_pessoa(conexao: sqlite3.Connection, pessoa_id: int,
     O filtro de turma é o mesmo cuidado de eventos_da_pessoa(): plano com turma
     nula é da modalidade inteira, plano com turma preenchida é só daquele grupo.
     Sem o `IS NULL OR`, o menino do Sub-11 abriria a área dele e leria o treino
-    tático do Sub-17 como se fosse o dele — e apareceria no treino errado.
+    tático do Sub-17 como se fosse o dele, e apareceria no treino errado.
 
     Trago uma semana pra trás porque quem faltou na terça quer saber o que
     perdeu, e porque o professor costuma publicar o da semana toda de uma vez.

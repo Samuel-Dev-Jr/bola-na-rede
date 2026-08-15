@@ -37,15 +37,13 @@ def recriar_schema() -> None:
 
 def aplicar_migracoes() -> None:
     """
-    Cria o que foi acrescentado depois do schema original, sem apagar nada.
+    Cria o que veio depois do schema original, sem apagar nada.
 
-    O schema.sql começa com DROP TABLE, então ele só serve pra banco novo: rodar
-    no banco do Centro apagaria a chamada que foi digitada direto na tela e não
-    existe em planilha nenhuma. As tabelas novas vivem no migracoes.sql, todas
-    em CREATE ... IF NOT EXISTS, e isto roda a cada início do sistema.
+    O schema.sql começa com DROP TABLE, então só serve pra banco novo. Rodar ele
+    no computador do Centro apagaria a chamada digitada na tela, que não existe
+    em planilha nenhuma — descobri isso quando fui criar a tabela de planos.
 
-    É seguro chamar quantas vezes quiser. Quando o banco já está em dia, o
-    SQLite não faz nada.
+    Pode chamar quantas vezes quiser: se o banco já está em dia, não faz nada.
     """
     conexao = conectar()
     try:

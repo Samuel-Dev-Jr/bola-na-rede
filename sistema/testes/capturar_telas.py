@@ -24,7 +24,7 @@ import db
 
 BASE = "http://127.0.0.1:5000"
 
-# O destino estava escrito à mão como C:\PROJETOS\... — a pasta do meu
+# O destino estava escrito à mão como C:\PROJETOS\..., a pasta do meu
 # computador. Fora dela o script criava a árvore inteira com esse nome no
 # diretório atual e salvava os prints lá dentro, sem reclamar de nada. Agora sai
 # da posição deste arquivo: testes/ -> sistema/ -> raiz do projeto.
@@ -90,7 +90,7 @@ def preparar_jogador():
 
     Mesmo tratamento da conta de admin do _acesso: senha aleatória, criada
     agora e apagada no fim. Escolho alguém do futebol masculino porque é a
-    modalidade que tem plano de treino publicado na base de demonstração — sem
+    modalidade que tem plano de treino publicado na base de demonstração. Sem
     isso o print sairia com a seção de treinos vazia.
 
     Devolve (login, senha), ou (None, None) se não houver ninguém matriculado.
@@ -140,7 +140,7 @@ def entrar_como(pagina, login, senha):
     pagina.click("button[type=submit]")
     pagina.wait_for_load_state("networkidle")
     if "/entrar" in pagina.url:
-        raise RuntimeError(f"não entrei como {login!r} — os prints sairiam da "
+        raise RuntimeError(f"não entrei como {login!r}. Os prints sairiam da "
                            f"tela de login e eu não perceberia.")
 
 
@@ -170,7 +170,7 @@ def capturar(contexto, telas, login=None, senha=None):
 senha_teste = _acesso.preparar_admin()
 login_jogador, senha_jogador = preparar_jogador()
 if login_jogador is None:
-    print("AVISO: ninguém matriculado no futebol masculino — a área do "
+    print("AVISO: ninguém matriculado no futebol masculino. A área do "
           "participante não vai ser capturada.")
 
 TELA_DESKTOP = {"viewport": {"width": 1440, "height": 900},
