@@ -941,12 +941,30 @@ body.tela-entrada::before { display: none; }
    coluna da esquerda, e o menu dela é vazio pra quem ainda não entrou. */
 body.tela-entrada .topo { display: none; }
 
+/* COLUNA, não linha. Aqui eu errei feio na primeira versão: pus `display: flex`
+   com a direção padrão pra centralizar o conteúdo na vertical, esquecendo que o
+   .pagina não tem só o conteúdo dentro — tem a trilha e, principalmente, as
+   mensagens de erro do flash, que o base.html imprime ANTES do bloco.
+   Resultado: ao errar a senha, o aviso "Login ou senha não conferem" virava
+   irmão do formulário na mesma linha e aparecia FORA, à esquerda, espremendo o
+   título em duas linhas. Só dava pra ver errando a senha de propósito, que foi
+   o que eu não fiz.
+   Em coluna, o aviso volta pro lugar dele: acima, e o conjunto todo centralizado. */
 body.tela-entrada .pagina {
   flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
   max-width: 940px;
   padding: 32px 20px;
+}
+
+/* O aviso acompanha a largura do conteúdo em vez de virar uma faixa de 940px
+   sobre uma coluna de 400. */
+body.tela-entrada .aviso {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 20px;
 }
 
 /* Tirando as manchas, o vidro ficou sem nada pra desfocar: o cartão virava um
@@ -1007,6 +1025,11 @@ body.tela-entrada .cartao {
     align-items: center;
     gap: 72px;
   }
+
+  /* Lado a lado, um aviso de 400px centralizado ficaria no meio das duas
+     colunas, alinhado com nenhuma. Aqui ele atravessa as duas, como mensagem
+     da página que é. */
+  body.tela-entrada .aviso { max-width: none; }
 
   .entrada__escudo { width: 64px; height: 64px; }
   .entrada__titulo { font-size: 44px; margin-top: 20px; }
