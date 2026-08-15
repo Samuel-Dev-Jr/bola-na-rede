@@ -21,6 +21,9 @@ Uso:
 Variáveis de ambiente:
     ADMIN_LOGIN   login do administrador (padrão: coordenacao)
     ADMIN_SENHA   senha dele — OBRIGATÓRIA, sem padrão de propósito
+    DEMO_LOGIN    login da conta de demonstração (padrão: demo)
+    DEMO_SENHA    senha dela (padrão: demo2026)
+    DEMO_ATIVA    0 desliga a conta de demonstração
 """
 
 import os
@@ -246,6 +249,52 @@ def criar_admin(conexao) -> int:
     return 0
 
 
+def criar_demo(conexao) -> int:
+    """
+    Conta de demonstração da vitrine, com senha conhecida.
+
+    Sem ela ninguém consegue abrir a instância hospedada pra ver o sistema — nem
+    eu, nem o professor, nem alguém a quem a coordenação queira mostrar o
+    projeto. A senha do admin de verdade não está escrita em lugar nenhum do
+    repositório, de propósito, e continua assim: quem quiser entrar como
+    administrador de fato precisa do valor de ADMIN_SENHA, que só existe no
+    painel da hospedagem.
+
+    Por que esta senha PODE estar aqui, e a do admin não:
+
+    - Este arquivo roda só no startCommand do Render (ver render.yaml). No
+      computador do Centro, onde existe nome de criança e telefone de
+      responsável, ele nunca executa. Lá o banco é criado pelo configurar.py e
+      os acessos pelo criar_usuario.py.
+    - A base que esta conta administra é INVENTADA. Os 62 nomes são fictícios.
+      Não há dado de ninguém pra vazar.
+    - O que ela alterar se perde no próximo reinício, que acontece a cada ~15
+      minutos de ociosidade. O estrago possível se desfaz sozinho.
+
+    Ou seja: não é a senha de um sistema, é a chave de uma maquete. Se um dia a
+    vitrine passar a ter dado real — o que não deve acontecer, ver o topo deste
+    arquivo — esta função sai antes.
+
+    Pra desligar sem mexer no código: DEMO_ATIVA=0 no painel.
+    """
+    if os.environ.get("DEMO_ATIVA", "1") == "0":
+        print("  conta de demonstração desligada (DEMO_ATIVA=0)")
+        return 0
+
+    login = os.environ.get("DEMO_LOGIN", "demo").strip()
+    senha = os.environ.get("DEMO_SENHA", "demo2026")
+
+    erro = autenticacao.criar_usuario(conexao, login, senha, "admin", None)
+    if erro:
+        # Não derruba o deploy por causa da conta de demonstração: o sistema
+        # ainda sobe e o admin de verdade continua entrando. Só avisa.
+        print(f"  AVISO: conta de demonstração não criada — {erro}")
+        return 0
+
+    print(f"  conta de demonstração {login!r} criada (base fictícia)")
+    return 0
+
+
 def main() -> int:
     print("Preparando a base de demonstração...")
 
@@ -284,6 +333,10 @@ def main() -> int:
             return codigo
 
         codigo = criar_admin(conexao)
+        if codigo:
+            return codigo
+
+        codigo = criar_demo(conexao)
         if codigo:
             return codigo
 

@@ -48,5 +48,13 @@ services:
       - key: ADMIN_SENHA
         sync: false
 
+      # Conta de demonstração, com senha conhecida, pra qualquer um conseguir
+      # ABRIR a vitrine e ver o sistema. Ela administra uma base inventada que
+      # se apaga a cada reinício — ver criar_demo() no preparar_deploy.py, que
+      # explica por que esta senha pode existir e a de cima não.
+      # Pra desligar: troque para 0.
+      - key: DEMO_ATIVA
+        value: "1"
+
       - key: PYTHON_VERSION
         value: "3.13.4"
