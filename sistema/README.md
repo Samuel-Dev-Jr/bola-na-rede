@@ -122,6 +122,8 @@ Cada módulo saiu de uma dor que a coordenação me contou:
 | Chamada | Chamada na folha, que depois ninguém somava |
 | Agenda | Treino que aconteceu e ninguém lançou a chamada: o aluno sai do cálculo de frequência e o alerta de evasão atrasa |
 | Convocação | Convocação bagunçada no WhatsApp, criança faltando no dia do jogo |
+| Treinos | "O que a gente vai treinar hoje?" só existia no caderno do professor, e quem faltava não sabia o que perdeu |
+| Minha área | O participante dependia de perguntar pra saber horário, frequência e se foi convocado |
 
 A **escalação**, dentro da tela de convocação, é a única parte que não saiu de
 uma conversa com a coordenação: foi ideia minha, e está marcada assim de
@@ -141,12 +143,21 @@ risco.py       a regra que classifica o risco de evasão
 autenticacao.py login, papéis e quem pode abrir o quê
 criar_usuario.py cria acesso pelo terminal (o primeiro admin)
 metricas.py    recalcula as métricas de impacto lendo o banco
+escalacao.py   as posições de cada esporte, pra montar o time no campo
 db.py          conexão com o SQLite
 configurar.py  cria o banco com as modalidades e turmas do Centro
 importar.py    carrega cadastro e chamada a partir de planilha CSV
+preparar_deploy.py monta a base de demonstração da vitrine hospedada
 dados/         os modelos de planilha
 schema.sql     criação das tabelas
+migracoes.sql  o que veio depois do schema, sem apagar banco em uso
 ```
+
+`schema.sql` e `migracoes.sql` são separados porque o primeiro começa com
+`DROP TABLE`: ele só serve pra banco novo. Tabela que nasce depois entra no
+`migracoes.sql`, em `CREATE ... IF NOT EXISTS`, e é aplicada a cada início — se
+atualizar o sistema custasse o semestre de chamada já digitada, ninguém
+atualizaria.
 
 Separei `consultas.py` e `risco.py` do `app.py` porque no começo eu tinha
 deixado tudo junto e não achava mais nada.
@@ -168,8 +179,14 @@ criança está doente, isso não é sinal de que ela vai abandonar a escolinha.
 
 ## O que ficou de fora
 
-- Não tem login. O sistema roda na rede local da escolinha e, no prazo que eu
-  tinha, preferi entregar o controle de evasão funcionando.
+- Esta lista dizia "não tem login". Tem: a coordenação entra como `admin` e o
+  participante como `jogador`, e a lista de rotas do jogador é de permissão, não
+  de proibição — rota nova nasce fechada. Ficou aqui desatualizado por um tempo.
+- O horário de treino se edita pela tela, mas ele tem duas metades que o sistema
+  não amarra uma na outra: os dias marcados (que a chamada e a agenda usam) e o
+  texto que aparece pra quem lê. Dá pra marcar segunda e escrever "Ter e Qui" —
+  o sistema aceita. Amarrar os dois exigiria gerar o texto a partir dos dias, e
+  aí se perderia o "Sáb, 8h às 11h" que a coordenação escreve à mão.
 - O cálculo de risco carrega todas as presenças na memória. O custo cresce com o
   número de presenças, não com o de pessoas, então é o histórico acumulado que
   vai apertar primeiro, não o tamanho da escolinha. Ainda não medi com a base

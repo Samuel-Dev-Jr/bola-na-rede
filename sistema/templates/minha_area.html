@@ -54,6 +54,41 @@
     </section>
   {% endif %}
 
+  {# O que vai ser feito no treino. Vem logo depois dos jogos porque é a segunda
+     pergunta do atleta — e, pra quem faltou, é a única forma de saber o que
+     perdeu. Mostro uma semana pra trás junto, por isso a marcação de "Hoje". #}
+  {% if planos %}
+    <section class="secao">
+      <h2 class="secao__titulo">O que vai ter no treino</h2>
+      <div class="lista-pessoas">
+        {% for p in planos %}
+          <div class="pessoa-cartao">
+            <div class="pessoa-cartao__topo">
+              <span class="pessoa-cartao__nome">{{ p.titulo }}</span>
+              {% if p.data == hoje %}
+                <span class="selo selo--regular">Hoje</span>
+              {% elif p.data < hoje %}
+                <span class="selo selo--evadido">Já passou</span>
+              {% endif %}
+            </div>
+            <p class="pessoa-cartao__responsavel">
+              {{ p.data|dia_semana }}, {{ p.data|data_br }} ·
+              {{ p.modalidade_nome }}
+              {%- if p.turma_nome %} · só {{ p.turma_nome }}
+              {%- else %} · todas as turmas{% endif %}
+            </p>
+            <p class="pessoa-cartao__texto">{{ p.conteudo }}</p>
+            {% if p.material %}
+              <p class="pessoa-cartao__responsavel">
+                <strong>Levar:</strong> {{ p.material }}
+              </p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
   <section class="secao">
     <h2 class="secao__titulo">Minhas atividades</h2>
     <div class="atividades">

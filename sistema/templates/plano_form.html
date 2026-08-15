@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}
+  {{ 'Editar plano' if plano else 'Publicar plano' }} — Bola na Rede
+{% endblock %}
+
+{% set acao = url_for('plano_editar', plano_id=plano.id) if plano
+              else url_for('plano_novo', slug=modalidade.slug) %}
+{% set volta = url_for('planos', slug=modalidade.slug) %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao, 'url': url_for('painel', slug=modalidade.slug)},
+    {'nome': 'Planos de ' + modalidade.termo_aula, 'url': volta},
+    {'nome': plano.titulo if plano else 'Novo'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="barra-acoes">
+  {{ nav.voltar(volta, 'Voltar') }}
+</div>
+
+<h1 class="titulo-pagina">{{ 'Editar plano' if plano else 'Publicar plano' }}</h1>
+<p class="subtitulo-pagina">
+  {{ modalidade.nome_exibicao }} · o que for escrito aqui aparece na área
+  do {{ modalidade.termo_aluno }} assim que salvar.
+</p>
+
+<form method="post" action="{{ acao }}">
+
+  <div class="cartao grupo-formulario">
+    <h2 class="grupo-formulario__titulo">Quando e pra quem</h2>
+    <div class="grade-formulario">
+      <div class="campo">
+        <label for="data">Data d{{ 'o' if modalidade.artigo_aula == 'um' else 'a' }}
+          {{ modalidade.termo_aula }}</label>
+        <input type="date" id="data" name="data" required
+               value="{{ data_sugerida.isoformat() if data_sugerida else '' }}">
+        {% if not plano %}
+          <span class="campo__ajuda">
+            Já vem preenchida com {{ modalidade.artigo_aula }} próxim{{ 'o' if modalidade.artigo_aula == 'um' else 'a' }}
+            {{ modalidade.termo_aula }}, pelos dias marcados no horário.
+          </span>
+        {% endif %}
+      </div>
+
+      <div class="campo">
+        <label for="turma_id">Turma</label>
+        <select id="turma_id" name="turma_id">
+          <option value="">Todas as turmas</option>
+          {% for t in turmas %}
+            <option value="{{ t.id }}"
+              {% if plano and plano.turma_id == t.id %}selected{% endif %}>
+              {{ t.nome }}
+            </option>
+          {% endfor %}
+        </select>
+        <span class="campo__ajuda">
+          Escolher uma turma esconde o plano das outras. O Sub-11 não precisa
+          ler o treino tático do Sub-17.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cartao grupo-formulario">
+    <h2 class="grupo-formulario__titulo">O plano</h2>
+    <div class="grade-formulario">
+      <div class="campo campo--todo">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo" name="titulo" required maxlength="120"
+               value="{{ plano.titulo if plano else '' }}"
+               placeholder="Finalização e jogo coletivo">
+        <span class="campo__ajuda">
+          É o que aparece em negrito na tela do {{ modalidade.termo_aluno }}.
+          Uma linha resolve.
+        </span>
+      </div>
+
+      <div class="campo campo--todo">
+        <label for="conteudo">O que vai ser feito</label>
+        <textarea id="conteudo" name="conteudo" required rows="7"
+                  placeholder="Aquecimento 15min&#10;Passe em duplas&#10;Finalização&#10;Coletivo 20min">{{ plano.conteudo if plano else '' }}</textarea>
+        <span class="campo__ajuda">
+          Escreva do jeito que você escreveria no caderno. As quebras de linha
+          são mantidas na tela.
+        </span>
+      </div>
+
+      <div class="campo campo--todo">
+        <label for="material">O que levar</label>
+        <input type="text" id="material" name="material" maxlength="200"
+               value="{{ plano.material if plano and plano.material else '' }}"
+               placeholder="opcional — caneleira, garrafa de água">
+        <span class="campo__ajuda">
+          Fica separado porque é o que precisa ser lido antes de sair de casa.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="barra-acoes barra-acoes--fim" style="margin-top: 18px;">
+    <a class="botao botao--discreto" href="{{ volta }}">Cancelar</a>
+    <button class="botao" type="submit">
+      {{ 'Salvar alterações' if plano else 'Publicar' }}
+    </button>
+  </div>
+</form>
+
+{% endblock %}

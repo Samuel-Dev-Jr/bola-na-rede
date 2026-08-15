@@ -71,6 +71,14 @@ CAMPOS_PESSOA = [
 # funcionar mesmo se o banco não existir.
 ROTAS_SEM_BANCO = {"manifest", "serviceworker", "offline", "static"}
 
+# As tabelas que nasceram depois do schema original entram aqui, uma vez, no
+# início do processo. É aditivo e não apaga nada — ver db.aplicar_migracoes().
+# Fica fora do before_request de propósito: rodar a cada requisição seria
+# desperdício, e uma vez por processo basta. Se o banco ainda não existe, o
+# before_request já devolve 503 pedindo pra rodar o configurar.
+if db.banco_existe():
+    db.aplicar_migracoes()
+
 
 @app.before_request
 def abrir_conexao():
@@ -115,11 +123,17 @@ def data_br(valor) -> str:
     return valor.strftime("%d/%m/%Y")
 
 
+# Os dias da semana na numeração do Python (0 = segunda), que é a mesma que o
+# banco guarda em modalidade.dias_aula. Estava escrito só dentro do filtro
+# abaixo; subiu pra cá quando a tela de horário passou a precisar da lista
+# inteira pra montar as caixas de seleção.
+DIAS_DA_SEMANA = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta",
+                  "Sábado", "Domingo"]
+
+
 @app.template_filter("dia_semana")
 def dia_semana(valor: date) -> str:
-    return ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"][
-        valor.weekday()
-    ]
+    return DIAS_DA_SEMANA[valor.weekday()]
 
 
 @app.context_processor
@@ -219,6 +233,66 @@ def painel(slug: str):
     )
 
 
+@app.route("/m/<slug>/horario", methods=["GET", "POST"])
+@autenticacao.somente_admin
+def modalidade_horario(slug: str):
+    """
+    Edita os dias e o horário de uma modalidade pela tela.
+
+    Isso vivia no configurar.py, em código. Trocar o horário do vôlei exigia
+    editar Python e rodar o configurar de novo — e o configurar RECRIA o schema,
+    ou seja, apagava o cadastro inteiro pra mudar uma linha de texto. Na prática
+    o horário era imutável depois da primeira matrícula, e a coordenação
+    dependia de mim pra uma coisa que muda sozinha: quadra emprestada, professor
+    que troca de turno, horário de verão.
+
+    São dois campos com papéis diferentes, e é importante não confundir:
+
+    - `dias_aula` é máquina. Sai daqui como "0,2,4" porque é o formato que
+      proxima_data_de_aula() e agenda_do_mes() já leem. Mexer nele muda a data
+      que a chamada sugere e quais quadradinhos a agenda pinta como dia de aula.
+    - `horario` é gente. É texto livre, escrito pra ser lido — "Seg e Qua, 18h
+      às 20h" — e aparece no painel, na chamada, na agenda e na área do jogador.
+
+    Nada disso reescreve o passado: presença já lançada continua lá igual, e o
+    nível de risco sai das presenças, não daqui.
+    """
+    modalidade = carregar_modalidade(slug)
+
+    if request.method == "POST":
+        # getlist porque são caixas de seleção; o int() filtra qualquer coisa
+        # que não seja dia da semana antes de virar texto de banco.
+        dias = sorted({
+            int(d) for d in request.form.getlist("dias")
+            if d.isdigit() and int(d) < len(DIAS_DA_SEMANA)
+        })
+        horario = request.form.get("horario", "").strip()
+
+        if not dias:
+            flash("Marque pelo menos um dia da semana.", "erro")
+            return redirect(url_for("modalidade_horario", slug=slug))
+
+        if not horario:
+            flash("Escreva o horário do jeito que ele deve aparecer na tela.",
+                  "erro")
+            return redirect(url_for("modalidade_horario", slug=slug))
+
+        g.conexao.execute(
+            "UPDATE modalidade SET dias_aula = ?, horario = ? WHERE id = ?",
+            (",".join(str(d) for d in dias), horario, modalidade["id"]),
+        )
+        g.conexao.commit()
+        flash("Horário atualizado.", "sucesso")
+        return redirect(url_for("painel", slug=slug))
+
+    return render_template(
+        "modalidade_horario.html",
+        modalidade=modalidade,
+        dias_da_semana=list(enumerate(DIAS_DA_SEMANA)),
+        dias_marcados={int(d) for d in modalidade["dias_aula"].split(",")},
+    )
+
+
 # ---------------------------------------------------- alunos da modalidade
 
 
@@ -300,6 +374,82 @@ def matricular(slug: str):
         turmas=consultas.turmas_da_modalidade(g.conexao, modalidade["id"]),
         pessoas=disponiveis,
     )
+
+
+@app.route("/matriculas/<int:matricula_id>/editar", methods=["GET", "POST"])
+@autenticacao.somente_admin
+def matricula_editar(matricula_id: int):
+    """
+    Corrige a turma e o número da camisa de quem já está matriculado.
+
+    Faltava, e o buraco era feio: depois de matricular, trocar a camisa ou subir
+    o menino de categoria só dava pra fazer corrigindo a planilha e importando
+    de novo. Menino faz aniversário e muda de categoria todo ano — isso não é
+    exceção, é o funcionamento normal do Centro.
+
+    Trocar de turma NÃO mexe na presença já registrada: presenca aponta pra
+    matricula, não pra turma, então a frequência dele sobe junto com ele. Era o
+    que eu queria — quem passou do Sub-13 pro Sub-15 continua sendo a mesma
+    pessoa, com o mesmo histórico, e o nível de risco não zera do nada.
+    """
+    matricula = consultas.obter_matricula(g.conexao, matricula_id)
+    if matricula is None:
+        abort(404)
+    modalidade = carregar_modalidade(matricula["modalidade_slug"])
+
+    if request.method == "POST":
+        erro, turma_id, numero = _matricula_do_form(matricula, modalidade["id"])
+        if erro:
+            flash(erro, "erro")
+            return redirect(url_for("matricula_editar", matricula_id=matricula_id))
+
+        g.conexao.execute(
+            "UPDATE matricula SET turma_id = ?, numero = ? WHERE id = ?",
+            (turma_id, numero, matricula_id),
+        )
+        g.conexao.commit()
+        flash("Matrícula atualizada.", "sucesso")
+        return redirect(url_for("pessoa_detalhe", pessoa_id=matricula["pessoa_id"]))
+
+    return render_template(
+        "matricula_form.html",
+        matricula=matricula,
+        modalidade=modalidade,
+        turmas=consultas.turmas_da_modalidade(g.conexao, modalidade["id"]),
+    )
+
+
+def _matricula_do_form(matricula: dict, modalidade_id: int):
+    """
+    Valida a turma e a camisa vindas do formulário de editar matrícula.
+
+    Devolve (erro, turma_id, numero) — com erro preenchido, os outros dois não
+    valem nada.
+    """
+    turma = g.conexao.execute(
+        "SELECT id FROM turma WHERE id = ? AND modalidade_id = ?",
+        (request.form.get("turma_id", "").strip(), modalidade_id),
+    ).fetchone()
+    if turma is None:
+        return "Essa turma não é desta modalidade.", None, None
+    turma_id = turma["id"]
+
+    # O banco tem UNIQUE (pessoa_id, turma_id). Sem esta conferência, mover
+    # alguém pra uma turma em que ele JÁ tem matrícula estouraria IntegrityError
+    # na cara do usuário, em vez de explicar que ele já está lá.
+    if turma_id != matricula["turma_id"]:
+        repetida = g.conexao.execute(
+            "SELECT 1 FROM matricula WHERE pessoa_id = ? AND turma_id = ? AND id != ?",
+            (matricula["pessoa_id"], turma_id, matricula["matricula_id"]),
+        ).fetchone()
+        if repetida:
+            return (f"{matricula['nome']} já tem matrícula nessa turma.", None, None)
+
+    numero, erro_numero = _numero_de_camisa(turma_id, matricula["matricula_id"])
+    if erro_numero:
+        return erro_numero, None, None
+
+    return None, turma_id, numero
 
 
 @app.route("/matriculas/<int:matricula_id>/encerrar", methods=["POST"])
@@ -427,7 +577,7 @@ def _data_do_form(campo: str):
     return date.fromisoformat(valor) if valor else None
 
 
-def _numero_de_camisa(turma_id: int):
+def _numero_de_camisa(turma_id: int, ignorar_matricula_id: int | None = None):
     """
     Lê o número da camisa do formulário e confere se está livre na turma.
 
@@ -435,6 +585,11 @@ def _numero_de_camisa(turma_id: int):
     (turma, numero), mas deixar o erro estourar de lá daria uma tela de exceção
     pro técnico. Pegando aqui eu consigo dizer COM QUEM o número está, que é a
     informação que ele precisa pra resolver.
+
+    `ignorar_matricula_id` existe por causa da tela de editar matrícula: sem
+    ele, abrir a matrícula do menino que é camisa 10, mudar só a turma e salvar
+    devolveria "a camisa 10 já é de Fulano nessa turma" — e o Fulano seria ele
+    mesmo. A matrícula que está sendo editada não pode competir consigo.
     """
     bruto = request.form.get("numero", "").strip()
     if not bruto:
@@ -448,14 +603,17 @@ def _numero_de_camisa(turma_id: int):
     if not 1 <= numero <= 99:
         return None, "O número da camisa tem que estar entre 1 e 99."
 
-    dono = g.conexao.execute(
-        """
+    consulta = """
         SELECT p.nome FROM matricula ma
         JOIN pessoa p ON p.id = ma.pessoa_id
         WHERE ma.turma_id = ? AND ma.numero = ?
-        """,
-        (turma_id, numero),
-    ).fetchone()
+    """
+    parametros = [turma_id, numero]
+    if ignorar_matricula_id is not None:
+        consulta += " AND ma.id != ?"
+        parametros.append(ignorar_matricula_id)
+
+    dono = g.conexao.execute(consulta, parametros).fetchone()
     if dono:
         return None, f"A camisa {numero} já é de {dono['nome']} nessa turma."
 
@@ -525,6 +683,148 @@ def agenda(slug: str):
         agenda=consultas.agenda_do_mes(g.conexao, modalidade,
                                        referencia.year, referencia.month),
     )
+
+
+# ---------------------------------------------------------- plano de treino
+
+
+@app.route("/m/<slug>/planos")
+@autenticacao.somente_admin
+def planos(slug: str):
+    """
+    O que vai ser feito nos treinos, publicado pelo professor.
+
+    Era o buraco que sobrava: o sistema sabia quem estava matriculado, quem
+    faltou e quem foi convocado, mas não respondia a pergunta que o atleta mais
+    faz — "o que a gente vai treinar hoje?". Isso vivia no caderno do professor,
+    e quem faltasse não tinha como saber o que perdeu.
+    """
+    modalidade = carregar_modalidade(slug)
+    return render_template(
+        "planos.html",
+        modalidade=modalidade,
+        planos=consultas.planos_da_modalidade(g.conexao, modalidade["id"]),
+    )
+
+
+@app.route("/m/<slug>/planos/novo", methods=["GET", "POST"])
+@autenticacao.somente_admin
+def plano_novo(slug: str):
+    modalidade = carregar_modalidade(slug)
+
+    if request.method == "POST":
+        erro = _salvar_plano(modalidade["id"])
+        if erro:
+            flash(erro, "erro")
+            return redirect(url_for("plano_novo", slug=slug))
+        flash("Plano publicado. Já aparece pra quem treina.", "sucesso")
+        return redirect(url_for("planos", slug=slug))
+
+    return render_template(
+        "plano_form.html", modalidade=modalidade, plano=None,
+        turmas=consultas.turmas_da_modalidade(g.conexao, modalidade["id"]),
+        data_sugerida=consultas.proxima_data_de_aula(modalidade["dias_aula"]),
+    )
+
+
+@app.route("/planos/<int:plano_id>/editar", methods=["GET", "POST"])
+@autenticacao.somente_admin
+def plano_editar(plano_id: int):
+    plano = consultas.obter_plano(g.conexao, plano_id)
+    if plano is None:
+        abort(404)
+    modalidade = carregar_modalidade(plano["modalidade_slug"])
+
+    if request.method == "POST":
+        erro = _salvar_plano(modalidade["id"], plano_id=plano_id)
+        if erro:
+            flash(erro, "erro")
+            return redirect(url_for("plano_editar", plano_id=plano_id))
+        flash("Plano atualizado.", "sucesso")
+        return redirect(url_for("planos", slug=modalidade["slug"]))
+
+    return render_template(
+        "plano_form.html", modalidade=modalidade, plano=plano,
+        turmas=consultas.turmas_da_modalidade(g.conexao, modalidade["id"]),
+        data_sugerida=plano["data"],
+    )
+
+
+@app.route("/planos/<int:plano_id>/excluir", methods=["POST"])
+@autenticacao.somente_admin
+def plano_excluir(plano_id: int):
+    plano = consultas.obter_plano(g.conexao, plano_id)
+    if plano is None:
+        abort(404)
+    g.conexao.execute("DELETE FROM plano_treino WHERE id = ?", (plano_id,))
+    g.conexao.commit()
+    flash("Plano removido.", "sucesso")
+    return redirect(url_for("planos", slug=plano["modalidade_slug"]))
+
+
+def _salvar_plano(modalidade_id: int, plano_id: int | None = None) -> str | None:
+    """
+    Grava o plano vindo do formulário. Devolve a mensagem de erro, ou None.
+
+    Criar e editar preenchem os mesmos campos com as mesmas regras, então a
+    validação mora aqui em vez de duplicada nas duas rotas — foi duplicando esse
+    tipo de coisa que eu já deixei o cadastro aceitar o que a edição recusava.
+
+    A turma é opcional e vem como texto vazio quando o professor escolhe "todas
+    as turmas". Gravo NULL nesse caso, que é o que planos_da_pessoa() lê como
+    "vale pra modalidade inteira".
+    """
+    titulo = request.form.get("titulo", "").strip()
+    conteudo = request.form.get("conteudo", "").strip()
+    material = request.form.get("material", "").strip() or None
+    bruto_turma = request.form.get("turma_id", "").strip()
+
+    if not titulo:
+        return "O plano precisa de um título — é o que aparece na lista."
+    if not conteudo:
+        return "Escreva o que vai ser feito no treino."
+
+    try:
+        data = _data_do_form("data")
+    except ValueError:
+        return "Data inválida."
+    if data is None:
+        return "Escolha a data do treino."
+
+    turma_id = None
+    if bruto_turma:
+        # Confiro que a turma é DESTA modalidade. Sem isso, um turma_id trocado
+        # na mão gravaria o treino do vôlei dentro do karatê, e o filtro de
+        # turma da área do jogador esconderia o plano de todo mundo.
+        turma_id = g.conexao.execute(
+            "SELECT id FROM turma WHERE id = ? AND modalidade_id = ?",
+            (bruto_turma, modalidade_id),
+        ).fetchone()
+        if turma_id is None:
+            return "Essa turma não é desta modalidade."
+        turma_id = turma_id["id"]
+
+    if plano_id is None:
+        g.conexao.execute(
+            """
+            INSERT INTO plano_treino (modalidade_id, turma_id, data, titulo,
+                                      conteudo, material)
+            VALUES (?,?,?,?,?,?)
+            """,
+            (modalidade_id, turma_id, data, titulo, conteudo, material),
+        )
+    else:
+        g.conexao.execute(
+            """
+            UPDATE plano_treino
+               SET turma_id = ?, data = ?, titulo = ?, conteudo = ?, material = ?
+             WHERE id = ?
+            """,
+            (turma_id, data, titulo, conteudo, material, plano_id),
+        )
+
+    g.conexao.commit()
+    return None
 
 
 # -------------------------------------------------------------- convocação
@@ -707,15 +1007,16 @@ def minha_area():
     usuario = autenticacao.usuario_atual()
 
     if usuario["pessoa_id"] is None:
-        return render_template("minha_area.html", pessoa=None, eventos=[])
+        return render_template("minha_area.html", pessoa=None, eventos=[], planos=[])
 
     pessoa = consultas.obter_pessoa(g.conexao, usuario["pessoa_id"])
     if pessoa is None:
-        return render_template("minha_area.html", pessoa=None, eventos=[])
+        return render_template("minha_area.html", pessoa=None, eventos=[], planos=[])
 
     return render_template(
         "minha_area.html", pessoa=pessoa,
         eventos=consultas.eventos_da_pessoa(g.conexao, usuario["pessoa_id"]),
+        planos=consultas.planos_da_pessoa(g.conexao, usuario["pessoa_id"]),
     )
 
 

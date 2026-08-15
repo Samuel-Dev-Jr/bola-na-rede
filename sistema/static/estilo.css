@@ -1628,6 +1628,18 @@ a.pessoa-cartao__nome:hover { color: var(--verde); }
   color: var(--texto-fraco);
 }
 
+/* O texto do plano de treino. Vem em cor cheia, e não na cor fraca das linhas
+   de apoio, porque É o conteúdo do cartão — o resto é etiqueta.
+   pre-wrap porque o professor escreve o treino em linhas ("aquecimento /
+   passe / coletivo"), e sem isso tudo virava um parágrafo só. */
+.pessoa-cartao__texto {
+  margin: 10px 0 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--texto);
+  white-space: pre-wrap;
+}
+
 /* Pastilha com o nome da modalidade, usada pra mostrar em que atividades a
    pessoa está. Puxa a cor do esporte. */
 .pastilha {

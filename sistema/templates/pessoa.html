@@ -67,6 +67,9 @@
         <div class="barra-acoes" style="margin: 14px 0 0;">
           <a class="botao botao--discreto botao--pequeno"
              href="{{ url_for('alunos', slug=m.modalidade_slug) }}">Ver a turma</a>
+          <a class="botao botao--discreto botao--pequeno"
+             href="{{ url_for('matricula_editar', matricula_id=m.matricula_id) }}">
+            Turma e camisa</a>
           <form method="post"
                 action="{{ url_for('matricula_encerrar', matricula_id=m.matricula_id) }}"
                 style="margin:0">

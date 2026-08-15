@@ -132,6 +132,11 @@ def configurar() -> None:
     print("Recriando o schema (isso apaga o que estiver no banco)...")
     db.recriar_schema()
 
+    # O schema.sql tem só as tabelas originais; as que vieram depois moram no
+    # migracoes.sql. Rodar os dois deixa o banco novo igual ao banco de quem já
+    # usa o sistema há meses.
+    db.aplicar_migracoes()
+
     conexao = db.conectar()
     try:
         cursor = conexao.cursor()

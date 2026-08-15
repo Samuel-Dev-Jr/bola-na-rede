@@ -145,6 +145,77 @@ def criar_eventos(conexao) -> int:
     return 0
 
 
+def criar_planos(conexao) -> int:
+    """
+    Publica planos de treino de exemplo, pelo mesmo motivo dos eventos.
+
+    A tela de planos subiria vazia na vitrine, e quem abrisse veria o botão de
+    publicar em cima de um "nenhum plano publicado ainda" — o módulo existiria
+    sem mostrar o que ele faz.
+
+    Um de cada tipo, de propósito: um da modalidade inteira, um de uma turma só
+    (pra dar pra ver que o filtro existe) e um de modalidade que chama a coisa
+    de "aula" em vez de "treino". As datas são relativas a hoje pelo mesmo
+    motivo dos jogos — plano de treino da semana passada parece sistema
+    abandonado.
+    """
+    hoje = date.today()
+
+    planos = [
+        ("futebol-masculino", "Sub-13", hoje + timedelta(days=1),
+         "Finalização e jogo coletivo",
+         "Aquecimento e corrida leve — 15min\n"
+         "Passe em duplas, dois toques\n"
+         "Finalização de fora da área\n"
+         "Coletivo 20min",
+         "Caneleira e garrafa de água"),
+        ("futebol-masculino", None, hoje + timedelta(days=3),
+         "Treino físico",
+         "Circuito de resistência\nTiros de 30m\nAlongamento",
+         None),
+        ("volei-masculino", None, hoje,
+         "Saque e recepção",
+         "Aquecimento de ombro\nSaque viagem — 20 séries\n"
+         "Recepção em duplas\nJogo treino",
+         None),
+        ("karate", "Faixa branca", hoje + timedelta(days=2),
+         "Kihon — base e postura",
+         "Aquecimento\nZenkutsu-dachi, repetição\n"
+         "Oi-zuki descendo o dojo\nAlongamento e meditação",
+         "Kimono lavado"),
+    ]
+
+    criados = 0
+    for slug, turma_nome, dia, titulo, conteudo, material in planos:
+        modalidade = conexao.execute(
+            "SELECT id FROM modalidade WHERE slug = ?", (slug,)
+        ).fetchone()
+        if modalidade is None:
+            continue
+
+        turma_id = None
+        if turma_nome:
+            turma = conexao.execute(
+                "SELECT id FROM turma WHERE modalidade_id = ? AND nome = ?",
+                (modalidade["id"], turma_nome),
+            ).fetchone()
+            turma_id = turma["id"] if turma else None
+
+        conexao.execute(
+            """
+            INSERT INTO plano_treino (modalidade_id, turma_id, data, titulo,
+                                      conteudo, material)
+            VALUES (?,?,?,?,?,?)
+            """,
+            (modalidade["id"], turma_id, dia, titulo, conteudo, material),
+        )
+        criados += 1
+
+    conexao.commit()
+    print(f"  {criados} plano(s) de treino de exemplo")
+    return 0
+
+
 def criar_admin(conexao) -> int:
     """
     Garante um administrador. Sem senha no ambiente, aborta.
@@ -205,6 +276,10 @@ def main() -> int:
             return 1
 
         codigo = criar_eventos(conexao)
+        if codigo:
+            return codigo
+
+        codigo = criar_planos(conexao)
         if codigo:
             return codigo
 

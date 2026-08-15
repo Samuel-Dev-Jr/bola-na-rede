@@ -911,6 +911,78 @@ def mensagem_whatsapp(evento: dict) -> str:
     return "\n".join(partes)
 
 
+# ---------------------------------------------------------- plano de treino
+
+
+def planos_da_modalidade(conexao: sqlite3.Connection, modalidade_id: int,
+                         limite: int = 60) -> list[dict]:
+    """
+    Os planos de treino de uma modalidade, do mais novo pro mais velho.
+
+    Do futuro pro passado nessa ordem porque a tela é de trabalho: o professor
+    abre aqui pra publicar o treino de amanhã ou corrigir o de hoje, não pra
+    consultar o de março.
+    """
+    return [dict(l) for l in conexao.execute(
+        """
+        SELECT p.*, t.nome AS turma_nome
+        FROM plano_treino p
+        LEFT JOIN turma t ON t.id = p.turma_id
+        WHERE p.modalidade_id = ?
+        ORDER BY p.data DESC, p.id DESC
+        LIMIT ?
+        """,
+        (modalidade_id, limite),
+    )]
+
+
+def obter_plano(conexao: sqlite3.Connection, plano_id: int) -> Optional[dict]:
+    linha = conexao.execute(
+        """
+        SELECT p.*, t.nome AS turma_nome, m.slug AS modalidade_slug
+        FROM plano_treino p
+        JOIN modalidade m ON m.id = p.modalidade_id
+        LEFT JOIN turma t ON t.id = p.turma_id
+        WHERE p.id = ?
+        """,
+        (plano_id,),
+    ).fetchone()
+    return dict(linha) if linha else None
+
+
+def planos_da_pessoa(conexao: sqlite3.Connection, pessoa_id: int,
+                     dias_atras: int = 7) -> list[dict]:
+    """
+    Os planos de treino que ESTA pessoa deve ler, na ordem em que acontecem.
+
+    O filtro de turma é o mesmo cuidado de eventos_da_pessoa(): plano com turma
+    nula é da modalidade inteira, plano com turma preenchida é só daquele grupo.
+    Sem o `IS NULL OR`, o menino do Sub-11 abriria a área dele e leria o treino
+    tático do Sub-17 como se fosse o dele — e apareceria no treino errado.
+
+    Trago uma semana pra trás porque quem faltou na terça quer saber o que
+    perdeu, e porque o professor costuma publicar o da semana toda de uma vez.
+    """
+    inicio = hoje() - timedelta(days=dias_atras)
+    return [dict(l) for l in conexao.execute(
+        """
+        SELECT DISTINCT p.*, m.slug AS modalidade_slug, m.nome AS modalidade_nome,
+               m.genero AS modalidade_genero, m.termo_aula AS termo_aula,
+               t.nome AS turma_nome
+        FROM plano_treino p
+        JOIN modalidade m ON m.id = p.modalidade_id
+        JOIN matricula ma ON ma.pessoa_id = ?
+        JOIN turma tm     ON tm.id = ma.turma_id
+                         AND tm.modalidade_id = p.modalidade_id
+        LEFT JOIN turma t ON t.id = p.turma_id
+        WHERE (p.turma_id IS NULL OR p.turma_id = ma.turma_id)
+          AND p.data >= ?
+        ORDER BY p.data, p.id
+        """,
+        (pessoa_id, inicio),
+    )]
+
+
 # ----------------------------------------------------------------- agenda
 
 

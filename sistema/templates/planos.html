@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Planos de {{ modalidade.termo_aula }} · {{ modalidade.nome_exibicao }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao, 'url': url_for('painel', slug=modalidade.slug)},
+    {'nome': 'Planos de ' + modalidade.termo_aula},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">
+  O que vai ter n{{ 'o' if modalidade.artigo_aula == 'um' else 'a' }}
+  {{ modalidade.termo_aula }}
+</h1>
+<p class="subtitulo-pagina">
+  Publique o plano e ele aparece na área de quem treina — inclusive de quem
+  faltou e quer saber o que perdeu.
+</p>
+
+<div class="barra-acoes">
+  <a class="botao" href="{{ url_for('plano_novo', slug=modalidade.slug) }}">
+    Publicar plano
+  </a>
+</div>
+
+{% if planos %}
+  <div class="cartao tabela-envolucro">
+    <table class="tabela-como-cartao">
+      <thead>
+        <tr>
+          <th>Plano</th>
+          <th>Data</th>
+          <th>Quem lê</th>
+          <th>Levar</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in planos %}
+          <tr>
+            <td>
+              <a class="celula-nome" href="{{ url_for('plano_editar', plano_id=p.id) }}">
+                {{ p.titulo }}
+              </a>
+              <div class="celula-secundaria">{{ p.conteudo }}</div>
+            </td>
+            <td data-rotulo="Data" class="celula-dado">
+              {{ p.data|data_br }}
+              {% if p.data == hoje %}
+                <div><span class="selo selo--info">hoje</span></div>
+              {% elif p.data > hoje %}
+                <div><span class="selo selo--info">a realizar</span></div>
+              {% endif %}
+            </td>
+            <td data-rotulo="Quem lê" class="celula-dado">
+              {{ p.turma_nome or 'Todas as turmas' }}
+            </td>
+            <td data-rotulo="Levar" class="celula-secundaria">{{ p.material or '—' }}</td>
+            <td class="celula-dado">
+              {# POST, e não link, porque apagar não pode acontecer por alguém
+                 abrir um endereço — nem por um pré-carregador do navegador. #}
+              <form method="post" action="{{ url_for('plano_excluir', plano_id=p.id) }}"
+                    onsubmit="return confirm('Remover o plano “{{ p.titulo }}”?');">
+                <button class="botao botao--discreto" type="submit">Remover</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="vazio">
+    <strong>Nenhum plano publicado ainda.</strong>
+    Publique o primeiro e {{ modalidade.termo_aluno }}s passam a abrir o app
+    sabendo o que vai ser feito.
+  </div>
+{% endif %}
+
+{% endblock %}

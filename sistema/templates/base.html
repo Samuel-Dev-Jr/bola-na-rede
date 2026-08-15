@@ -56,6 +56,10 @@
            {% if rota == 'chamada' %}aria-current="page"{% endif %}>Chamada</a>
         <a href="{{ url_for('agenda', slug=modalidade.slug) }}"
            {% if rota == 'agenda' %}aria-current="page"{% endif %}>Agenda</a>
+        {# Rótulo pelo termo da modalidade: "Treinos" no futebol, "Aulas" no
+           pilates. O startswith pega planos, plano_novo e plano_editar. #}
+        <a href="{{ url_for('planos', slug=modalidade.slug) }}"
+           {% if rota and rota.startswith('plano') %}aria-current="page"{% endif %}>{{ modalidade.termo_aula_pl|capitalize }}</a>
         {% if modalidade.tem_convocacao %}
           <a href="{{ url_for('convocacoes', slug=modalidade.slug) }}"
              {% if rota and rota.startswith('convoca') %}aria-current="page"{% endif %}>Convocação</a>

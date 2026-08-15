@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Horário de {{ modalidade.nome_exibicao }} — Bola na Rede{% endblock %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': modalidade.nome_exibicao, 'url': url_for('painel', slug=modalidade.slug)},
+    {'nome': 'Horário'},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="barra-acoes">
+  {{ nav.voltar(url_for('painel', slug=modalidade.slug), 'Voltar') }}
+</div>
+
+<h1 class="titulo-pagina">Horário de {{ modalidade.nome_exibicao }}</h1>
+<p class="subtitulo-pagina">
+  Em que dias tem {{ modalidade.termo_aula }} e como o horário aparece pra quem lê.
+</p>
+
+<form method="post" action="{{ url_for('modalidade_horario', slug=modalidade.slug) }}">
+
+  {# Os dias são o campo que o sistema USA: é deles que sai a data sugerida na
+     chamada e quais dias a agenda pinta. Por isso vêm primeiro. #}
+  <div class="cartao grupo-formulario">
+    <h2 class="grupo-formulario__titulo">Dias com {{ modalidade.termo_aula }}</h2>
+    <div class="grade-formulario">
+      <div class="campo campo--todo">
+        {% for numero, nome in dias_da_semana %}
+          <label class="caixa-marcacao">
+            <input type="checkbox" name="dias" value="{{ numero }}"
+                   {% if numero in dias_marcados %}checked{% endif %}>
+            <span>{{ nome }}</span>
+          </label>
+        {% endfor %}
+        <span class="campo__ajuda">
+          A chamada abre já na próxima data marcada aqui, e a agenda do mês
+          destaca esses dias. Pelo menos um.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cartao grupo-formulario">
+    <h2 class="grupo-formulario__titulo">Horário escrito</h2>
+    <div class="grade-formulario">
+      <div class="campo campo--todo">
+        <label for="horario">Como aparece na tela</label>
+        <input type="text" id="horario" name="horario" required maxlength="120"
+               value="{{ modalidade.horario }}">
+        <span class="campo__ajuda">
+          Texto livre, do jeito que a coordenação fala — por exemplo
+          <strong>Ter e Qui, 18h às 20h · Sáb, 8h às 11h</strong>. É o que o
+          {{ modalidade.termo_aluno }} lê na área dele, no painel e na chamada.
+          O sistema não interpreta este campo, então ele só fica certo se
+          combinar com os dias marcados acima.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="barra-acoes barra-acoes--fim" style="margin-top: 18px;">
+    <a class="botao botao--discreto"
+       href="{{ url_for('painel', slug=modalidade.slug) }}">Cancelar</a>
+    <button class="botao" type="submit">Salvar horário</button>
+  </div>
+</form>
+
+<div class="cartao" style="padding: 18px; margin-top: 18px;">
+  <span class="etiqueta">O que isso não muda</span>
+  <p style="margin: 8px 0 0;">
+    Chamada já lançada continua exatamente como está, e o nível de risco de
+    cada {{ modalidade.termo_aluno }} sai das presenças registradas — não deste
+    horário. Mudar aqui vale de agora em diante.
+  </p>
+</div>
+
+{% endblock %}

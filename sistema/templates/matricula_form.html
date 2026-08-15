@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% import "_trilha.html" as nav %}
+
+{% block titulo %}Matrícula de {{ matricula.nome }} — Bola na Rede{% endblock %}
+
+{% set volta = url_for('pessoa_detalhe', pessoa_id=matricula.pessoa_id) %}
+
+{% block trilha %}
+  {{ nav.trilha([
+    {'nome': 'Centro', 'url': url_for('centro')},
+    {'nome': 'Pessoas', 'url': url_for('pessoas')},
+    {'nome': matricula.nome, 'url': volta},
+    {'nome': 'Matrícula em ' + modalidade.nome_exibicao},
+  ]) }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="barra-acoes">
+  {{ nav.voltar(volta, 'Voltar') }}
+</div>
+
+<h1 class="titulo-pagina">Matrícula de {{ matricula.nome }}</h1>
+<p class="subtitulo-pagina">
+  {{ modalidade.nome_exibicao }} · desde {{ matricula.data_matricula|data_br }}.
+  A ficha da pessoa se edita
+  <a href="{{ url_for('pessoa_editar', pessoa_id=matricula.pessoa_id) }}">na
+  ficha</a>; aqui é só o que é desta atividade.
+</p>
+
+<form method="post" action="{{ url_for('matricula_editar', matricula_id=matricula.matricula_id) }}">
+
+  <div class="cartao grupo-formulario">
+    <div class="grade-formulario">
+      <div class="campo">
+        <label for="turma_id">Turma</label>
+        <select id="turma_id" name="turma_id" required>
+          {% for t in turmas %}
+            <option value="{{ t.id }}"
+              {% if t.id == matricula.turma_id %}selected{% endif %}>{{ t.nome }}</option>
+          {% endfor %}
+        </select>
+        <span class="campo__ajuda">
+          Mudar de turma <strong>não apaga a frequência</strong>: as presenças
+          são da matrícula, então o histórico sobe de categoria junto com
+          {{ matricula.nome.split()[0] }}.
+        </span>
+      </div>
+
+      <div class="campo">
+        <label for="numero">Número da camisa</label>
+        <input type="number" id="numero" name="numero" min="1" max="99"
+               inputmode="numeric" placeholder="opcional"
+               value="{{ matricula.numero if matricula.numero else '' }}">
+        <span class="campo__ajuda">
+          De 1 a 99, sem repetir na turma. Deixe em branco pra tirar o número.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="barra-acoes barra-acoes--fim" style="margin-top: 18px;">
+    <a class="botao botao--discreto" href="{{ volta }}">Cancelar</a>
+    <button class="botao" type="submit">Salvar alterações</button>
+  </div>
+</form>
+
+{% endblock %}

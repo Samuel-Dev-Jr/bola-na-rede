@@ -7,6 +7,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 CAMINHO_BANCO = BASE_DIR / "bola_na_rede.db"
 CAMINHO_SCHEMA = BASE_DIR / "schema.sql"
+CAMINHO_MIGRACOES = BASE_DIR / "migracoes.sql"
 
 # O Python 3.12 marcou como obsoleto o jeito antigo do sqlite3 converter datas,
 # e aparecia um monte de aviso no terminal. Registrei os meus: gravo a data
@@ -29,6 +30,26 @@ def recriar_schema() -> None:
     conexao = conectar()
     try:
         conexao.executescript(CAMINHO_SCHEMA.read_text(encoding="utf-8"))
+        conexao.commit()
+    finally:
+        conexao.close()
+
+
+def aplicar_migracoes() -> None:
+    """
+    Cria o que foi acrescentado depois do schema original, sem apagar nada.
+
+    O schema.sql começa com DROP TABLE, então ele só serve pra banco novo: rodar
+    no banco do Centro apagaria a chamada que foi digitada direto na tela e não
+    existe em planilha nenhuma. As tabelas novas vivem no migracoes.sql, todas
+    em CREATE ... IF NOT EXISTS, e isto roda a cada início do sistema.
+
+    É seguro chamar quantas vezes quiser. Quando o banco já está em dia, o
+    SQLite não faz nada.
+    """
+    conexao = conectar()
+    try:
+        conexao.executescript(CAMINHO_MIGRACOES.read_text(encoding="utf-8"))
         conexao.commit()
     finally:
         conexao.close()

@@ -85,6 +85,11 @@
     <a class="botao botao--secundario"
        href="{{ url_for('convocacoes', slug=modalidade.slug) }}">Convocações</a>
   {% endif %}
+  <a class="botao botao--secundario"
+     href="{{ url_for('planos', slug=modalidade.slug) }}">
+    Planos de {{ modalidade.termo_aula }}</a>
+  <a class="botao botao--discreto"
+     href="{{ url_for('modalidade_horario', slug=modalidade.slug) }}">Editar horário</a>
 </div>
 
 {# lista de ação #}
