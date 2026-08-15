@@ -985,10 +985,15 @@ body.tela-entrada .cartao {
   margin: 0 auto;
 }
 
+/* A logo do Centro, não a marca do app. Ela é um brasão com cinco esportes e
+   duas linhas de texto dentro; a 52px, que era o tamanho de antes, o texto
+   virava um borrão. Testei em cada tamanho que o sistema usa: abaixo de ~110px
+   não dá pra ler "Jardim Elizabete". Daí o salto. */
 .entrada__escudo {
   display: block;
-  width: 52px;
-  height: 52px;
+  width: 112px;
+  height: auto;
+  margin-left: -6px;   /* o brasão já tem ar próprio nas laterais */
 }
 
 .entrada__titulo {
@@ -1031,7 +1036,7 @@ body.tela-entrada .cartao {
      da página que é. */
   body.tela-entrada .aviso { max-width: none; }
 
-  .entrada__escudo { width: 64px; height: 64px; }
+  .entrada__escudo { width: 152px; }
   .entrada__titulo { font-size: 44px; margin-top: 20px; }
   .entrada__local  { font-size: 17px; }
 

@@ -11,7 +11,13 @@
    como a porta de um sistema. O texto é o que o sistema faz — sem promessa que
    ele não cumpre. #}
 <div class="entrada__marca">
-  <img class="entrada__escudo" src="{{ url_for('static', filename='icone.svg') }}" alt="">
+  {# A logo do Centro entra aqui e não no cabeçalho porque é onde ela cabe: ela
+     tem cinco esportes, um livro e duas linhas de texto dentro, e nada disso
+     sobrevive aos 28px da barra de cima. Esta é a porta do sistema — o lugar
+     onde identificar a instituição importa e há espaço pra isso. #}
+  <img class="entrada__escudo" src="{{ url_for('static', filename='logo.png') }}"
+       alt="Centro de Cultura e Esporte — Jardim Elizabete"
+       width="640" height="640">
   <h1 class="entrada__titulo">Bola na Rede</h1>
   <p class="entrada__local">Centro de Cultura e Esporte · Jardim Elizabete</p>
   <p class="entrada__resumo">

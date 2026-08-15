@@ -174,10 +174,17 @@ def manifest():
                 "background_color": "#f5f6f4",
                 "theme_color": "#0f7a3d",
                 "lang": "pt-BR",
+                # O maskable é ARQUIVO SEPARADO, e antes não era: eu apontava o
+                # mesmo icone-512 nos dois. O Android recorta o maskable no
+                # formato que o fabricante quiser — círculo, losango, quadrado
+                # arredondado — e só garante os 80% centrais. Com a logo do
+                # Centro isso passou a doer de verdade: o recorte comia a faixa
+                # de baixo e o ícone ficava sem "JARDIM ELIZABETE". A versão
+                # maskable entra a 70% num fundo sólido, com folga pro corte.
                 "icons": [
                     {"src": "/static/icone-192.png", "sizes": "192x192", "type": "image/png"},
                     {"src": "/static/icone-512.png", "sizes": "512x512", "type": "image/png"},
-                    {"src": "/static/icone-512.png", "sizes": "512x512",
+                    {"src": "/static/icone-maskable-512.png", "sizes": "512x512",
                      "type": "image/png", "purpose": "maskable"},
                 ],
                 "shortcuts": [
