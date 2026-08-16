@@ -62,10 +62,16 @@ app.secret_key = autenticacao.chave_secreta()
 # Campos de texto da ficha da pessoa. Uso essa lista pra montar o INSERT e o
 # UPDATE sem repetir o nome de cada coluna nos dois lugares.
 CAMPOS_PESSOA = [
-    "nome", "responsavel_nome", "responsavel_parentesco", "responsavel_telefone",
-    "email", "emergencia_nome", "emergencia_telefone", "alergias", "condicoes",
-    "medicacao_continua", "plano_saude", "observacoes_medicas",
+    "nome", "genero", "responsavel_nome", "responsavel_parentesco",
+    "responsavel_telefone", "email", "emergencia_nome", "emergencia_telefone",
+    "alergias", "condicoes", "medicacao_continua", "plano_saude",
+    "observacoes_medicas",
 ]
+
+# Só o que o futsal separa em turma masculina e feminina. Deixo "não informado"
+# como valor de verdade em vez de campo vazio: ficha antiga tem genero NULL, e
+# eu preciso distinguir "ninguém preencheu ainda" de "a pessoa não quis dizer".
+GENEROS = ["Feminino", "Masculino", "Não informado"]
 
 # Essas rotas não leem o banco. O service worker e a página de offline precisam
 # funcionar mesmo se o banco não existir.
@@ -133,6 +139,7 @@ def dia_semana(valor: date) -> str:
 def variaveis_globais():
     return {
         "ROTULO_RISCO": ROTULO_RISCO,
+        "GENEROS": GENEROS,
         "hoje": consultas.hoje(),
         # Os templates precisam saber quem está logado pra decidir o que mostrar
         # no menu. Deixo disponível em toda página em vez de passar em cada
@@ -581,6 +588,20 @@ def _dados_da_pessoa() -> dict:
         dados[campo] = valor or None
     dados["nome"] = dados["nome"] or "Sem nome"
     return dados
+
+
+def _nome_inteiro_do_form() -> str:
+    """
+    Junta nome e sobrenome num nome só, que é como a ficha guarda.
+
+    A tela de acessos pede os dois separados porque é assim que a coordenação
+    fala ("a Antonella Souza"), mas dividir a coluna `nome` da ficha em duas
+    quebraria a chamada, a convocação e a mensagem do WhatsApp, que ordenam e
+    exibem por ela.
+    """
+    partes = [request.form.get("nome", "").strip(),
+              request.form.get("sobrenome", "").strip()]
+    return " ".join(parte for parte in partes if parte)
 
 
 def _data_do_form(campo: str):
@@ -1152,40 +1173,93 @@ def minha_area():
 def usuarios():
     """Gestão de acessos."""
     if request.method == "POST":
-        login_novo = request.form.get("login", "").strip()
+        # O e-mail É o login. Era um campo "login" inventado pela coordenação
+        # (antonella.souza), e ninguém lembrava o que tinha digitado pra
+        # ninguém. O e-mail a pessoa já sabe de cor, e é por onde a senha
+        # chega — então é ele que identifica.
+        email = request.form.get("email", "").strip()
         senha_nova = request.form.get("senha", "")
+        papel = request.form.get("papel", "jogador")
+        escolha = request.form.get("pessoa_id", "")
         pessoa_id = _inteiro_do_form("pessoa_id")
 
-        pessoa = None
-        if pessoa_id is not None:
-            pessoa = g.conexao.execute("SELECT nome, email FROM pessoa WHERE id = ?",
+        if "@" not in email or " " in email:
+            flash("O e-mail é o login da pessoa, então precisa ser um e-mail "
+                  "de verdade.", "erro")
+            return redirect(url_for("usuarios"))
+
+        # Antes de cadastrar a ficha, e não depois: senha curta ou e-mail
+        # repetido deixariam a pessoa gravada e sem acesso.
+        erro = autenticacao.erro_do_acesso(g.conexao, email, senha_nova, papel)
+        if erro:
+            flash(erro, "erro")
+            return redirect(url_for("usuarios"))
+
+        nome_de_quem = email
+        if escolha == "nova":
+            # A ficha inteira nasce aqui: quem entra no sistema é gente do
+            # Centro, e sem responsável e data de nascimento a ficha não serve
+            # pra chamada nem pra ligar quando a criança some.
+            dados = _dados_da_pessoa()
+            dados["nome"] = _nome_inteiro_do_form()
+            dados["email"] = email
+            erro = _erro_da_ficha(dados)
+            if erro:
+                flash(erro, "erro")
+                return redirect(url_for("usuarios"))
+
+            cursor = g.conexao.execute(
+                f"""
+                INSERT INTO pessoa ({", ".join(dados)}, data_nascimento, autoriza_imagem)
+                VALUES ({", ".join("?" * len(dados))}, ?, 0)
+                """,
+                [*dados.values(), _data_do_form("data_nascimento")],
+            )
+            g.conexao.commit()
+            pessoa_id = cursor.lastrowid
+            nome_de_quem = dados["nome"]
+
+        elif pessoa_id is not None:
+            pessoa = g.conexao.execute("SELECT nome FROM pessoa WHERE id = ?",
                                        (pessoa_id,)).fetchone()
             if pessoa is None:
                 flash("Essa pessoa não existe.", "erro")
                 return redirect(url_for("usuarios"))
+            # O e-mail digitado aqui vale como o e-mail da ficha: é por ele que
+            # os avisos saem, e ter dois e-mails diferentes pra mesma pessoa é
+            # o tipo de coisa que ninguém percebe até parar de chegar aviso.
+            g.conexao.execute("UPDATE pessoa SET email = ? WHERE id = ?",
+                              (email, pessoa_id))
+            g.conexao.commit()
+            nome_de_quem = pessoa["nome"]
 
-        erro = autenticacao.criar_usuario(g.conexao, login=login_novo,
-                                          senha=senha_nova,
-                                          papel=request.form.get("papel", "jogador"),
+        erro = autenticacao.criar_usuario(g.conexao, login=email,
+                                          senha=senha_nova, papel=papel,
                                           pessoa_id=pessoa_id)
         if erro:
             flash(erro, "erro")
             return redirect(url_for("usuarios"))
 
-        mensagem = f"Acesso {login_novo!r} criado."
-        if pessoa and pessoa["email"]:
-            erro_email = correio.enviar(
-                pessoa["email"],
-                "Seu acesso ao sistema do Centro de Cultura e Esportes",
-                f"Olá! O acesso de {pessoa['nome']} ao sistema do Centro foi criado.\n\n"
-                f"Endereço: {request.url_root}\n"
-                f"Login: {login_novo}\n"
-                f"Senha: {senha_nova}\n\n"
-                "Dá pra trocar a senha depois de entrar.",
-            )
-            mensagem += (" A pessoa foi avisada por e-mail."
-                         if erro_email is None else f" ({erro_email}.)")
-        flash(mensagem, "sucesso")
+        erro_email = correio.enviar(
+            email,
+            "Seu acesso ao sistema do Centro de Cultura e Esportes",
+            f"Olá! O acesso de {nome_de_quem} ao sistema do Centro foi criado.\n\n"
+            f"Endereço: {request.url_root}\n"
+            f"Usuário: {email}\n"
+            f"Senha: {senha_nova}\n\n"
+            "É o seu e-mail que serve de usuário para entrar. "
+            "Dá pra trocar a senha depois de entrar.",
+        )
+        if erro_email is None:
+            flash(f"Acesso de {nome_de_quem} criado. A pessoa foi avisada por "
+                  f"e-mail: entra com {email} e a senha que você definiu.",
+                  "sucesso")
+        else:
+            # Sem e-mail configurado a senha tem que aparecer na tela, senão o
+            # acesso nasce e ninguém sabe entregar como entrar.
+            flash(f"Acesso de {nome_de_quem} criado. Usuário: {email} · "
+                  f"Senha: {senha_nova} — anote e entregue para a pessoa "
+                  f"({erro_email}).", "sucesso")
         return redirect(url_for("usuarios"))
 
     # A varredura de inatividade roda ao abrir esta tela: o plano grátis do

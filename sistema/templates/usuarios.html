@@ -88,11 +88,80 @@
   <form method="post" action="{{ url_for('usuarios') }}">
     <div class="cartao grupo-formulario">
       <div class="grade-formulario">
+        <div class="campo campo--todo">
+          <label for="pessoa_id">Para quem é o acesso</label>
+          <select id="pessoa_id" name="pessoa_id">
+            <option value="nova">Cadastrar uma pessoa nova</option>
+            <option value="">Sem ficha — só administra o sistema</option>
+            {% for p in sem_acesso %}
+              <option value="{{ p.id }}">{{ p.nome }} — já cadastrado</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    {# Some quando o acesso é pra quem já tem ficha. O required sai junto, senão
+       o navegador barra o envio reclamando de campo escondido. #}
+    <div class="cartao grupo-formulario" id="bloco-ficha">
+      <h2 class="grupo-formulario__titulo">Dados da pessoa</h2>
+      <div class="grade-formulario">
         <div class="campo">
-          <label for="login">Login</label>
-          <input type="text" id="login" name="login" required
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" required placeholder="Antonella">
+        </div>
+
+        <div class="campo">
+          <label for="sobrenome">Sobrenome</label>
+          <input type="text" id="sobrenome" name="sobrenome" placeholder="Souza">
+        </div>
+
+        <div class="campo">
+          <label for="genero">Gênero</label>
+          <select id="genero" name="genero">
+            {% for g in GENEROS %}
+              <option value="{{ g }}">{{ g }}</option>
+            {% endfor %}
+          </select>
+          <span class="campo__ajuda">Separa o futsal em turma masculina e feminina.</span>
+        </div>
+
+        <div class="campo">
+          <label for="data_nascimento">Data de nascimento</label>
+          <input type="date" id="data_nascimento" name="data_nascimento" required>
+        </div>
+
+        <div class="campo campo--todo">
+          <label for="responsavel_nome">Nome do responsável</label>
+          <input type="text" id="responsavel_nome" name="responsavel_nome" required>
+        </div>
+
+        <div class="campo">
+          <label for="responsavel_parentesco">Parentesco</label>
+          <input type="text" id="responsavel_parentesco" name="responsavel_parentesco"
+                 required placeholder="Mãe, pai, avó… ou Próprio aluno">
+        </div>
+
+        <div class="campo">
+          <label for="responsavel_telefone">Telefone (WhatsApp)</label>
+          <input type="tel" id="responsavel_telefone" name="responsavel_telefone"
+                 required placeholder="(11) 90000-0000">
+        </div>
+      </div>
+    </div>
+
+    <div class="cartao grupo-formulario">
+      <h2 class="grupo-formulario__titulo">Como a pessoa entra</h2>
+      <div class="grade-formulario">
+        <div class="campo campo--todo">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" required
                  autocapitalize="none" spellcheck="false"
-                 placeholder="ex.: antonella.souza">
+                 placeholder="antonella@exemplo.com">
+          <span class="campo__ajuda">
+            É o e-mail que serve de usuário para entrar, e é para ele que o
+            aviso com a senha é enviado.
+          </span>
         </div>
 
         <div class="campo">
@@ -100,8 +169,8 @@
           <input type="text" id="senha" name="senha" required
                  placeholder="mínimo 8 caracteres">
           <span class="campo__ajuda">
-            Fica visível aqui de propósito: você precisa entregar ela para a
-            pessoa. Depois de salvar, só o hash é guardado.
+            Fica visível aqui de propósito: sem e-mail configurado, é por aqui
+            que você entrega a senha. Depois de salvar, só o hash é guardado.
           </span>
         </div>
 
@@ -112,19 +181,6 @@
             <option value="admin">Administrador — vê e altera tudo</option>
           </select>
         </div>
-
-        <div class="campo">
-          <label for="pessoa_id">Vincular a uma pessoa</label>
-          <select id="pessoa_id" name="pessoa_id">
-            <option value="">Sem vínculo (só administra)</option>
-            {% for p in sem_acesso %}
-              <option value="{{ p.id }}">{{ p.nome }}</option>
-            {% endfor %}
-          </select>
-          <span class="campo__ajuda">
-            É o vínculo que faz a área do jogador mostrar as atividades dele.
-          </span>
-        </div>
       </div>
     </div>
 
@@ -132,6 +188,28 @@
       <button class="botao" type="submit">Criar acesso</button>
     </div>
   </form>
+
+  <script>
+    (function () {
+      const escolha = document.getElementById('pessoa_id');
+      const bloco = document.getElementById('bloco-ficha');
+      const obrigatorios = ['nome', 'data_nascimento', 'responsavel_nome',
+                            'responsavel_parentesco', 'responsavel_telefone'];
+
+      function ajustar() {
+        const cadastrando = escolha.value === 'nova';
+        bloco.hidden = !cadastrando;
+        // Sem tirar o required, o navegador recusa o envio apontando pra um
+        // campo que não está na tela, e a pessoa não vê o que ele quer.
+        for (const id of obrigatorios) {
+          document.getElementById(id).required = cadastrando;
+        }
+      }
+
+      escolha.addEventListener('change', ajustar);
+      ajustar();
+    })();
+  </script>
 </section>
 
 {# ---------------------------------------------------------- a lista #}

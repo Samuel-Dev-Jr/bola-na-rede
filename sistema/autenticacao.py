@@ -276,9 +276,15 @@ def senha_aleatoria() -> str:
     return secrets.token_urlsafe(9)
 
 
-def criar_usuario(conexao, login: str, senha: str, papel: str,
-                  pessoa_id: int | None) -> str | None:
-    """Cria o usuário. Devolve mensagem de erro, ou None se deu certo."""
+def erro_do_acesso(conexao, login: str, senha: str, papel: str) -> str | None:
+    """
+    As recusas do criar_usuario, sem gravar nada.
+
+    Existe separado porque a tela de acessos cadastra a ficha da pessoa antes
+    de criar o login. Sem conferir aqui, uma senha curta deixava a pessoa
+    cadastrada e sem acesso nenhum: a coordenação tentava de novo, e a segunda
+    tentativa criava a mesma criança duas vezes na lista.
+    """
     login = (login or "").strip()
     if not login:
         return "O login não pode ficar vazio."
@@ -293,6 +299,16 @@ def criar_usuario(conexao, login: str, senha: str, papel: str,
     # UNIQUE COLLATE NOCASE, mas com um erro que não ajuda quem está na tela.
     if conexao.execute("SELECT 1 FROM usuario WHERE login = ?", (login,)).fetchone():
         return f"Já existe um acesso com o login {login!r}."
+    return None
+
+
+def criar_usuario(conexao, login: str, senha: str, papel: str,
+                  pessoa_id: int | None) -> str | None:
+    """Cria o usuário. Devolve mensagem de erro, ou None se deu certo."""
+    login = (login or "").strip()
+    erro = erro_do_acesso(conexao, login, senha, papel)
+    if erro:
+        return erro
 
     conexao.execute(
         "INSERT INTO usuario (login, senha_hash, papel, pessoa_id) VALUES (?,?,?,?)",
@@ -353,8 +369,15 @@ def desativar_por_inatividade(conexao, hoje, dias: int = DIAS_INATIVIDADE) -> li
 
     Participar = presença ou falta justificada numa matrícula ativa. Quem nunca
     teve chamada conta a partir da data da matrícula, senão o recém-chegado
-    cairia antes da primeira aula. Sem matrícula ativa nenhuma, desativa
-    direto. Admin nunca entra na varredura. Devolve os logins desativados.
+    cairia antes da primeira aula. Quem não tem matrícula ativa nenhuma conta a
+    partir da criação do próprio acesso. Admin nunca entra na varredura.
+    Devolve os logins desativados.
+
+    A última âncora existe por um defeito que a tela de acessos revelou: ao
+    cadastrar alguém e criar o login na mesma tela, a pessoa ainda não tem
+    matrícula, e a varredura — que roda justamente ao voltar pra essa tela —
+    desativava a conta um segundo depois de criada. Antes daqui a regra
+    desativava direto quem não tinha matrícula ativa.
     """
     limite = (hoje - timedelta(days=dias)).isoformat()
     parados = conexao.execute(
@@ -362,18 +385,15 @@ def desativar_por_inatividade(conexao, hoje, dias: int = DIAS_INATIVIDADE) -> li
         SELECT u.id, u.login
         FROM usuario u
         WHERE u.papel = 'jogador' AND u.ativo = 1 AND u.pessoa_id IS NOT NULL
-          AND (
-            NOT EXISTS (SELECT 1 FROM matricula ma
-                        WHERE ma.pessoa_id = u.pessoa_id AND ma.status = 'ativa')
-            OR COALESCE(
-                 (SELECT MAX(pr.data) FROM presenca pr
-                  JOIN matricula ma ON ma.id = pr.matricula_id
-                  WHERE ma.pessoa_id = u.pessoa_id AND ma.status = 'ativa'
-                    AND pr.status IN ('presente', 'justificada')),
-                 (SELECT MAX(ma.data_matricula) FROM matricula ma
-                  WHERE ma.pessoa_id = u.pessoa_id AND ma.status = 'ativa')
-               ) < ?
-          )
+          AND COALESCE(
+                (SELECT MAX(pr.data) FROM presenca pr
+                 JOIN matricula ma ON ma.id = pr.matricula_id
+                 WHERE ma.pessoa_id = u.pessoa_id AND ma.status = 'ativa'
+                   AND pr.status IN ('presente', 'justificada')),
+                (SELECT MAX(ma.data_matricula) FROM matricula ma
+                 WHERE ma.pessoa_id = u.pessoa_id AND ma.status = 'ativa'),
+                date(u.criado_em)
+              ) < ?
         """,
         (limite,),
     ).fetchall()

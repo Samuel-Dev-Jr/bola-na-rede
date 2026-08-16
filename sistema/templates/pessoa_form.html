@@ -49,6 +49,18 @@
                value="{{ pessoa.data_nascimento.isoformat() if pessoa else '' }}">
       </div>
 
+      <div class="campo">
+        <label for="genero">Gênero</label>
+        <select id="genero" name="genero">
+          <option value="">—</option>
+          {% for g in GENEROS %}
+            <option value="{{ g }}"
+              {{ 'selected' if pessoa and pessoa.genero == g else '' }}>{{ g }}</option>
+          {% endfor %}
+        </select>
+        <span class="campo__ajuda">É o que separa o futsal em turma masculina e feminina.</span>
+      </div>
+
       {% if modalidade %}
         <div class="campo">
           <label for="turma_id">Turma em {{ modalidade.nome_exibicao }}</label>

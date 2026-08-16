@@ -198,6 +198,10 @@
         <dd>{{ pessoa.data_nascimento|data_br }} ({{ pessoa.idade }} anos)</dd>
       </div>
       <div>
+        <dt>Gênero</dt>
+        <dd>{{ pessoa.genero or 'Não informado' }}</dd>
+      </div>
+      <div>
         <dt>Uso de imagem</dt>
         <dd>{{ 'Autorizado pelo responsável' if pessoa.autoriza_imagem else 'Não autorizado' }}</dd>
       </div>
