@@ -25,17 +25,9 @@ import db
 # e ordem. Ela fica registrada aqui porque é a regra que a coordenação usa pra
 # dizer em que turma uma criança entra, e o importador de CSV vai precisar dela
 # pra recusar matrícula em turma que não corresponde à idade.
-# As três atividades que o Centro tem hoje e que entraram no sistema. O futsal
-# conta duas vezes porque masculino e feminino treinam em dias diferentes e
-# competem separados.
-#
-# O Centro também oferece BALÉ e DANÇA, e eles não estão aqui de propósito: os
-# professores me disseram que nessas turmas o contato com as famílias já
-# acontece direto pelo grupo de WhatsApp, e que controle de frequência ali não
-# fazia falta agora. Preferi respeitar isso a entregar tela que ninguém pediu.
-# Quando quiserem, entra sem mexer em código nenhum.
-#
-# Já teve VÔLEI e BASQUETE. O basquete acabou e o vôlei está sem professor.
+# As atividades que entraram no sistema. Balé e dança existem no Centro mas
+# ficaram de fora a pedido dos professores: nessas turmas o contato com as
+# famílias já acontece pelo WhatsApp. Vôlei e basquete não existem mais.
 MODALIDADES = [
     {
         "slug": "futsal-masculino", "nome": "Futsal", "genero": "Masculino",
@@ -61,11 +53,8 @@ MODALIDADES = [
         "turmas": [("Sub-13", (10, 13)), ("Sub-15", (14, 15)), ("Sub-17", (16, 17))],
     },
     {
-        # Estava cadastrado como karatê, e está errado desde o começo: o que
-        # acontece no Centro é jiu-jitsu. Descobri olhando a foto do treino —
-        # tatame, trabalho de solo e imobilização, nada de golpe em pé. Karatê
-        # e jiu-jitsu não se organizam igual: um gradua por faixa etária e
-        # kata, o outro por faixa de graduação mesmo, e o adulto treina junto.
+        # Cheguei a cadastrar como karatê; a foto do treino (tatame, solo)
+        # mostrou que é jiu-jitsu.
         "slug": "jiu-jitsu", "nome": "Jiu-Jitsu", "genero": "Misto",
         "descricao": "Turmas por faixa, em parceria com a ABOA",
         "cor": "#6d28d9", "icone": "jiu-jitsu",

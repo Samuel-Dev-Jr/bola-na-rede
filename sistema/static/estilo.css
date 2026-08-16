@@ -151,12 +151,8 @@ a { color: var(--verde); }
   padding: 10px 0;
 }
 
-/* 38px, e não os 28 de antes. O brasão do Centro tem cinco esportes dentro; a
-   28px ele era uma mancha. 38 é o teto: o .topo__interno tem 58px de altura
-   mínima e o .marca reserva 10px de respiro em cima e embaixo — 38 + 20 = 58,
-   então a barra não cresce.
-   Sem border-radius: o arredondamento existia pro ícone antigo, que era um
-   quadrado verde. O brasão tem contorno próprio e fundo transparente. */
+/* 38px é o teto: a barra tem 58 de altura e o .marca reserva 20 de respiro.
+   O brasão tem contorno próprio, então o border-radius antigo saiu. */
 .marca__escudo {
   width: 38px;
   height: 38px;
@@ -434,14 +430,8 @@ a { color: var(--verde); }
   font-variant-numeric: tabular-nums;
 }
 
-/* Dia com aula: fundo na cor da modalidade.
-
-   O número do dia leva 12% de preto na cor. Sem isso ele ficava em 4.47:1
-   contra o fundo tingido, e o mínimo do WCAG AA é 4.5 — reprovava por 0.03,
-   que é o tipo de margem que não dá pra ver no olho e o teste de contraste
-   pega. O verde do futebol era o pior caso; o roxo do karatê e o rosa do balé
-   passavam. Escurecer só o texto resolve sem mudar a cor da modalidade, que é
-   o que identifica a atividade na tela inteira. */
+/* Dia com aula: fundo na cor da modalidade. O texto leva 12% de preto, senão
+   ficava em 4.47:1 e o mínimo do WCAG é 4.5. */
 .calendario__dia--aula {
   background: color-mix(in srgb, var(--modalidade, var(--verde)) 12%, transparent);
   border-color: color-mix(in srgb, var(--modalidade, var(--verde)) 30%, transparent);
@@ -923,14 +913,8 @@ tbody tr:hover { background: rgba(255, 255, 255, .5); }
 .botao--largo { width: 100%; }
 
 /* ------------------------------------------------------------ tela de entrar
-
-   Esta tela foge do layout das outras de propósito: ela é a porta, não uma
-   ferramenta de trabalho.
-
-   No celular a coluna estreita já ficava certa, mas no computador o cartão
-   encostava no topo e sobrava um monte de espaço vazio embaixo — parecia que
-   ele tinha caído ali. Agora ocupa a altura da janela e, quando tem largura,
-   vira duas colunas. */
+   A porta do sistema foge do layout das outras: ocupa a altura da janela e,
+   quando tem largura, vira duas colunas. */
 
 body.tela-entrada {
   min-height: 100vh;
@@ -939,21 +923,16 @@ body.tela-entrada {
   flex-direction: column;
 }
 
-/* Fora as manchas de cor. Nas telas de trabalho elas existem porque o efeito de
-   vidro precisa de alguma coisa atrás pra desfocar; aqui não há conteúdo atrás
-   de nada, só o cartão no vazio, e elas apareciam como três borrões soltos
-   nos cantos, que era exatamente o que incomodava. */
+/* Sem as manchas de cor: aqui não há vidro pra desfocar e elas viravam três
+   borrões soltos nos cantos. */
 body.tela-entrada::before { display: none; }
 
 /* A barra de cima repetiria o nome do projeto, que nesta tela já está grande na
    coluna da esquerda, e o menu dela é vazio pra quem ainda não entrou. */
 body.tela-entrada .topo { display: none; }
 
-/* COLUNA, e não linha, e aqui eu errei feio. Pus flex sem definir a direção pra
-   centralizar na vertical, esquecendo que o .pagina também recebe as mensagens
-   de erro. Aí quem errasse a senha via o "Login ou senha não conferem" do LADO
-   do formulário, espremendo o título. Testei a tela em três larguras e só no
-   estado feliz — o erro só apareceu quando erraram a senha de verdade. */
+/* Coluna, não linha: o .pagina também recebe as mensagens de erro, e em linha
+   o aviso de senha errada aparecia do LADO do formulário. */
 body.tela-entrada .pagina {
   flex: 1;
   display: flex;

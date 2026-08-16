@@ -2,7 +2,7 @@
   Service worker do sistema do Centro de Cultura e Esportes.
 
   É o que faz o app funcionar sem internet. O técnico usa na quadra do Centro
-  de Cultura e Esporte, onde o sinal cai direto, então precisava abrir mesmo
+  de Cultura e Esportes, onde o sinal cai direto, então precisava abrir mesmo
   offline em vez de dar tela de dinossauro.
 
   A estratégia é: tenta a rede primeiro (pra sempre mostrar dado atualizado) e,

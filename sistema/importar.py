@@ -1,41 +1,18 @@
 """
 Importa cadastro e chamada de planilha CSV para o banco.
 
-Feito pra transcrever o caderno de papel da escolinha. São dois arquivos:
+  matriculas.csv  uma linha por matrícula. Quem faz duas atividades aparece em
+                  duas linhas; o importador junta por nome + nascimento e cria
+                  UMA pessoa com DUAS matrículas.
+  presencas.csv   formato largo, igual à folha de papel: uma coluna por data,
+                  P/F/J na célula. Vazia = sem registro, que não é falta.
 
-  matriculas.csv  uma linha por matrícula (pessoa + turma). Quem faz duas
-                  atividades aparece em duas linhas, com os mesmos dados
-                  pessoais — o importador junta pela dupla nome + nascimento e
-                  cria UMA pessoa com DUAS matrículas. É o modelo pessoa/
-                  matrícula funcionando na entrada de dados.
+Reimportar não duplica nada, então dá pra corrigir a planilha e mandar de novo.
+Linha sem dado obrigatório é recusada com o motivo — o importador não inventa
+nada. Tudo devolve um Resultado em vez de imprimir, senão o segundo upload na
+tela mostraria os erros do primeiro.
 
-                  A coluna `numero` é o número da camisa, opcional, de 1 a 99.
-                  Ele é da matrícula e não da pessoa: dá pra ser 10 no futsal
-                  masculino e 7 no feminino. Repetido na mesma turma é recusado.
-
-  presencas.csv   formato largo, igual ao caderno: nome na vertical, uma coluna
-                  por data, e P / F / J na célula. Célula vazia significa que
-                  não houve registro naquele dia — que é diferente de falta.
-
-Pra rodar pelo terminal:
-    python importar.py dados/matriculas.csv
-    python importar.py dados/matriculas.csv dados/presencas.csv
-
-Pela tela: Configurações, no menu do Centro.
-
-Rodar de novo com o mesmo arquivo não duplica nada: pessoa e matrícula são
-reconhecidas pela chave natural, e presença usa ON CONFLICT. Dá pra corrigir a
-planilha e reimportar quantas vezes precisar.
-
-O que ele NÃO faz: inventar dado. Se a planilha não tiver telefone do
-responsável, ele recusa a linha e diz qual é, em vez de preencher com algo
-plausível.
-
-Sobre a estrutura: tudo devolve um Resultado em vez de imprimir. A primeira
-versão guardava avisos e erros em listas no nível do módulo, e isso funcionava
-no terminal — onde o processo morre no fim — mas quebraria na tela: num
-servidor de vida longa as listas iam acumulando, e o segundo upload mostraria
-os erros do primeiro.
+Pelo terminal:  python importar.py dados/matriculas.csv [dados/presencas.csv]
 """
 
 import csv

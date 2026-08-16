@@ -1,23 +1,9 @@
 """
 Login, papéis e proteção das rotas.
 
-Deixei num arquivo separado pelo mesmo motivo do risco.py: é regra de negócio
-que precisa ser lida e conferida sozinha. Quem revisa segurança não deveria ter
-que procurar as verificações espalhadas entre as rotas.
-
-São dois papéis:
-
-  admin     a coordenação. Enxerga e altera tudo.
-  jogador   o participante. Enxerga o que é dele e o que é público da turma.
-            NÃO enxerga ficha médica nem telefone de outra pessoa.
-
-Essa segunda linha é a que importa. A lista de pessoas do Centro mostra nome
-completo de menor, telefone do responsável e condição de saúde. Se eu deixasse
-jogador entrar ali, eu teria construído exatamente o problema que o DECISOES.md
-diz que o sistema evita.
-
-A senha nunca é guardada: guardo o hash do werkzeug, que já vem com o Flask e
-usa sal por senha.
+Dois papéis: admin (a coordenação, vê tudo) e jogador (só o que é dele — nunca
+ficha médica ou telefone de outra pessoa). Senha vira hash do werkzeug; o banco
+nunca guarda a senha em si.
 """
 
 import functools
@@ -42,15 +28,9 @@ ROTAS_DO_JOGADOR = {
     "minha_area", "logout",
 }
 
-# Por que a lista é tão curta: na primeira versão eu tinha posto `painel` e
-# `centro` aqui, pensando "é só leitura". Errado. O painel da modalidade tem o
-# bloco "Ligar esta semana", com nome completo, nível de risco e TELEFONE DO
-# RESPONSÁVEL de quem está faltando. Abrir isso pro jogador seria publicar, pra
-# turma inteira, quem está em risco de evasão e o telefone da mãe.
-#
-# A lição: tela de admin não se reaproveita pro jogador só porque é leitura. O
-# que o participante precisa ver — as atividades dele, o horário, os jogos, se
-# está convocado — vive em telas próprias, que mostram só o dele.
+# A lista é curta de propósito. Cheguei a pôr `painel` aqui achando que era só
+# leitura, mas ele mostra nome, risco e telefone do responsável de quem falta.
+# Tela de admin não se reaproveita pro jogador só porque é leitura.
 
 CHAVE_SESSAO = "usuario_id"
 VARIAVEL_CHAVE = "CENTRO_CHAVE"
@@ -63,15 +43,8 @@ MINIMO_SENHA = 8
 
 def chave_secreta() -> str:
     """
-    A chave que assina o cookie de sessão.
-
-    Antes isso era uma string fixa no código, com um comentário meu dizendo que
-    tinha que sair de lá no dia que existisse login. Esse dia chegou: com login,
-    chave conhecida deixa qualquer um forjar um cookie de admin.
-
-    Em produção vem da variável de ambiente. Sem ela eu gero uma aleatória, o
-    que é seguro mas derruba as sessões a cada reinício — e é justamente esse
-    incômodo que faz alguém configurar a variável.
+    A chave que assina o cookie de sessão. Vem do ambiente; sem ela, sorteio
+    uma — seguro, mas derruba as sessões a cada reinício.
     """
     definida = os.environ.get(VARIAVEL_CHAVE)
     if definida:
@@ -199,11 +172,8 @@ def listar_usuarios(conexao) -> list[dict]:
 
 def sobra_outro_admin(conexao, usuario_id: int) -> bool:
     """
-    Se este usuário parar de ser admin ativo, ainda existe outro?
-
-    É a trava que impede a coordenação de se trancar fora do próprio sistema.
-    Sem ela, rebaixar ou desativar o último admin deixaria o sistema sem ninguém
-    capaz de administrar — e o conserto só por linha de comando.
+    Se este usuário parar de ser admin ativo, ainda existe outro? É a trava que
+    impede a coordenação de se trancar fora do próprio sistema.
     """
     return conexao.execute(
         "SELECT COUNT(*) c FROM usuario "
@@ -257,12 +227,7 @@ def pessoas_sem_usuario(conexao) -> list[dict]:
 
 
 def senha_aleatoria() -> str:
-    """
-    Senha inicial legível, para ser entregue de boca ou no papel.
-
-    Uso token_urlsafe e corto: é aleatório de verdade, mas curto o suficiente
-    pra alguém digitar no celular sem errar. A pessoa troca depois.
-    """
+    """Senha inicial curta o bastante pra digitar no celular. A pessoa troca depois."""
     return secrets.token_urlsafe(9)
 
 

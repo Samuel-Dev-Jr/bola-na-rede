@@ -12,10 +12,8 @@ Cada esporte tem sua geometria e não dá pra usar um desenho só:
     vôlei      6 em quadra, na rotação numerada de 1 a 6
     basquete   5 em quadra, por função (armador, ala, pivô)
 
-Só o futsal está em uso hoje. Deixei os outros três porque o Centro já teve
-vôlei e basquete e pode voltar a ter, e porque o futebol de campo é o que o
-projeto era em 2019. Apagar o mapa não devolve tempo nenhum e me obrigaria a
-redesenhar tudo se uma modalidade voltar.
+Só o futsal está em uso hoje; os outros ficam porque o Centro já teve esses
+esportes e pode voltar a ter.
 
 As coordenadas são porcentagens dentro do desenho, com (0,0) no canto superior
 esquerdo. O ataque é sempre pra cima: o gol/rede do adversário fica no topo.
@@ -28,11 +26,7 @@ tela, do celular de 390px ao monitor.
 # O código é o que vai pro banco. Os rótulos são pro técnico ler no campo, e o
 # nome por extenso entra no title, pra quem não conhece a abreviação.
 
-# O futsal é jogado com 5 em quadra, e a formação mais comum na base é o
-# losango: um fixo na defesa, dois alas nas laterais e o pivô mais à frente,
-# de costas pro gol. Eu tinha copiado as 11 posições do futebol de campo e
-# ficava errado de um jeito que qualquer um que joga percebe na hora — a tela
-# pedia zagueiro e volante numa quadra de 40 metros.
+# Losango do futsal: fixo na defesa, alas nas laterais, pivô na frente.
 FUTSAL = [
     ("GOL",  "GOL", "Goleiro",         50, 86),
     ("FIX",  "FIX", "Fixo",            50, 64),
@@ -80,15 +74,9 @@ BASQUETE = [
 POR_MODALIDADE = {
     "futsal-masculino": ("futsal", FUTSAL),
     "futsal-feminino": ("futsal", FUTSAL),
-    # As de baixo não existem no Centro hoje. Ficam mapeadas porque o mapa não
-    # atrapalha: para_modalidade() só é consultado pelo slug que está no banco.
-    #
-    # Cuidado com estas quatro linhas: quando renomeei futebol para futsal com
-    # um replace no projeto inteiro, elas viraram "futsal-masculino" também. O
-    # Python aceita chave repetida sem reclamar e fica com a ÚLTIMA, então o
-    # futsal passou a carregar as 11 posições do futebol de campo — justo o
-    # defeito que o renomear existia pra corrigir. Só apareceu porque eu abri o
-    # arquivo pra conferir.
+    # As de baixo não existem no Centro hoje; só o slug do banco é consultado.
+    # Cuidado ao renomear em massa: um replace já duplicou chave aqui, e o
+    # Python fica com a última sem avisar (a história está no DECISOES.md, 6b).
     "futebol-masculino": ("futebol", FUTEBOL),
     "futebol-feminino": ("futebol", FUTEBOL),
     "volei-masculino": ("volei", VOLEI),

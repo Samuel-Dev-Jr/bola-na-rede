@@ -22,6 +22,7 @@ import sqlite3
 from datetime import date, timedelta
 from typing import Optional
 
+import escalacao
 from risco import (
     PRIORIDADE_RISCO,
     AvaliacaoRisco,
@@ -332,8 +333,8 @@ def obter_pessoa(conexao: sqlite3.Connection, pessoa_id: int) -> Optional[dict]:
     A ficha da pessoa, com TODAS as matrículas dela.
 
     É a tela que só passou a existir depois de separar pessoa de matrícula.
-    Antes, pra saber que o Samuel também jogava basquete, era preciso procurar
-    na outra lista — e era comum a ficha médica estar preenchida só em uma.
+    Antes, pra saber que o menino do futsal também fazia jiu-jitsu, era preciso
+    procurar na outra lista, e era comum a ficha médica estar só em uma.
     """
     pessoa = conexao.execute("SELECT * FROM pessoa WHERE id = ?", (pessoa_id,)).fetchone()
     if pessoa is None:
@@ -878,12 +879,9 @@ def mensagem_whatsapp(evento: dict) -> str:
 
     escalados = evento.get("escalados") or {}
     if escalados:
-        # Com time montado, a mensagem sai na ORDEM DO CAMPO — goleiro primeiro,
-        # depois defesa, meio e ataque. Ordem alfabética aqui não ajudaria
-        # ninguém: quem lê quer conferir o time, não achar um nome.
-        from escalacao import para_modalidade
-
-        _tipo, posicoes = para_modalidade(evento["modalidade_slug"])
+        # Com time montado, a mensagem sai na ordem da quadra: goleiro primeiro.
+        # Quem lê quer conferir o time, não achar um nome em ordem alfabética.
+        _tipo, posicoes = escalacao.para_modalidade(evento["modalidade_slug"])
         partes += ["", f"*Escalação ({len(escalados)}):*"]
         for codigo, _curto, nome_posicao, _x, _y in posicoes:
             pessoa = escalados.get(codigo)

@@ -47,15 +47,8 @@ PLANILHAS = [
 
 def criar_eventos(conexao) -> int:
     """
-    Cria jogos de exemplo e convoca gente para o mais próximo.
-
-    Sem isto o módulo de Convocação sobe vazio, e ele é um dos cinco do sistema —
-    a vitrine mostraria quatro. Descobri porque o teste de escritas quebrou
-    procurando um evento que não existia.
-
-    As datas são relativas a hoje, e não fixas: base de demonstração com jogo
-    marcado para uma data que já passou mostra "nenhum jogo próximo" e parece
-    defeito.
+    Jogos de exemplo, com convocação. Datas relativas a hoje: jogo de data
+    passada mostra "nenhum jogo próximo" e parece defeito.
     """
     hoje = date.today()
 
@@ -152,14 +145,7 @@ def criar_eventos(conexao) -> int:
 
 
 def criar_planos(conexao) -> int:
-    """
-    Planos de treino de exemplo, pelo mesmo motivo dos eventos: senão a tela
-    sobe vazia e o módulo não mostra pra que serve.
-
-    Pus um de cada tipo: da modalidade inteira e de uma turma só, pra dar pra ver
-    que o filtro de turma existe. Datas relativas a hoje, senão plano da semana
-    passada parece sistema abandonado.
-    """
+    """Planos de exemplo, senão a tela da vitrine sobe vazia."""
     hoje = date.today()
 
     planos = [
@@ -249,18 +235,9 @@ def criar_admin(conexao) -> int:
 
 def criar_demo(conexao) -> int:
     """
-    Conta de demonstração da vitrine, com senha conhecida.
-
-    Sem ela ninguém abre a instância hospedada pra ver o sistema, porque o único
-    acesso era o ADMIN_SENHA que só existe no painel do Render.
-
-    Sei que isso contradiz o criar_admin aí em cima, e não contradiz: este
-    arquivo só roda no Render. No computador do Centro, onde tem nome de criança
-    e telefone de responsável, ele nunca executa — lá é o configurar.py e o
-    criar_usuario.py. A base daqui é inventada e some no próximo reinício.
-
-    Se um dia a vitrine tiver dado real, apagar esta função vem antes.
-    Pra desligar sem mexer no código: DEMO_ATIVA=0 no painel.
+    Conta de demonstração da vitrine, com senha conhecida. Só existe porque este
+    arquivo roda apenas na hospedagem, sobre base inventada que some a cada
+    reinício — no computador do Centro ele nunca executa. DEMO_ATIVA=0 desliga.
     """
     if os.environ.get("DEMO_ATIVA", "1") == "0":
         print("  conta de demonstração desligada (DEMO_ATIVA=0)")

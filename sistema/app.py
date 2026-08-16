@@ -1,5 +1,5 @@
 """
-Centro de Cultura e Esportes - sistema de gestão da escolinha comunitária.
+Centro de Cultura e Esportes - sistema de gestão das atividades do Centro.
 
 Projeto de Extensão Curricularizada - UniFECAF
 Análise e Desenvolvimento de Sistemas
@@ -53,12 +53,8 @@ app = Flask(__name__)
 # arquivo enorme não derrubar o servidor tentando ler tudo na memória.
 app.config["MAX_CONTENT_LENGTH"] = 4 * 1024 * 1024
 
-# A chave que assina o cookie de sessão. Ela ficava fixa aqui, com um comentário
-# meu dizendo que tinha que sair do código no dia que existisse login. Esse dia
-# chegou: com login, chave conhecida deixa qualquer um forjar cookie de admin.
-# Agora vem de CENTRO_CHAVE, e sem ela é sorteada a cada início. Seguro,
-# mas derruba as sessões quando o servidor reinicia.
-#     Windows:  set CENTRO_CHAVE=<string longa e aleatória>
+# A chave que assina o cookie de sessão vem de CENTRO_CHAVE; sem ela é sorteada
+# a cada início, o que derruba as sessões no reinício.
 app.secret_key = autenticacao.chave_secreta()
 
 # Campos de texto da ficha da pessoa. Uso essa lista pra montar o INSERT e o
@@ -73,11 +69,7 @@ CAMPOS_PESSOA = [
 # funcionar mesmo se o banco não existir.
 ROTAS_SEM_BANCO = {"manifest", "serviceworker", "offline", "static"}
 
-# As tabelas que nasceram depois do schema original entram aqui, uma vez, no
-# início do processo. É aditivo e não apaga nada (ver db.aplicar_migracoes()).
-# Fica fora do before_request de propósito: rodar a cada requisição seria
-# desperdício, e uma vez por processo basta. Se o banco ainda não existe, o
-# before_request já devolve 503 pedindo pra rodar o configurar.
+# Tabela nova entra por migração, uma vez por processo. Aditivo, não apaga nada.
 if db.banco_existe():
     db.aplicar_migracoes()
 
@@ -125,10 +117,7 @@ def data_br(valor) -> str:
     return valor.strftime("%d/%m/%Y")
 
 
-# Os dias da semana na numeração do Python (0 = segunda), que é a mesma que o
-# banco guarda em modalidade.dias_aula. Estava escrito só dentro do filtro
-# abaixo; subiu pra cá quando a tela de horário passou a precisar da lista
-# inteira pra montar as caixas de seleção.
+# Numeração do Python: 0 = segunda. É a mesma do modalidade.dias_aula.
 DIAS_DA_SEMANA = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta",
                   "Sábado", "Domingo"]
 
@@ -166,12 +155,10 @@ def manifest():
         json.dumps(
             {
                 "name": "Centro de Cultura e Esportes",
-                # O short_name é o rótulo embaixo do ícone na tela de início.
-                # O celular corta o que passa de uns 12 caracteres, então o
-                # nome inteiro apareceria como "Centro de Cul...".
+                # O celular corta o rótulo do ícone em ~12 caracteres.
                 "short_name": "Centro CE",
                 "description": "Gestão das atividades do Centro de Cultura e "
-                               "Esporte do Jardim Elizabete.",
+                               "Esportes do Jardim Elizabete.",
                 "start_url": "/",
                 "scope": "/",
                 "display": "standalone",
@@ -179,13 +166,9 @@ def manifest():
                 "background_color": "#f5f6f4",
                 "theme_color": "#0f7a3d",
                 "lang": "pt-BR",
-                # O maskable é ARQUIVO SEPARADO, e antes não era: eu apontava o
-                # mesmo icone-512 nos dois. O Android recorta o maskable no
-                # formato que o fabricante quiser (círculo, losango, quadrado
-                # arredondado) e só garante os 80% centrais. Com a logo do
-                # Centro isso passou a doer de verdade: o recorte comia a faixa
-                # de baixo e o ícone ficava sem "JARDIM ELIZABETE". A versão
-                # maskable entra a 70% num fundo sólido, com folga pro corte.
+                # O maskable é arquivo separado: o Android recorta esse ícone
+                # e só garante os 80% centrais — com a logo inteira o corte
+                # comia o "JARDIM ELIZABETE".
                 "icons": [
                     {"src": "/static/icone-192.png", "sizes": "192x192", "type": "image/png"},
                     {"src": "/static/icone-512.png", "sizes": "512x512", "type": "image/png"},
@@ -249,17 +232,9 @@ def painel(slug: str):
 @autenticacao.somente_admin
 def modalidade_horario(slug: str):
     """
-    Edita os dias e o horário de uma modalidade pela tela.
-
-    Isso vivia no configurar.py, em código, e o configurar recria o schema —
-    ou seja, pra trocar o horário de uma turma eu apagava o cadastro inteiro. Na
-    prática o horário era imutável depois da primeira matrícula, e a coordenação
-    me ligava por causa de quadra emprestada e professor trocando de turno.
-
-    Os dois campos fazem coisas diferentes e eu confundi na primeira versão:
-    dias_aula é o que o sistema lê (sai como "0,2,4", que é o formato que a
-    chamada e a agenda já esperam) e horario é texto livre, escrito pra pessoa
-    ler. Presença já lançada não é afetada por nenhum dos dois.
+    Edita os dias e o horário de uma modalidade. Antes isso vivia no
+    configurar.py e mudar horário exigia recriar o banco. dias_aula é o que o
+    sistema lê ("0,2,4"); horario é texto livre pra pessoa ler.
     """
     modalidade = carregar_modalidade(slug)
 
@@ -331,8 +306,22 @@ def matricular(slug: str):
     modalidade = carregar_modalidade(slug)
 
     if request.method == "POST":
-        pessoa_id = int(request.form["pessoa_id"])
-        turma_id = int(request.form["turma_id"])
+        pessoa_id = _inteiro_do_form("pessoa_id")
+        turma_id = _inteiro_do_form("turma_id")
+        if pessoa_id is None or turma_id is None:
+            flash("Escolha a pessoa e a turma.", "erro")
+            return redirect(url_for("matricular", slug=slug))
+
+        # A turma tem que ser desta modalidade, senão um turma_id trocado no
+        # formulário matricularia a pessoa em outra atividade por esta tela.
+        turma_ok = g.conexao.execute(
+            "SELECT 1 FROM turma WHERE id = ? AND modalidade_id = ?",
+            (turma_id, modalidade["id"]),
+        ).fetchone()
+        if turma_ok is None:
+            flash("Essa turma não é desta modalidade.", "erro")
+            return redirect(url_for("matricular", slug=slug))
+
         ja_existe = g.conexao.execute(
             "SELECT 1 FROM matricula WHERE pessoa_id = ? AND turma_id = ?",
             (pessoa_id, turma_id),
@@ -384,14 +373,8 @@ def matricular(slug: str):
 @autenticacao.somente_admin
 def matricula_editar(matricula_id: int):
     """
-    Corrige a turma e o número da camisa de quem já está matriculado.
-
-    Antes disso, trocar a camisa ou subir o menino de categoria só dava pra
-    fazer corrigindo a planilha e reimportando. Menino faz aniversário todo ano,
-    então isso não é exceção, é o normal do Centro.
-
-    Trocar de turma não mexe na presença já registrada, porque presenca aponta
-    pra matricula e não pra turma. A frequência sobe junto com ele.
+    Corrige turma e camisa de quem já está matriculado. Trocar de turma não
+    mexe na presença: ela aponta pra matrícula, então o histórico sobe junto.
     """
     matricula = consultas.obter_matricula(g.conexao, matricula_id)
     if matricula is None:
@@ -499,6 +482,11 @@ def pessoa_nova(slug: str = None):
 
     if request.method == "POST":
         dados = _dados_da_pessoa()
+        erro = _erro_da_ficha(dados)
+        if erro:
+            flash(erro, "erro")
+            return redirect(request.path)
+
         cursor = g.conexao.execute(
             f"""
             INSERT INTO pessoa ({", ".join(dados)}, data_nascimento, autoriza_imagem)
@@ -510,18 +498,18 @@ def pessoa_nova(slug: str = None):
         g.conexao.commit()
         pessoa_id = cursor.lastrowid
 
-        turma_id = request.form.get("turma_id")
+        turma_id = _inteiro_do_form("turma_id")
         if turma_id:
             # Se o número estiver ocupado eu matriculo sem número e aviso, em vez
             # de recusar o cadastro inteiro: a pessoa já foi gravada, e perder o
             # cadastro por causa da camisa seria o pior dos dois resultados.
-            numero, erro_numero = _numero_de_camisa(int(turma_id))
+            numero, erro_numero = _numero_de_camisa(turma_id)
             g.conexao.execute(
                 """
                 INSERT INTO matricula (pessoa_id, turma_id, data_matricula, status, numero)
                 VALUES (?,?,?, 'ativa', ?)
                 """,
-                (pessoa_id, int(turma_id),
+                (pessoa_id, turma_id,
                  _data_do_form("data_matricula") or consultas.hoje(), numero),
             )
             g.conexao.commit()
@@ -545,6 +533,11 @@ def pessoa_editar(pessoa_id: int):
 
     if request.method == "POST":
         dados = _dados_da_pessoa()
+        erro = _erro_da_ficha(dados)
+        if erro:
+            flash(erro, "erro")
+            return redirect(url_for("pessoa_editar", pessoa_id=pessoa_id))
+
         atribuicoes = ", ".join(f"{campo} = ?" for campo in dados)
         g.conexao.execute(
             f"""
@@ -578,19 +571,41 @@ def _data_do_form(campo: str):
     return date.fromisoformat(valor) if valor else None
 
 
+def _inteiro_do_form(campo: str):
+    """Devolve o campo como int, ou None se vier vazio ou não numérico."""
+    valor = request.form.get(campo, "").strip()
+    return int(valor) if valor.isdigit() else None
+
+
+def _erro_da_ficha(dados: dict) -> str | None:
+    """
+    O que o banco recusaria com IntegrityError, eu recuso antes com mensagem.
+    O formulário já tem required, mas required é do navegador — um POST montado
+    à mão chega aqui sem os campos e derrubava a rota com erro 500.
+    """
+    obrigatorios = {
+        "nome": "o nome",
+        "responsavel_nome": "o nome do responsável",
+        "responsavel_parentesco": "o parentesco do responsável",
+        "responsavel_telefone": "o telefone do responsável",
+    }
+    for campo, rotulo in obrigatorios.items():
+        if not dados.get(campo):
+            return f"Falta {rotulo}."
+    try:
+        if _data_do_form("data_nascimento") is None:
+            return "Falta a data de nascimento."
+    except ValueError:
+        return "Data de nascimento inválida."
+    return None
+
+
 def _numero_de_camisa(turma_id: int, ignorar_matricula_id: int | None = None):
     """
-    Lê o número da camisa do formulário e confere se está livre na turma.
-
-    Devolve (numero, erro). O banco já garante isso com índice único por
-    (turma, numero), mas deixar o erro estourar de lá daria uma tela de exceção
-    pro técnico. Pegando aqui eu consigo dizer COM QUEM o número está, que é a
-    informação que ele precisa pra resolver.
-
-    `ignorar_matricula_id` existe por causa da tela de editar matrícula: sem
-    ele, abrir a matrícula do menino que é camisa 10, mudar só a turma e salvar
-    devolveria "a camisa 10 já é de Fulano nessa turma", e o Fulano seria ele
-    mesmo. A matrícula que está sendo editada não pode competir consigo.
+    Lê o número da camisa e confere se está livre na turma. Devolve (numero,
+    erro). O banco garantiria com o índice único, mas aqui eu digo COM QUEM o
+    número está. ignorar_matricula_id evita a matrícula competir consigo mesma
+    na tela de edição.
     """
     bruto = request.form.get("numero", "").strip()
     if not bruto:
@@ -630,23 +645,34 @@ def chamada(slug: str):
     turmas = consultas.turmas_da_modalidade(g.conexao, modalidade["id"])
 
     if request.method == "POST":
-        dia = date.fromisoformat(request.form["data"])
+        try:
+            dia = date.fromisoformat(request.form.get("data", ""))
+        except ValueError:
+            flash("Data inválida.", "erro")
+            return redirect(url_for("chamada", slug=slug))
+
         # Os rádios vêm com nome "matricula_12". Aqui eu separo o id.
         marcacoes = {
             int(chave.removeprefix("matricula_")): valor
             for chave, valor in request.form.items()
             if chave.startswith("matricula_")
+            and chave.removeprefix("matricula_").isdigit()
         }
         total = consultas.salvar_chamada(g.conexao, dia, marcacoes)
         flash(f"Chamada de {dia.strftime('%d/%m/%Y')} salva com {total} alunos.",
               "sucesso")
         return redirect(url_for("chamada", slug=slug,
-                                turma=request.form["turma_id"], data=dia.isoformat()))
+                                turma=request.form.get("turma_id", ""),
+                                data=dia.isoformat()))
 
-    turma_id = int(request.args.get("turma") or turmas[0]["id"])
-    parametro_data = request.args.get("data")
-    dia = (date.fromisoformat(parametro_data) if parametro_data
-           else consultas.proxima_data_de_aula(modalidade["dias_aula"]))
+    bruto_turma = request.args.get("turma", "")
+    turma_id = int(bruto_turma) if bruto_turma.isdigit() else turmas[0]["id"]
+    try:
+        parametro_data = request.args.get("data", "")
+        dia = (date.fromisoformat(parametro_data) if parametro_data
+               else consultas.proxima_data_de_aula(modalidade["dias_aula"]))
+    except ValueError:
+        dia = consultas.proxima_data_de_aula(modalidade["dias_aula"])
 
     return render_template(
         "chamada.html",
@@ -692,14 +718,7 @@ def agenda(slug: str):
 @app.route("/m/<slug>/planos")
 @autenticacao.somente_admin
 def planos(slug: str):
-    """
-    O que vai ser feito nos treinos, publicado pelo professor.
-
-    Era o buraco que sobrava: o sistema sabia quem estava matriculado, quem
-    faltou e quem foi convocado, mas não respondia a pergunta que o atleta mais
-    faz — "o que a gente vai treinar hoje?". Isso vivia no caderno do professor,
-    e quem faltasse não tinha como saber o que perdeu.
-    """
+    """Os planos de treino publicados, que aparecem na área de quem treina."""
     modalidade = carregar_modalidade(slug)
     return render_template(
         "planos.html",
@@ -765,14 +784,8 @@ def plano_excluir(plano_id: int):
 
 def _salvar_plano(modalidade_id: int, plano_id: int | None = None) -> str | None:
     """
-    Grava o plano vindo do formulário. Devolve a mensagem de erro, ou None.
-
-    Criar e editar usam os mesmos campos, então deixo a validação aqui em vez de
-    escrever duas vezes. Já me queimei duplicando validação e deixando o
-    cadastro aceitar o que a edição recusava.
-
-    Turma vazia vira NULL, que é como o planos_da_pessoa() lê "vale pra
-    modalidade inteira".
+    Grava o plano do formulário. Devolve mensagem de erro, ou None. Turma vazia
+    vira NULL, que o planos_da_pessoa() lê como "modalidade inteira".
     """
     titulo = request.form.get("titulo", "").strip()
     conteudo = request.form.get("conteudo", "").strip()
@@ -848,6 +861,29 @@ def convocacao_nova(slug: str):
         abort(404)
 
     if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        if not nome:
+            flash("O evento precisa de um nome.", "erro")
+            return redirect(url_for("convocacao_nova", slug=slug))
+
+        # Mesma conferência do plano de treino: turma trocada no formulário
+        # criaria um jogo desta modalidade apontando pra turma de outra.
+        turma_id = _inteiro_do_form("turma_id")
+        if turma_id is not None:
+            turma_ok = g.conexao.execute(
+                "SELECT 1 FROM turma WHERE id = ? AND modalidade_id = ?",
+                (turma_id, modalidade["id"]),
+            ).fetchone()
+            if turma_ok is None:
+                flash("Essa turma não é desta modalidade.", "erro")
+                return redirect(url_for("convocacao_nova", slug=slug))
+
+        try:
+            dia = _data_do_form("data") or consultas.hoje()
+        except ValueError:
+            flash("Data inválida.", "erro")
+            return redirect(url_for("convocacao_nova", slug=slug))
+
         cursor = g.conexao.execute(
             """
             INSERT INTO evento (modalidade_id, turma_id, nome, adversario,
@@ -855,10 +891,9 @@ def convocacao_nova(slug: str):
             VALUES (?,?,?,?,?,?,?)
             """,
             (
-                modalidade["id"], int(request.form["turma_id"]),
-                request.form["nome"].strip(),
+                modalidade["id"], turma_id, nome,
                 request.form.get("adversario", "").strip() or None,
-                _data_do_form("data") or consultas.hoje(),
+                dia,
                 request.form.get("local", "").strip()
                 or "Centro de Cultura e Esportes — Jardim Elizabete",
                 request.form.get("observacoes", "").strip() or None,
@@ -876,18 +911,20 @@ def convocacao_nova(slug: str):
 
 @app.route("/convocacao/<int:evento_id>", methods=["GET", "POST"])
 def convocacao_detalhe(evento_id: int):
-    if request.method == "POST":
-        # Ignoro o que não for número em vez de estourar. Antes era int(v) direto,
-        # e um valor inesperado no formulário devolvia 500 com stack trace — o que
-        # é feio em qualquer lugar e é pior agora que o sistema está na internet.
-        ids = [int(v) for v in request.form.getlist("convocado") if v.isdigit()]
-        consultas.salvar_convocacao(g.conexao, evento_id, ids)
-        flash(f"Convocação salva com {len(ids)} alunos.", "sucesso")
-        return redirect(url_for("convocacao_detalhe", evento_id=evento_id))
-
     evento = consultas.obter_evento(g.conexao, evento_id)
     if evento is None:
         abort(404)
+
+    if request.method == "POST":
+        # Só entra quem é elegível deste evento. O escalar já fazia essa
+        # conferência e esta rota não — dava pra convocar alguém de outra
+        # modalidade mexendo no formulário, e o irmão dela recusava.
+        elegiveis = {e["matricula_id"] for e in evento["elegiveis"]}
+        ids = [int(v) for v in request.form.getlist("convocado")
+               if v.isdigit() and int(v) in elegiveis]
+        consultas.salvar_convocacao(g.conexao, evento_id, ids)
+        flash(f"Convocação salva com {len(ids)} alunos.", "sucesso")
+        return redirect(url_for("convocacao_detalhe", evento_id=evento_id))
 
     tipo_quadra, posicoes = escalacao.para_modalidade(evento["modalidade_slug"])
     return render_template(
@@ -902,11 +939,8 @@ def convocacao_detalhe(evento_id: int):
 @autenticacao.somente_admin
 def convocacao_escalar(evento_id: int):
     """
-    Põe alguém numa posição, ou manda pro banco.
-
-    Uma requisição por movimento, e não um formulário gigante com o time todo:
-    assim o técnico mexe numa peça de cada vez e nunca perde o que já montou se
-    o celular cair no meio.
+    Põe alguém numa posição, ou manda pro banco. Uma requisição por movimento:
+    o técnico nunca perde o time montado se o celular cair no meio.
     """
     evento = consultas.obter_evento(g.conexao, evento_id)
     if evento is None:
@@ -949,11 +983,9 @@ def convocacao_limpar_escalacao(evento_id: int):
 @app.route("/entrar", methods=["GET", "POST"])
 def login():
     """
-    Entrada no sistema.
-
-    Se ainda não existe nenhum usuário, a tela avisa como criar o primeiro. Não
-    faço isso por formulário aberto de propósito: uma tela de "crie o primeiro
-    admin" ficaria disponível na rede local pra quem chegasse primeiro.
+    Entrada no sistema. Sem nenhum usuário, a tela ensina a criar o primeiro
+    pelo terminal — formulário aberto de "primeiro admin" seria de quem chegasse
+    antes.
     """
     if autenticacao.usuario_atual() is not None:
         return redirect(url_for("centro"))
@@ -976,8 +1008,11 @@ def login():
 
         # Só aceito destino interno. Sem isso, um link com ?proximo=http://...
         # transformaria o login numa porta pra redirecionar gente pra fora.
+        # A barra invertida entra na checagem porque navegador trata "/\" como
+        # "//", que vira endereço de fora.
         proximo = request.form.get("proximo", "")
-        if proximo.startswith("/") and not proximo.startswith("//"):
+        if (proximo.startswith("/") and not proximo.startswith("//")
+                and not proximo.startswith("/\\")):
             return redirect(proximo)
         return redirect(url_for("centro") if usuario["papel"] == "admin"
                         else url_for("minha_area"))
@@ -998,12 +1033,7 @@ def logout():
 
 @app.route("/minha-area")
 def minha_area():
-    """
-    O que o participante vê. Só o que é dele.
-
-    Admin também pode abrir: é como a coordenação confere o que o jogador está
-    vendo, sem precisar do login dele.
-    """
+    """O que o participante vê. Admin também abre, pra conferir a tela dele."""
     usuario = autenticacao.usuario_atual()
 
     if usuario["pessoa_id"] is None:
@@ -1026,18 +1056,14 @@ def minha_area():
 @app.route("/usuarios", methods=["GET", "POST"])
 @autenticacao.somente_admin
 def usuarios():
-    """
-    Gestão de acessos. Só admin — e o decorador é reforço, porque a guarda
-    central já bloqueia tudo o que não está na lista do jogador.
-    """
+    """Gestão de acessos."""
     if request.method == "POST":
-        pessoa_id = request.form.get("pessoa_id") or None
         erro = autenticacao.criar_usuario(
             g.conexao,
             login=request.form.get("login", ""),
             senha=request.form.get("senha", ""),
             papel=request.form.get("papel", "jogador"),
-            pessoa_id=int(pessoa_id) if pessoa_id else None,
+            pessoa_id=_inteiro_do_form("pessoa_id"),
         )
         flash(erro or f"Acesso {request.form.get('login')!r} criado.",
               "erro" if erro else "sucesso")
@@ -1080,19 +1106,17 @@ def usuario_ativo(usuario_id: int):
 @app.route("/usuarios/<int:usuario_id>/senha", methods=["POST"])
 @autenticacao.somente_admin
 def usuario_senha(usuario_id: int):
-    """
-    Define nova senha para alguém.
+    """Define nova senha. Não existe "ver a atual": o banco só guarda hash."""
+    alvo = g.conexao.execute("SELECT login FROM usuario WHERE id = ?",
+                             (usuario_id,)).fetchone()
+    if alvo is None:
+        abort(404)
 
-    Não existe "ver a senha atual": o banco guarda hash, e isso é de propósito —
-    nem a coordenação consegue ler a senha de ninguém.
-    """
     nova = request.form.get("senha", "").strip() or autenticacao.senha_aleatoria()
     erro = autenticacao.definir_senha(g.conexao, usuario_id, nova)
     if erro:
         flash(erro, "erro")
     else:
-        alvo = g.conexao.execute("SELECT login FROM usuario WHERE id = ?",
-                                 (usuario_id,)).fetchone()
         flash(f"Senha de {alvo['login']} trocada para: {nova} — "
               f"anote agora, ela não aparece de novo.", "sucesso")
     return redirect(url_for("usuarios"))
@@ -1102,11 +1126,8 @@ def usuario_senha(usuario_id: int):
 @autenticacao.somente_admin
 def usuarios_em_lote():
     """
-    Cria acesso de jogador para quem tem matrícula ativa e ainda não tem conta.
-
-    Existe porque criar 62 acessos um por um na tela é trabalho que ninguém faz.
-    As senhas aparecem UMA VEZ nesta resposta: o banco guarda só o hash, então
-    depois de sair desta tela não há como recuperá-las — só definir novas.
+    Cria acesso de jogador pra quem tem matrícula ativa e ainda não tem conta.
+    As senhas aparecem UMA vez: o banco só guarda o hash.
     """
     criadas = []
     for pessoa in autenticacao.pessoas_sem_usuario(g.conexao):
@@ -1137,11 +1158,8 @@ def usuarios_em_lote():
 @app.route("/configuracoes", methods=["GET", "POST"])
 def configuracoes():
     """
-    Importação de planilha pela tela, pra não precisar de terminal.
-
-    O arquivo enviado NÃO é gravado em disco: leio o conteúdo direto da
-    requisição e passo pro importador. Não tem por que guardar uma cópia da
-    planilha no servidor, e arquivo que não existe não vaza.
+    Importação de planilha pela tela. O arquivo não é gravado em disco: leio da
+    requisição e passo pro importador — arquivo que não existe não vaza.
     """
     resultado = None
 
@@ -1183,18 +1201,9 @@ def arquivo_grande(_erro):
 
 
 if __name__ == "__main__":
-    # O modo debug agora é OPT-IN, e ele estava ligado por padrão. Duas razões
-    # pra ter mudado, e as duas me morderam de verdade:
-    #
-    # 1. Segurança. O depurador do Werkzeug executa código no servidor a partir
-    #    do navegador. Enquanto isso rodava só em localhost era risco teórico;
-    #    aberto na rede ou hospedado, é a porta mais larga que existe.
-    # 2. O recarregador cria um processo filho que sobrevive ao fechamento do
-    #    terminal, segurando a porta. Cheguei a ter cinco servidores escutando a
-    #    5000 ao mesmo tempo, de dias diferentes, e uma tela nova respondendo 404
-    #    porque a requisição caiu num servidor velho.
-    #
-    # Pra desenvolver com recarga automática:  set CENTRO_DEBUG=1
+    # Debug é opt-in: o depurador do Werkzeug executa código pelo navegador, e
+    # o recarregador já me deixou com cinco servidores presos na mesma porta.
+    #     set CENTRO_DEBUG=1
     debug = os.environ.get("CENTRO_DEBUG") == "1"
 
     # PORT é o que a hospedagem define. HOST em 0.0.0.0 aceita conexão de outros
