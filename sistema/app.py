@@ -61,7 +61,7 @@ app.secret_key = autenticacao.chave_secreta()
 # UPDATE sem repetir o nome de cada coluna nos dois lugares.
 CAMPOS_PESSOA = [
     "nome", "responsavel_nome", "responsavel_parentesco", "responsavel_telefone",
-    "emergencia_nome", "emergencia_telefone", "alergias", "condicoes",
+    "email", "emergencia_nome", "emergencia_telefone", "alergias", "condicoes",
     "medicacao_continua", "plano_saude", "observacoes_medicas",
 ]
 
@@ -597,6 +597,9 @@ def _erro_da_ficha(dados: dict) -> str | None:
             return "Falta a data de nascimento."
     except ValueError:
         return "Data de nascimento inválida."
+    email = dados.get("email")
+    if email and ("@" not in email or " " in email):
+        return f"O e-mail {email!r} não parece um e-mail."
     return None
 
 

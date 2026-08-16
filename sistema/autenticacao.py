@@ -83,9 +83,25 @@ def senha_inicial_confere(conexao, usuario, senha: str) -> bool:
 
 
 def buscar_por_login(conexao, login: str):
-    return conexao.execute(
-        "SELECT * FROM usuario WHERE login = ? AND ativo = 1", (login.strip(),)
+    digitado = login.strip()
+    usuario = conexao.execute(
+        "SELECT * FROM usuario WHERE login = ? AND ativo = 1", (digitado,)
     ).fetchone()
+    if usuario is not None or "@" not in digitado:
+        return usuario
+
+    # O campo também aceita o e-mail da ficha — mas só quando ele aponta pra
+    # UMA pessoa: irmãos dividem o e-mail do responsável, e nesse caso cada um
+    # entra pelo próprio login.
+    encontrados = conexao.execute(
+        """
+        SELECT u.* FROM usuario u
+        JOIN pessoa p ON p.id = u.pessoa_id
+        WHERE p.email = ? COLLATE NOCASE AND u.ativo = 1
+        """,
+        (digitado,),
+    ).fetchall()
+    return encontrados[0] if len(encontrados) == 1 else None
 
 
 def buscar_por_id(conexao, usuario_id: int):

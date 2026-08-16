@@ -201,6 +201,10 @@
         <dt>Uso de imagem</dt>
         <dd>{{ 'Autorizado pelo responsável' if pessoa.autoriza_imagem else 'Não autorizado' }}</dd>
       </div>
+      <div>
+        <dt>E-mail do responsável</dt>
+        <dd>{{ pessoa.email or 'Não informado' }}</dd>
+      </div>
     </dl>
   </div>
 </section>

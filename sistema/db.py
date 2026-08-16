@@ -51,6 +51,13 @@ def tabelas_extras() -> list[str]:
     return re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)", texto)
 
 
+# Colunas que nasceram depois do schema. ALTER TABLE não tem IF NOT EXISTS no
+# SQLite, então o aplicar_migracoes confere o PRAGMA antes de alterar.
+COLUNAS_NOVAS = [
+    ("pessoa", "email", "TEXT"),
+]
+
+
 def aplicar_migracoes() -> None:
     """
     Cria o que veio depois do schema original, sem apagar nada. Roda a cada
@@ -59,6 +66,11 @@ def aplicar_migracoes() -> None:
     conexao = conectar()
     try:
         conexao.executescript(CAMINHO_MIGRACOES.read_text(encoding="utf-8"))
+        for tabela, coluna, tipo in COLUNAS_NOVAS:
+            existentes = {l["name"] for l in
+                          conexao.execute(f"PRAGMA table_info({tabela})")}
+            if coluna not in existentes:
+                conexao.execute(f"ALTER TABLE {tabela} ADD COLUMN {coluna} {tipo}")
         conexao.commit()
     finally:
         conexao.close()

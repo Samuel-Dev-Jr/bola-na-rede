@@ -38,7 +38,7 @@ OBRIGATORIAS_MATRICULA = [
 ]
 
 OPCIONAIS_PESSOA = [
-    "emergencia_nome", "emergencia_telefone", "alergias", "condicoes",
+    "email", "emergencia_nome", "emergencia_telefone", "alergias", "condicoes",
     "medicacao_continua", "plano_saude", "observacoes_medicas",
 ]
 

@@ -257,6 +257,27 @@ def criar_demo(conexao) -> int:
     return 0
 
 
+def criar_emails(conexao) -> None:
+    """
+    E-mail fictício pra cada pessoa da demonstração, pra dar pra mostrar o
+    login por e-mail. O domínio .example é reservado — nunca entrega de
+    verdade, então nenhum e-mail de mentira cai na caixa de alguém real.
+    """
+    usados = set()
+    for pessoa in conexao.execute("SELECT id, nome FROM pessoa ORDER BY id"):
+        partes = autenticacao.sem_acento(pessoa["nome"]).casefold().split()
+        base = f"{partes[0]}.{partes[-1]}" if len(partes) > 1 else partes[0]
+        email, contador = f"{base}@exemplo.example", 1
+        while email in usados:
+            contador += 1
+            email = f"{base}{contador}@exemplo.example"
+        usados.add(email)
+        conexao.execute("UPDATE pessoa SET email = ? WHERE id = ?",
+                        (email, pessoa["id"]))
+    conexao.commit()
+    print(f"  {len(usados)} e-mail(s) fictício(s) em @exemplo.example")
+
+
 def main() -> int:
     print("Preparando a base de demonstração...")
 
@@ -285,6 +306,8 @@ def main() -> int:
             for e in resultado.erros[:10]:
                 print(f"      {e}")
             return 1
+
+        criar_emails(conexao)
 
         codigo = criar_eventos(conexao)
         if codigo:

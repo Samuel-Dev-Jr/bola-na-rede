@@ -93,6 +93,13 @@
       </div>
 
       <div class="campo">
+        <label for="email">E-mail do responsável</label>
+        <input type="email" id="email" name="email"
+               placeholder="para avisos e acesso ao sistema"
+               value="{{ pessoa.email if pessoa and pessoa.email else '' }}">
+      </div>
+
+      <div class="campo">
         <label for="emergencia_nome">Contato alternativo</label>
         <input type="text" id="emergencia_nome" name="emergencia_nome"
                value="{{ pessoa.emergencia_nome if pessoa and pessoa.emergencia_nome else '' }}">
