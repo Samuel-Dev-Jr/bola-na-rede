@@ -18,26 +18,23 @@
   Quem entra, com que papel, e quem ainda não tem acesso.
 </p>
 
-{# As senhas criadas em lote aparecem primeiro e só nesta resposta. O banco
-   guarda hash, então depois de sair desta tela não há como recuperá-las. #}
 {% if criadas %}
-  <div class="aviso aviso--erro">
-    <strong>Anote agora: estas senhas não aparecem de novo.</strong>
-    O sistema guarda só o hash — nem a coordenação consegue ler a senha de
-    ninguém depois. Se perder, é só definir uma nova.
+  <div class="aviso aviso--sucesso">
+    <strong>{{ criadas|length }} acesso(s) criado(s).</strong>
+    A senha inicial de cada um é a própria data de nascimento (ex.: 01022014).
+    No primeiro acesso o sistema obriga a trocar por uma senha própria.
   </div>
 
   <div class="cartao tabela-envolucro" style="padding: 0;">
     <table>
       <thead>
-        <tr><th>Pessoa</th><th>Login</th><th>Senha inicial</th></tr>
+        <tr><th>Pessoa</th><th>Login</th></tr>
       </thead>
       <tbody>
         {% for c in criadas %}
           <tr>
             <td>{{ c.nome }}</td>
             <td><code>{{ c.login }}</code></td>
-            <td><code>{{ c.senha }}</code></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -160,6 +157,9 @@
           {{ u.pessoa_nome or 'sem pessoa vinculada' }}
           · {{ 'ativo' if u.ativo else 'DESATIVADO' }}
           · último acesso: {{ u.ultimo_acesso or 'nunca' }}
+          {% if u.senha_hash == '' %}
+            · senha inicial (data de nascimento)
+          {% endif %}
         </p>
 
         <div class="barra-acoes" style="margin: 12px 0 0;">

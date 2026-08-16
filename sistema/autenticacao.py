@@ -7,6 +7,7 @@ nunca guarda a senha em si.
 """
 
 import functools
+import hmac
 import os
 import secrets
 import unicodedata
@@ -25,7 +26,7 @@ ROTAS_PUBLICAS = {
 # é de permissão, não de proibição, de propósito: se eu criar uma rota nova e
 # esquecer de classificar, ela nasce fechada em vez de aberta.
 ROTAS_DO_JOGADOR = {
-    "minha_area", "logout",
+    "minha_area", "logout", "senha_nova",
 }
 
 # A lista é curta de propósito. Cheguei a pôr `painel` aqui achando que era só
@@ -58,6 +59,24 @@ def hash_da_senha(senha: str) -> str:
 
 def senha_confere(senha_hash: str, senha: str) -> bool:
     return check_password_hash(senha_hash, senha)
+
+
+def usa_senha_inicial(usuario) -> bool:
+    """senha_hash vazia é o marcador de conta que ainda usa a senha inicial."""
+    return usuario is not None and usuario["senha_hash"] == ""
+
+
+def senha_inicial_confere(conexao, usuario, senha: str) -> bool:
+    """A senha inicial é a data de nascimento da pessoa: 01022014, com ou sem barras."""
+    if usuario["pessoa_id"] is None:
+        return False
+    pessoa = conexao.execute("SELECT data_nascimento FROM pessoa WHERE id = ?",
+                             (usuario["pessoa_id"],)).fetchone()
+    if pessoa is None:
+        return False
+    esperada = pessoa["data_nascimento"].strftime("%d%m%Y")
+    digitada = senha.strip().replace("/", "")
+    return hmac.compare_digest(digitada, esperada)
 
 
 def buscar_por_login(conexao, login: str):
@@ -144,6 +163,13 @@ def exigir_login():
     Usado no before_request, depois de carregar_usuario.
     """
     endpoint = request.endpoint
+
+    # Quem entrou com a senha inicial (data de nascimento) primeiro define a
+    # senha própria; até lá o resto do sistema não abre.
+    if (usa_senha_inicial(usuario_atual()) and endpoint not in ROTAS_PUBLICAS
+            and endpoint not in ("senha_nova", "logout")):
+        return redirect(url_for("senha_nova"))
+
     if rota_permitida(endpoint):
         return None
 
@@ -255,6 +281,19 @@ def criar_usuario(conexao, login: str, senha: str, papel: str,
     )
     conexao.commit()
     return None
+
+
+def criar_acesso_inicial(conexao, login: str, pessoa_id: int) -> None:
+    """
+    Acesso de jogador criado no lote: nasce sem hash, e a senha inicial é a
+    data de nascimento (ver senha_inicial_confere). Nada de hash aqui de
+    propósito — dezenas de hashes numa requisição só foi o que derrubava o
+    botão do lote em produção. Não faz commit: o lote comita uma vez no fim.
+    """
+    conexao.execute(
+        "INSERT INTO usuario (login, senha_hash, papel, pessoa_id) VALUES (?,?,?,?)",
+        (login, "", "jogador", pessoa_id),
+    )
 
 
 def definir_papel(conexao, usuario_id: int, papel: str) -> str | None:

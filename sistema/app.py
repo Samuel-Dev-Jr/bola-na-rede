@@ -998,13 +998,24 @@ def login():
 
         usuario = autenticacao.buscar_por_login(g.conexao, login_digitado)
 
+        confere = False
+        if usuario is not None:
+            confere = (
+                autenticacao.senha_inicial_confere(g.conexao, usuario, senha)
+                if autenticacao.usa_senha_inicial(usuario)
+                else autenticacao.senha_confere(usuario["senha_hash"], senha)
+            )
+
         # Uma mensagem só para usuário inexistente e senha errada. Mensagens
         # diferentes contariam a quem tenta quais logins existem.
-        if usuario is None or not autenticacao.senha_confere(usuario["senha_hash"], senha):
+        if not confere:
             flash("Login ou senha não conferem.", "erro")
             return redirect(url_for("login", proximo=request.form.get("proximo", "")))
 
         autenticacao.entrar(g.conexao, usuario)
+
+        if autenticacao.usa_senha_inicial(usuario):
+            return redirect(url_for("senha_nova"))
 
         # Só aceito destino interno. Sem isso, um link com ?proximo=http://...
         # transformaria o login numa porta pra redirecionar gente pra fora.
@@ -1026,6 +1037,32 @@ def logout():
     autenticacao.sair()
     flash("Você saiu do sistema.", "sucesso")
     return redirect(url_for("login"))
+
+
+@app.route("/senha-nova", methods=["GET", "POST"])
+def senha_nova():
+    """
+    Onde quem entrou com a senha inicial define a senha própria. A guarda que
+    segura a pessoa aqui até trocar está em autenticacao.exigir_login.
+    """
+    usuario = autenticacao.usuario_atual()
+
+    if request.method == "POST":
+        senha = request.form.get("senha", "")
+        if senha != request.form.get("confirmacao", ""):
+            flash("As duas senhas não são iguais.", "erro")
+            return redirect(url_for("senha_nova"))
+
+        erro = autenticacao.definir_senha(g.conexao, usuario["id"], senha)
+        if erro:
+            flash(erro, "erro")
+            return redirect(url_for("senha_nova"))
+
+        flash("Senha definida. É ela que vale daqui pra frente.", "sucesso")
+        return redirect(url_for("centro") if usuario["papel"] == "admin"
+                        else url_for("minha_area"))
+
+    return render_template("senha_nova.html")
 
 
 # --------------------------------------------------------- área do jogador
@@ -1127,23 +1164,21 @@ def usuario_senha(usuario_id: int):
 def usuarios_em_lote():
     """
     Cria acesso de jogador pra quem tem matrícula ativa e ainda não tem conta.
-    As senhas aparecem UMA vez: o banco só guarda o hash.
+    A senha inicial é a data de nascimento de cada um, trocada à força no
+    primeiro acesso — sortear senha aqui gerava um hash por pessoa e o tempo
+    disso derrubava a requisição em produção (ver ESPECIFICACAO.md).
     """
     criadas = []
     for pessoa in autenticacao.pessoas_sem_usuario(g.conexao):
         login = autenticacao.sugerir_login(g.conexao, pessoa["nome"])
-        senha = autenticacao.senha_aleatoria()
-        erro = autenticacao.criar_usuario(g.conexao, login, senha, "jogador",
-                                          pessoa["id"])
-        if erro is None:
-            criadas.append({"nome": pessoa["nome"], "login": login, "senha": senha})
+        autenticacao.criar_acesso_inicial(g.conexao, login, pessoa["id"])
+        criadas.append({"nome": pessoa["nome"], "login": login})
+    g.conexao.commit()
 
     if not criadas:
         flash("Todo mundo com matrícula ativa já tem acesso.", "sucesso")
         return redirect(url_for("usuarios"))
 
-    # Renderizo em vez de redirecionar: as senhas só existem nesta resposta, e um
-    # redirect as jogaria fora antes de você conseguir anotar.
     return render_template(
         "usuarios.html",
         usuarios=autenticacao.listar_usuarios(g.conexao),

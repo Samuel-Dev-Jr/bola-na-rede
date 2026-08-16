@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block titulo %}Definir senha — Centro de Cultura e Esportes{% endblock %}
+
+{% block conteudo %}
+
+<h1 class="titulo-pagina">Defina a sua senha</h1>
+<p class="subtitulo-pagina">
+  A senha inicial (a data de nascimento) vale só até aqui. Escolha uma senha
+  sua, com pelo menos 8 caracteres — é ela que você vai usar daqui pra frente.
+</p>
+
+<form method="post" action="{{ url_for('senha_nova') }}">
+  <div class="cartao grupo-formulario" style="max-width: 460px;">
+    <div class="campo">
+      <label for="senha">Senha nova</label>
+      <input type="password" id="senha" name="senha" required minlength="8"
+             autocomplete="new-password">
+    </div>
+
+    <div class="campo">
+      <label for="confirmacao">Repita a senha</label>
+      <input type="password" id="confirmacao" name="confirmacao" required
+             minlength="8" autocomplete="new-password">
+    </div>
+  </div>
+
+  <div class="barra-acoes" style="margin-top: 18px;">
+    <button class="botao" type="submit">Salvar e entrar</button>
+  </div>
+</form>
+
+{% endblock %}
