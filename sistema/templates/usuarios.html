@@ -172,10 +172,14 @@
             </button>
           </form>
 
-          {# Nova senha. Vazio gera uma aleatória. #}
-          <form method="post" action="{{ url_for('usuario_senha', usuario_id=u.id) }}">
+          {# Nova senha: vazio sorteia. Quem tem e-mail na ficha é avisado. #}
+          <form method="post" action="{{ url_for('usuario_senha', usuario_id=u.id) }}"
+                style="display: flex; gap: 6px;">
+            <input type="text" name="senha" placeholder="nova senha (vazio sorteia)"
+                   autocomplete="off"
+                   style="max-width: 190px; padding: 6px 10px; font-size: 0.85rem;">
             <button class="botao botao--discreto botao--pequeno" type="submit">
-              Sortear nova senha
+              Alterar senha
             </button>
           </form>
 

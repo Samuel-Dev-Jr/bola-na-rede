@@ -41,6 +41,7 @@ from flask import (
 
 import autenticacao
 import consultas
+import correio
 import db
 import escalacao
 import importar
@@ -1098,15 +1099,40 @@ def minha_area():
 def usuarios():
     """Gestão de acessos."""
     if request.method == "POST":
-        erro = autenticacao.criar_usuario(
-            g.conexao,
-            login=request.form.get("login", ""),
-            senha=request.form.get("senha", ""),
-            papel=request.form.get("papel", "jogador"),
-            pessoa_id=_inteiro_do_form("pessoa_id"),
-        )
-        flash(erro or f"Acesso {request.form.get('login')!r} criado.",
-              "erro" if erro else "sucesso")
+        login_novo = request.form.get("login", "").strip()
+        senha_nova = request.form.get("senha", "")
+        pessoa_id = _inteiro_do_form("pessoa_id")
+
+        pessoa = None
+        if pessoa_id is not None:
+            pessoa = g.conexao.execute("SELECT nome, email FROM pessoa WHERE id = ?",
+                                       (pessoa_id,)).fetchone()
+            if pessoa is None:
+                flash("Essa pessoa não existe.", "erro")
+                return redirect(url_for("usuarios"))
+
+        erro = autenticacao.criar_usuario(g.conexao, login=login_novo,
+                                          senha=senha_nova,
+                                          papel=request.form.get("papel", "jogador"),
+                                          pessoa_id=pessoa_id)
+        if erro:
+            flash(erro, "erro")
+            return redirect(url_for("usuarios"))
+
+        mensagem = f"Acesso {login_novo!r} criado."
+        if pessoa and pessoa["email"]:
+            erro_email = correio.enviar(
+                pessoa["email"],
+                "Seu acesso ao sistema do Centro de Cultura e Esportes",
+                f"Olá! O acesso de {pessoa['nome']} ao sistema do Centro foi criado.\n\n"
+                f"Endereço: {request.url_root}\n"
+                f"Login: {login_novo}\n"
+                f"Senha: {senha_nova}\n\n"
+                "Dá pra trocar a senha depois de entrar.",
+            )
+            mensagem += (" A pessoa foi avisada por e-mail."
+                         if erro_email is None else f" ({erro_email}.)")
+        flash(mensagem, "sucesso")
         return redirect(url_for("usuarios"))
 
     # A varredura de inatividade roda ao abrir esta tela: o plano grátis do
@@ -1156,8 +1182,14 @@ def usuario_ativo(usuario_id: int):
 @autenticacao.somente_admin
 def usuario_senha(usuario_id: int):
     """Define nova senha. Não existe "ver a atual": o banco só guarda hash."""
-    alvo = g.conexao.execute("SELECT login FROM usuario WHERE id = ?",
-                             (usuario_id,)).fetchone()
+    alvo = g.conexao.execute(
+        """
+        SELECT u.login, p.nome AS pessoa_nome, p.email
+        FROM usuario u LEFT JOIN pessoa p ON p.id = u.pessoa_id
+        WHERE u.id = ?
+        """,
+        (usuario_id,),
+    ).fetchone()
     if alvo is None:
         abort(404)
 
@@ -1165,9 +1197,25 @@ def usuario_senha(usuario_id: int):
     erro = autenticacao.definir_senha(g.conexao, usuario_id, nova)
     if erro:
         flash(erro, "erro")
-    else:
-        flash(f"Senha de {alvo['login']} trocada para: {nova} — "
-              f"anote agora, ela não aparece de novo.", "sucesso")
+        return redirect(url_for("usuarios"))
+
+    mensagem = (f"Senha de {alvo['login']} trocada para: {nova} — "
+                f"anote agora, ela não aparece de novo.")
+    if alvo["email"]:
+        erro_email = correio.enviar(
+            alvo["email"],
+            "Sua senha no sistema do Centro foi alterada",
+            f"Olá! A coordenação alterou a senha de "
+            f"{alvo['pessoa_nome'] or alvo['login']} no sistema do Centro.\n\n"
+            f"Endereço: {request.url_root}\n"
+            f"Login: {alvo['login']}\n"
+            f"Senha nova: {nova}\n\n"
+            "Com ela o acesso segue normal. Se você não pediu essa troca, "
+            "fale com a coordenação.",
+        )
+        mensagem += (" A pessoa foi avisada por e-mail."
+                     if erro_email is None else f" ({erro_email}.)")
+    flash(mensagem, "sucesso")
     return redirect(url_for("usuarios"))
 
 
@@ -1184,12 +1232,26 @@ def usuarios_em_lote():
     for pessoa in autenticacao.pessoas_sem_usuario(g.conexao):
         login = autenticacao.sugerir_login(g.conexao, pessoa["nome"])
         autenticacao.criar_acesso_inicial(g.conexao, login, pessoa["id"])
-        criadas.append({"nome": pessoa["nome"], "login": login})
+        criadas.append({"nome": pessoa["nome"], "login": login,
+                        "email": pessoa["email"]})
     g.conexao.commit()
 
     if not criadas:
         flash("Todo mundo com matrícula ativa já tem acesso.", "sucesso")
         return redirect(url_for("usuarios"))
+
+    avisados = correio.enviar_em_lote([
+        (c["email"],
+         "Seu acesso ao sistema do Centro de Cultura e Esportes",
+         f"Olá! O acesso de {c['nome']} ao sistema do Centro foi criado.\n\n"
+         f"Endereço: {request.url_root}\n"
+         f"Login: {c['login']}\n"
+         "Senha inicial: a data de nascimento, só números (ex.: 01022014).\n\n"
+         "No primeiro acesso o sistema pede pra definir uma senha própria.")
+        for c in criadas
+    ])
+    if avisados:
+        flash(f"{avisados} aviso(s) de acesso saindo por e-mail.", "sucesso")
 
     return render_template(
         "usuarios.html",

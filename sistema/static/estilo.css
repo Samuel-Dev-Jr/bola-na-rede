@@ -1111,7 +1111,7 @@ input[type="file"] {
    número da camisa, e o `password` quando fiz o login — nos dois casos o campo
    saiu sem borda e sem altura, com a cara padrão do navegador, diferente dos
    vizinhos. Se aparecer um tipo novo, ele entra aqui. */
-input[type="text"], input[type="date"], input[type="tel"],
+input[type="text"], input[type="date"], input[type="tel"], input[type="email"],
 input[type="number"], input[type="password"], select, textarea {
   font-family: var(--fonte);
   font-size: 16px;

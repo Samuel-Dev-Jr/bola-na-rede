@@ -262,7 +262,7 @@ def pessoas_sem_usuario(conexao) -> list[dict]:
     """Quem tem matrícula ativa e ainda não tem acesso ao sistema."""
     return [dict(l) for l in conexao.execute(
         """
-        SELECT DISTINCT p.id, p.nome, p.data_nascimento
+        SELECT DISTINCT p.id, p.nome, p.data_nascimento, p.email
         FROM pessoa p
         JOIN matricula ma ON ma.pessoa_id = p.id AND ma.status = 'ativa'
         WHERE p.id NOT IN (SELECT pessoa_id FROM usuario WHERE pessoa_id IS NOT NULL)
