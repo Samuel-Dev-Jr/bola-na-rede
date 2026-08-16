@@ -76,7 +76,7 @@ if "Login ou senha" in corpo_login:
 con = sqlite3.connect(BANCO)
 con.row_factory = sqlite3.Row
 
-# Procuro um evento de futebol que tenha pelo menos 6 elegíveis. A elegibilidade
+# Procuro um evento de futsal que tenha pelo menos 6 elegíveis. A elegibilidade
 # segue a MESMA regra da rota: evento de turma só aceita quem é daquela turma;
 # evento da modalidade aceita qualquer um dela. Espelhar essa regra aqui é o que
 # evita o teste falhar por motivo errado, escalando alguém que a rota recusa.
@@ -84,7 +84,7 @@ evento = None
 for candidato in con.execute(
     """SELECT e.id, e.turma_id, e.modalidade_id, m.slug FROM evento e
        JOIN modalidade m ON m.id = e.modalidade_id
-       WHERE m.slug LIKE 'futebol%' ORDER BY e.id"""
+       WHERE m.slug LIKE 'futsal%' ORDER BY e.id"""
 ):
     if candidato["turma_id"]:
         lista = [r["id"] for r in con.execute(
@@ -98,7 +98,7 @@ for candidato in con.execute(
         break
 
 if evento is None:
-    print("  Nenhum evento de futebol com 6+ elegíveis. O teste precisa de 6 pra "
+    print("  Nenhum evento de futsal com 6+ elegíveis. O teste precisa de 6 pra "
           "exercitar substituição e disputa de posição.")
     sys.exit(2)
 
@@ -110,7 +110,9 @@ print(f"\n  evento {ev} ({evento['slug']}), "
 print("\n1. O campo aparece na tela")
 html = abrir(f"/convocacao/{ev}")
 checar("tem o desenho do campo", 'class="quadra' in html)
-checar("tem as 11 posições do futebol", html.count('class="posicao') >= 11,
+# O futsal joga com 5, não com os 11 do campo. Quando o Centro trocou o campo
+# pela quadra, esta linha esperava 11 e passou a reprovar o desenho certo.
+checar("tem as 5 posições do futsal", html.count('class="posicao') >= 5,
        f"{html.count('class=\"posicao')}")
 
 print("\n2. Escalar alguém no gol")
@@ -138,18 +140,18 @@ checar("e foi pro banco (posição nula)", antigo and antigo["posicao"] is None,
 
 print("\n4. Ninguém em dois lugares ao mesmo tempo")
 postar(f"/convocacao/{ev}/escalar",
-       {"matricula_id": elegiveis[1], "posicao": "ATA-D"})
+       {"matricula_id": elegiveis[1], "posicao": "PIV"})
 posicoes = [r["posicao"] for r in con.execute(
     "SELECT posicao FROM convocacao WHERE evento_id = ? AND matricula_id = ?",
     (ev, elegiveis[1]))]
-checar("ele mudou de posição, não duplicou", posicoes == ["ATA-D"], str(posicoes))
+checar("ele mudou de posição, não duplicou", posicoes == ["PIV"], str(posicoes))
 
 print("\n5. Duas pessoas na mesma posição, nunca")
-postar(f"/convocacao/{ev}/escalar", {"matricula_id": elegiveis[2], "posicao": "VOL"})
-postar(f"/convocacao/{ev}/escalar", {"matricula_id": elegiveis[3], "posicao": "VOL"})
+postar(f"/convocacao/{ev}/escalar", {"matricula_id": elegiveis[2], "posicao": "FIX"})
+postar(f"/convocacao/{ev}/escalar", {"matricula_id": elegiveis[3], "posicao": "FIX"})
 no_vol = [r["matricula_id"] for r in con.execute(
-    "SELECT matricula_id FROM convocacao WHERE evento_id = ? AND posicao = 'VOL'", (ev,))]
-checar("só um volante", len(no_vol) == 1, f"{len(no_vol)} pessoas")
+    "SELECT matricula_id FROM convocacao WHERE evento_id = ? AND posicao = 'FIX'", (ev,))]
+checar("só um fixo", len(no_vol) == 1, f"{len(no_vol)} pessoas")
 
 print("\n6. Posição inventada é recusada")
 _, corpo = postar(f"/convocacao/{ev}/escalar",
@@ -165,9 +167,9 @@ print("\n7. Escalar alguém de outra modalidade é recusado")
 de_fora = con.execute(
     """SELECT ma.id FROM matricula ma JOIN turma t ON t.id = ma.turma_id
        JOIN modalidade m ON m.id = t.modalidade_id
-       WHERE m.slug = 'karate' LIMIT 1""").fetchone()
+       WHERE m.slug = 'jiu-jitsu' LIMIT 1""").fetchone()
 _, corpo = postar(f"/convocacao/{ev}/escalar",
-                  {"matricula_id": de_fora["id"], "posicao": "MEI-C"})
+                  {"matricula_id": de_fora["id"], "posicao": "ALA-D"})
 checar("recusa quem não é elegível", "não está entre os elegíveis" in texto(corpo),
        texto(corpo)[:120])
 
@@ -189,7 +191,7 @@ msg = re.search(r'id="mensagem">(.*?)</pre>', html, re.S)
 if msg:
     corpo_msg = msg.group(1)
     checar("tem seção de escalação", "Escala" in corpo_msg)
-    checar("cita posição por extenso", "Goleiro" in corpo_msg or "Volante" in corpo_msg,
+    checar("cita posição por extenso", "Goleiro" in corpo_msg or "Fixo" in corpo_msg,
            corpo_msg[:200])
     checar("tem banco", "banco" in corpo_msg.casefold())
 else:

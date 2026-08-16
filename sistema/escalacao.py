@@ -7,9 +7,15 @@ rotação aqui sem ler uma linha de Flask.
 
 Cada esporte tem sua geometria e não dá pra usar um desenho só:
 
+    futsal     5 em quadra, no losango com pivô na frente
     futebol    11 em campo, formação 4-4-2
     vôlei      6 em quadra, na rotação numerada de 1 a 6
     basquete   5 em quadra, por função (armador, ala, pivô)
+
+Só o futsal está em uso hoje. Deixei os outros três porque o Centro já teve
+vôlei e basquete e pode voltar a ter, e porque o futebol de campo é o que o
+projeto era em 2019. Apagar o mapa não devolve tempo nenhum e me obrigaria a
+redesenhar tudo se uma modalidade voltar.
 
 As coordenadas são porcentagens dentro do desenho, com (0,0) no canto superior
 esquerdo. O ataque é sempre pra cima: o gol/rede do adversário fica no topo.
@@ -21,6 +27,19 @@ tela, do celular de 390px ao monitor.
 #
 # O código é o que vai pro banco. Os rótulos são pro técnico ler no campo, e o
 # nome por extenso entra no title, pra quem não conhece a abreviação.
+
+# O futsal é jogado com 5 em quadra, e a formação mais comum na base é o
+# losango: um fixo na defesa, dois alas nas laterais e o pivô mais à frente,
+# de costas pro gol. Eu tinha copiado as 11 posições do futebol de campo e
+# ficava errado de um jeito que qualquer um que joga percebe na hora — a tela
+# pedia zagueiro e volante numa quadra de 40 metros.
+FUTSAL = [
+    ("GOL",  "GOL", "Goleiro",         50, 86),
+    ("FIX",  "FIX", "Fixo",            50, 64),
+    ("ALA-D", "AD", "Ala direito",     80, 44),
+    ("ALA-E", "AE", "Ala esquerdo",    20, 44),
+    ("PIV",  "PIV", "Pivô",            50, 22),
+]
 
 FUTEBOL = [
     ("GOL",   "GOL", "Goleiro",          50, 88),
@@ -59,6 +78,17 @@ BASQUETE = [
 
 # Qual conjunto cada modalidade usa. A chave é o slug do banco.
 POR_MODALIDADE = {
+    "futsal-masculino": ("futsal", FUTSAL),
+    "futsal-feminino": ("futsal", FUTSAL),
+    # As de baixo não existem no Centro hoje. Ficam mapeadas porque o mapa não
+    # atrapalha: para_modalidade() só é consultado pelo slug que está no banco.
+    #
+    # Cuidado com estas quatro linhas: quando renomeei futebol para futsal com
+    # um replace no projeto inteiro, elas viraram "futsal-masculino" também. O
+    # Python aceita chave repetida sem reclamar e fica com a ÚLTIMA, então o
+    # futsal passou a carregar as 11 posições do futebol de campo — justo o
+    # defeito que o renomear existia pra corrigir. Só apareceu porque eu abri o
+    # arquivo pra conferir.
     "futebol-masculino": ("futebol", FUTEBOL),
     "futebol-feminino": ("futebol", FUTEBOL),
     "volei-masculino": ("volei", VOLEI),
@@ -72,9 +102,9 @@ def para_modalidade(slug: str):
     """
     (tipo_de_quadra, posições) da modalidade, ou (None, []) se ela não escala.
 
-    Karatê e balé caem no segundo caso: não têm time em campo, e por isso
-    também não têm convocação. Devolver lista vazia deixa a tela decidir sem
-    precisar saber quais esportes são coletivos.
+    O jiu-jitsu cai no segundo caso: não tem time em quadra, e por isso também
+    não tem convocação. Devolver lista vazia deixa a tela decidir sem precisar
+    saber quais esportes são coletivos.
     """
     return POR_MODALIDADE.get(slug, (None, []))
 

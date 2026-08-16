@@ -1,4 +1,4 @@
-# Testes do Centro de Cultura e Esporte
+# Testes do Centro de Cultura e Esportes
 
 O `testar_risco.py` roda sozinho, sem nada ligado. Os outros quatro precisam do
 sistema rodando (`python app.py`) numa janela à parte.

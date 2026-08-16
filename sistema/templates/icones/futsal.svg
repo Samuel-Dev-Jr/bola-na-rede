@@ -1,0 +1,12 @@
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- A bola de futsal dentro da quadra, e não sozinha como no futebol.svg: o
+       que diferencia futsal de futebol de campo não é a bola, é o piso. Sem a
+       moldura da quadra os dois ícones ficavam idênticos, e o Centro joga os
+       dois em momentos diferentes da história dele.
+       A bola é menor e mais baixa que a do futebol pra caber a linha de fundo. -->
+  <rect x="2.6" y="4.2" width="18.8" height="15.6" rx="1.6"/>
+  <path d="M12 4.2v15.6"/>
+  <circle cx="12" cy="12" r="5.4"/>
+  <path d="M12 8.4l2.1 1.53-.8 2.47h-2.6l-.8-2.47z"/>
+</svg>

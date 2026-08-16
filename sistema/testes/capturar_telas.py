@@ -36,23 +36,23 @@ LOGIN_JOGADOR = "teste-automatizado-jogador"
 # (nome do arquivo, rota, captura a página inteira?)
 DESKTOP = [
     ("desktop-01-centro", "/", True),
-    ("desktop-02-painel", "/m/futebol-masculino", True),
-    ("desktop-03-alunos", "/m/futebol-masculino/alunos", True),
+    ("desktop-02-painel", "/m/futsal-masculino", True),
+    ("desktop-03-alunos", "/m/futsal-masculino/alunos", True),
     ("desktop-04-pessoa", "/pessoas/1", True),
-    ("desktop-05-agenda", "/m/futebol-masculino/agenda", True),
-    ("desktop-06-chamada", "/m/futebol-masculino/chamada", False),
+    ("desktop-05-agenda", "/m/futsal-masculino/agenda", True),
+    ("desktop-06-chamada", "/m/futsal-masculino/chamada", False),
     ("desktop-07-convocacao", "/convocacao/1", False),
     ("desktop-08-configuracoes", "/configuracoes", True),
     ("desktop-09-acessos", "/usuarios", True),
-    ("desktop-10-planos", "/m/futebol-masculino/planos", True),
-    ("desktop-11-plano-novo", "/m/futebol-masculino/planos/novo", True),
-    ("desktop-12-horario", "/m/futebol-masculino/horario", True),
+    ("desktop-10-planos", "/m/futsal-masculino/planos", True),
+    ("desktop-11-plano-novo", "/m/futsal-masculino/planos/novo", True),
+    ("desktop-12-horario", "/m/futsal-masculino/horario", True),
     ("desktop-13-matricula", "/matriculas/1/editar", True),
 ]
 
 CELULAR = [
     ("celular-01-centro", "/", True),
-    ("celular-02-painel", "/m/futebol-masculino", True),
+    ("celular-02-painel", "/m/futsal-masculino", True),
     # Só a viewport, e não a página inteira: as 62 pessoas a 390px com escala 3
     # viram uma imagem de mais de 20 mil pixels de altura. O Chrome estoura o
     # limite tentando montar isso, e mesmo que montasse a tira ficaria ilegível
@@ -60,10 +60,10 @@ CELULAR = [
     # celular, e isso a primeira tela já mostra.
     ("celular-03-pessoas", "/pessoas", False),
     ("celular-04-pessoa", "/pessoas/1", True),
-    ("celular-05-chamada", "/m/futebol-masculino/chamada", False),
-    ("celular-06-agenda", "/m/bale/agenda", True),
-    ("celular-07-matricular", "/m/futebol-masculino/matricular", True),
-    ("celular-08-planos", "/m/futebol-masculino/planos", True),
+    ("celular-05-chamada", "/m/futsal-masculino/chamada", False),
+    ("celular-06-agenda", "/m/jiu-jitsu/agenda", True),
+    ("celular-07-matricular", "/m/futsal-masculino/matricular", True),
+    ("celular-08-planos", "/m/futsal-masculino/planos", True),
 ]
 
 # A área do participante. Precisa de outra conta: como admin ela abre dizendo
@@ -108,7 +108,7 @@ def preparar_jogador():
             JOIN matricula ma ON ma.pessoa_id = p.id
             JOIN turma t      ON t.id = ma.turma_id
             JOIN modalidade m ON m.id = t.modalidade_id
-            WHERE m.slug = 'futebol-masculino' AND ma.status = 'ativa'
+            WHERE m.slug = 'futsal-masculino' AND ma.status = 'ativa'
             LIMIT 1
             """
         ).fetchone()

@@ -1,11 +1,12 @@
-# Centro de Cultura e Esporte
+# Centro de Cultura e Esportes
 
-Sistema de gestão da escolinha de futebol comunitária.
+Sistema de gestão das atividades do Centro: futsal masculino e feminino e
+jiu-jitsu.
 
 Projeto de Extensão Curricularizada — UniFECAF
 Análise e Desenvolvimento de Sistemas — 2026
 
-Centro de Cultura e Esporte — Jardim Elizabete
+Centro de Cultura e Esportes — Jardim Elizabete
 R. Manoel Maria Fernandes, 580, Jardim Elizabete, Taboão da Serra/SP
 
 ## Como rodar
@@ -44,7 +45,7 @@ Não precisa de Node, nem de servidor de banco, nem de internet. O banco é um
 arquivo só (`centro.db`) e as fontes são as que já vêm no computador,
 porque o técnico usa o sistema na beira do campo, onde às vezes não pega sinal.
 
-O `configurar.py` cria o banco com as 4 modalidades e as 13 turmas do Centro, e
+O `configurar.py` cria o banco com as 3 modalidades e as 11 turmas do Centro, e
 **sem nenhuma pessoa**. O cadastro entra de duas formas: pela tela, uma pessoa
 por vez, ou em lote a partir de planilha:
 

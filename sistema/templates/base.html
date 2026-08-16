@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{% block titulo %}Centro de Cultura e Esporte{% endblock %}</title>
+  <title>{% block titulo %}Centro de Cultura e Esportes{% endblock %}</title>
 
   {# Isso aqui é o que faz o navegador oferecer "instalar" e abrir sem a
      barra de endereço, igual a um app baixado da loja. #}
@@ -11,8 +11,8 @@
   <meta name="theme-color" content="{{ modalidade.cor if modalidade else '#0f7a3d' }}">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Centro de Cultura e Esporte">
-  <meta name="description" content="Gestão das atividades do Centro de Cultura e Esporte do Jardim Elizabete.">
+  <meta name="apple-mobile-web-app-title" content="Centro de Cultura e Esportes">
+  <meta name="description" content="Gestão das atividades do Centro de Cultura e Esportes do Jardim Elizabete.">
 
   <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icone-180.png') }}">
@@ -39,12 +39,12 @@
          O de 640 fica só na tela de entrar, onde ele aparece uma vez. #}
       <img class="marca__escudo" src="{{ url_for('static', filename='marca.png') }}"
            alt="" width="128" height="128">
-      {# O subtítulo era 'Centro de Cultura e Esporte' quando o nome do sistema
+      {# O subtítulo era 'Centro de Cultura e Esportes' quando o nome do sistema
          era outro. Agora que o nome É esse, repetir ali sairia "Centro de
-         Cultura e Esporte / Centro de Cultura e Esporte". Fora de uma
+         Cultura e Esporte / Centro de Cultura e Esportes". Fora de uma
          modalidade ele mostra o bairro, que é a informação que sobra. #}
       <span>
-        Centro de Cultura e Esporte
+        Centro de Cultura e Esportes
         <span class="marca__local">
           {{ modalidade.nome_exibicao if modalidade else 'Jardim Elizabete' }}
         </span>
@@ -113,7 +113,7 @@
 </main>
 
 <footer class="rodape">
-  Centro de Cultura e Esporte · Jardim Elizabete<br>
+  Centro de Cultura e Esportes · Jardim Elizabete<br>
   R. Manoel Maria Fernandes, 580, Jardim Elizabete, Taboão da Serra/SP
 </footer>
 

@@ -1,0 +1,15 @@
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- Duas pessoas no chão, uma por cima da outra, sobre o tatame. É a
+       diferença que importa: o ícone antigo era do karatê e mostrava um chute
+       em pé, o que não descreve nada do que acontece no treino. Jiu-jitsu é
+       corpo a corpo no solo, e a silhueta de dois deitados diz isso de longe.
+       O retângulo de baixo é a borda do tatame. -->
+  <circle cx="5.6" cy="10.4" r="2" fill="currentColor" stroke="none"/>
+  <path d="M7.6 11.4h7.6"/>
+  <path d="M9.6 11.4l2.6 2.9"/>
+  <circle cx="17.4" cy="7.6" r="2" fill="currentColor" stroke="none"/>
+  <path d="M16.2 9.4l-4.9 3.2"/>
+  <path d="M15.4 12.6l2.6 1.7"/>
+  <path d="M2.6 17.6h18.8"/>
+</svg>

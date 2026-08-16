@@ -1,13 +1,14 @@
 """
-Centro de Cultura e Esporte - sistema de gestão da escolinha comunitária.
+Centro de Cultura e Esportes - sistema de gestão da escolinha comunitária.
 
 Projeto de Extensão Curricularizada - UniFECAF
 Análise e Desenvolvimento de Sistemas
 
-O projeto começou só com futebol, em 2019, e hoje tem também karatê e balé, os
-dois em parceria com a ONG ABOA. O futebol tem turma masculina e feminina, que
-treinam em dias diferentes, então cada uma é uma modalidade separada: quatro
-no total.
+O projeto começou só com futebol de campo, em 2019, e hoje o Centro oferece
+futsal, jiu-jitsu, balé e dança, boa parte em parceria com a ONG ABOA. No
+sistema entraram três: futsal masculino, futsal feminino e jiu-jitsu. Balé e
+dança ficaram de fora a pedido deles, porque naquelas turmas o contato com as
+famílias já acontece pelo grupo de WhatsApp.
 
 O sistema trabalha com PESSOA e MATRÍCULA. Uma pessoa pode estar matriculada em
 várias modalidades, e mais da metade do Centro está. As rotas de dentro de uma
@@ -164,7 +165,7 @@ def manifest():
     return app.response_class(
         json.dumps(
             {
-                "name": "Centro de Cultura e Esporte",
+                "name": "Centro de Cultura e Esportes",
                 # O short_name é o rótulo embaixo do ícone na tela de início.
                 # O celular corta o que passa de uns 12 caracteres, então o
                 # nome inteiro apareceria como "Centro de Cul...".
@@ -192,8 +193,8 @@ def manifest():
                      "type": "image/png", "purpose": "maskable"},
                 ],
                 "shortcuts": [
-                    {"name": "Fazer chamada", "url": "/m/futebol-masculino/chamada"},
-                    {"name": "Quem está sumindo", "url": "/m/futebol-masculino/alunos?nivel=evadido"},
+                    {"name": "Fazer chamada", "url": "/m/futsal-masculino/chamada"},
+                    {"name": "Quem está sumindo", "url": "/m/futsal-masculino/alunos?nivel=evadido"},
                     {"name": "Buscar pessoa", "url": "/pessoas"},
                 ],
             },
@@ -251,7 +252,7 @@ def modalidade_horario(slug: str):
     Edita os dias e o horário de uma modalidade pela tela.
 
     Isso vivia no configurar.py, em código, e o configurar recria o schema —
-    ou seja, pra trocar o horário do vôlei eu apagava o cadastro inteiro. Na
+    ou seja, pra trocar o horário de uma turma eu apagava o cadastro inteiro. Na
     prática o horário era imutável depois da primeira matrícula, e a coordenação
     me ligava por causa de quadra emprestada e professor trocando de turno.
 
@@ -793,7 +794,7 @@ def _salvar_plano(modalidade_id: int, plano_id: int | None = None) -> str | None
     turma_id = None
     if bruto_turma:
         # Confiro que a turma é DESTA modalidade. Sem isso, um turma_id trocado
-        # na mão gravaria o treino do vôlei dentro do karatê, e o filtro de
+        # na mão gravaria o treino do futsal dentro do jiu-jitsu, e o filtro de
         # turma da área do jogador esconderia o plano de todo mundo.
         turma_id = g.conexao.execute(
             "SELECT id FROM turma WHERE id = ? AND modalidade_id = ?",
@@ -859,7 +860,7 @@ def convocacao_nova(slug: str):
                 request.form.get("adversario", "").strip() or None,
                 _data_do_form("data") or consultas.hoje(),
                 request.form.get("local", "").strip()
-                or "Centro de Cultura e Esporte — Jardim Elizabete",
+                or "Centro de Cultura e Esportes — Jardim Elizabete",
                 request.form.get("observacoes", "").strip() or None,
             ),
         )

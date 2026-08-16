@@ -63,7 +63,7 @@ con.execute("PRAGMA foreign_keys = ON")
 
 # ------------------------------------------------------------------ chamada
 print("\n1. POST /m/<slug>/chamada")
-for slug, dia in [("karate", "2026-08-12"), ("bale", "2026-08-12")]:
+for slug, dia in [("jiu-jitsu", "2026-08-12"), ("jiu-jitsu", "2026-08-12")]:
     turma = con.execute(
         """SELECT t.id FROM turma t JOIN modalidade m ON m.id = t.modalidade_id
            WHERE m.slug = ? ORDER BY t.ordem LIMIT 1""", (slug,)).fetchone()
@@ -91,12 +91,12 @@ for slug, dia in [("karate", "2026-08-12"), ("bale", "2026-08-12")]:
     checar(f"{slug}: regravar nao duplica", n == 1, f"{n} linhas")
 
 # ------------------------------------------------------- cadastro de pessoa
-print("\n2. POST /m/karate/pessoas/nova  (cadastra e ja matricula)")
+print("\n2. POST /m/jiu-jitsu/pessoas/nova  (cadastra e ja matricula)")
 turma_karate = con.execute(
     """SELECT t.id FROM turma t JOIN modalidade m ON m.id = t.modalidade_id
-       WHERE m.slug = 'karate' ORDER BY t.ordem LIMIT 1""").fetchone()
+       WHERE m.slug = 'jiu-jitsu' ORDER BY t.ordem LIMIT 1""").fetchone()
 
-status, _ = postar("/m/karate/pessoas/nova", {
+status, _ = postar("/m/jiu-jitsu/pessoas/nova", {
     "nome": "Teste Automatizado da Silva",
     "data_nascimento": "2014-03-15",
     "turma_id": turma_karate["id"],
@@ -119,11 +119,11 @@ if nova:
     checar("ficha medica salva", nova["condicoes"] == "Asma", str(nova["condicoes"]))
 
     # -------------------------------------------------- segunda modalidade
-    print("\n3. POST /m/futebol-masculino/matricular  (mesma pessoa, 2a atividade)")
+    print("\n3. POST /m/futsal-masculino/matricular  (mesma pessoa, 2a atividade)")
     turma_fut = con.execute(
         """SELECT t.id FROM turma t JOIN modalidade m ON m.id = t.modalidade_id
-           WHERE m.slug = 'futebol-masculino' ORDER BY t.ordem LIMIT 1""").fetchone()
-    status, _ = postar("/m/futebol-masculino/matricular", {
+           WHERE m.slug = 'futsal-masculino' ORDER BY t.ordem LIMIT 1""").fetchone()
+    status, _ = postar("/m/futsal-masculino/matricular", {
         "pessoa_id": nova["id"], "turma_id": turma_fut["id"],
         "data_matricula": "2026-08-10",
     })
@@ -138,7 +138,7 @@ if nova:
 
     # ------------------------------------------------- matricula repetida
     print("\n4. POST matricular de novo na MESMA turma (deve recusar)")
-    postar("/m/futebol-masculino/matricular", {
+    postar("/m/futsal-masculino/matricular", {
         "pessoa_id": nova["id"], "turma_id": turma_fut["id"],
     })
     mats = con.execute(
@@ -183,7 +183,7 @@ print("\n7. POST /convocacao/<id>")
 evento = con.execute(
     """SELECT e.id, e.turma_id FROM evento e
        JOIN modalidade m ON m.id = e.modalidade_id
-       WHERE m.slug = 'futebol-masculino' LIMIT 1""").fetchone()
+       WHERE m.slug = 'futsal-masculino' LIMIT 1""").fetchone()
 
 # Sem evento no banco isto quebrava com "NoneType object is not subscriptable",
 # e o traceback não dizia o que faltava. Agora falha explicando.

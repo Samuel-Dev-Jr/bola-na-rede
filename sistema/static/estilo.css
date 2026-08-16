@@ -1,5 +1,5 @@
 /*
-   Estilo do sistema do Centro de Cultura e Esporte.
+   Estilo do sistema do Centro de Cultura e Esportes.
    Projeto de Extensão Curricularizada UniFECAF / ADS
 
    Refiz tudo pensando em celular primeiro. A primeira versão eu tinha feito
@@ -1330,6 +1330,15 @@ input:focus, select:focus, textarea:focus {
     repeating-linear-gradient(180deg,
       #157a44 0 7.6%, #12703d 7.6% 15.2%);
   border: 2px solid rgba(255, 255, 255, .5);
+}
+
+/* Futsal é em quadra coberta, com piso pintado — não em grama. O fundo listrado
+   de campo estava errado desde que o Centro passou a jogar futsal em vez de
+   futebol de campo, e é o tipo de coisa que quem joga percebe antes de ler
+   qualquer texto. Quadra é mais larga que o campo em proporção, daí o 4/5. */
+.quadra--futsal {
+  aspect-ratio: 4 / 5;
+  background: linear-gradient(180deg, #2a6f9e 0 50%, #24628c 50% 100%);
 }
 
 .quadra--volei,

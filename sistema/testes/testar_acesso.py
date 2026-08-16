@@ -111,15 +111,15 @@ def so_texto(html):
 
 
 PROTEGIDAS = [
-    "/", "/pessoas", "/pessoas/1", "/configuracoes", "/m/futebol-masculino",
-    "/m/futebol-masculino/chamada", "/m/futebol-masculino/alunos", "/minha-area",
+    "/", "/pessoas", "/pessoas/1", "/configuracoes", "/m/futsal-masculino",
+    "/m/futsal-masculino/chamada", "/m/futsal-masculino/alunos", "/minha-area",
 ]
 
 DA_COORDENACAO = [
     "/pessoas", "/pessoas/1", "/pessoas/1/editar", "/pessoas/nova",
-    "/configuracoes", "/m/futebol-masculino", "/m/futebol-masculino/alunos",
-    "/m/futebol-masculino/chamada", "/m/futebol-masculino/matricular",
-    "/m/karate/agenda", "/m/futebol-masculino/convocacao",
+    "/configuracoes", "/m/futsal-masculino", "/m/futsal-masculino/alunos",
+    "/m/futsal-masculino/chamada", "/m/futsal-masculino/matricular",
+    "/m/jiu-jitsu/agenda", "/m/futsal-masculino/convocacao",
 ]
 
 senhas, tem_pessoa = preparar_contas()
@@ -163,7 +163,7 @@ try:
         checar(f"{rota} barrada", "/minha-area" in url, f"chegou em {url}")
 
     print("\n6. O painel nao vaza telefone nem risco pro jogador")
-    _, corpo = abrir(jog, "/m/futebol-masculino")
+    _, corpo = abrir(jog, "/m/futsal-masculino")
     texto = so_texto(corpo)
     checar("sem 'Ligar esta semana'", "Ligar esta semana" not in texto)
     checar("sem rotulo 'Risco de evasao'", "Risco de evasão" not in texto)

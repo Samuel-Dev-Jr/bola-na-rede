@@ -1,4 +1,4 @@
-# Decisões de projeto — Centro de Cultura e Esporte
+# Decisões de projeto — Centro de Cultura e Esportes
 
 Projeto de Extensão Curricularizada — UniFECAF
 Análise e Desenvolvimento de Sistemas — 2026
@@ -20,7 +20,7 @@ Essa foi a mudança mais importante do banco, e ela veio de um erro meu.
 Na primeira versão cada linha de aluno pertencia a uma modalidade só. Parecia
 óbvio: uma tabela `atleta`, com uma coluna apontando pra turma. Só que mais da
 metade das crianças do Centro faz mais de uma atividade. Do jeito antigo, quem
-fazia futebol e karatê virava **duas pessoas** no
+fazia futsal e jiu-jitsu virava **duas pessoas** no
 banco, com o telefone digitado duas vezes e a ficha médica preenchida em uma e
 vazia na outra.
 
@@ -39,7 +39,7 @@ turma   ──┘
 
 `matricula` é tabela associativa entre pessoa e turma. E a **presença é da
 matrícula, não da pessoa** — porque frequência é por modalidade: dá para ser
-assíduo no futebol e estar sumindo do karatê, e a coordenação precisa ver as
+assíduo no futsal e estar sumindo do jiu-jitsu, e a coordenação precisa ver as
 duas coisas separadas para saber com quem falar.
 
 Consequência prática nas rotas: a ficha da pessoa vive em `/pessoas/<id>`, fora
@@ -49,7 +49,7 @@ da modalidade, porque ela junta todas as atividades dela. O resto vive em
 **O número da camisa mostrou que a separação estava certa.** Quando fui
 acrescentar número de camisa, o campo caiu na `matricula` sem discussão: número
 é do time, não do ser humano. A mesma criança pode ser 10 no futebol e 7 no
-karatê, e no balé não usar número nenhum. Se a tabela ainda fosse a `atleta`
+feminino, e no jiu-jitsu não usar número nenhum. Se a tabela ainda fosse a `atleta`
 da primeira versão, isso funcionaria por acidente — porque lá cada linha já era
 uma modalidade — e quebraria na primeira vez que alguém tentasse consertar a
 duplicação de cadastro.
@@ -118,7 +118,7 @@ A primeira versão tinha uma tela de mensalidades, com valor arrecadado no mês 
 situação de pagamento de cada criança. Eu tirei, e essa é uma decisão que eu
 defendo, não uma funcionalidade que faltou.
 
-O Centro de Cultura e Esporte é um grupo comunitário informal, **sem CNPJ**, e as atividades
+O Centro de Cultura e Esportes é um grupo comunitário informal, **sem CNPJ**, e as atividades
 são gratuitas. Um sistema que controla cobrança daria a entender que existe
 pessoa jurídica por trás, e não existe. Além disso, a tela marcava criança por
 criança quem estava com pagamento em aberto e quem era isento por
@@ -348,6 +348,54 @@ limite de atenção de 0,75 para 0,70 e **nenhum caso falhou**. Eu testava 75% e
 67%, e os dois ficam do mesmo lado dos dois limites — faltava um caso entre 70%
 e 75%. Depois de corrigir, repeti o exercício com as 6 constantes da regra e as
 2 decisões sobre falta justificada: as 8 alterações passaram a quebrar o teste.
+
+## 6b. O dia em que descobri que o cadastro descrevia um Centro que não existe
+
+Este registro é o mais importante do documento, porque o erro não foi de
+código: foi de levantamento. E ninguém o teria pego lendo código.
+
+Na véspera da entrega, sentei com as fotos e com as pessoas que dão aula no
+Centro e conferi, atividade por atividade, o que acontece lá de verdade. O
+resultado contra o que o sistema tinha cadastrado:
+
+| O que o sistema dizia | O que existe |
+|---|---|
+| Futebol de campo (M e F) | **Futsal** (M e F) — quadra coberta, 5 em quadra |
+| Karatê | **Jiu-jitsu** — a foto do treino mostra tatame e trabalho de solo |
+| Vôlei (M e F) | Não existe mais: sem professor e sem agenda |
+| Basquete (M e F) | Acabou |
+| Pilates | **Nunca existiu.** É balé, de criança — eu entendi errado |
+| — | **Dança** existe, é grande e é de adulto, e não estava cadastrada |
+
+Oito modalidades cadastradas; cinco não descreviam nada. E o comentário no topo
+do `configurar.py` dizia — diz até hoje — que aquilo "não é dado de teste, é a
+configuração da escolinha". Um arquivo que se declara verdade estava errado na
+maior parte das linhas, porque eu montei a lista de memória em vez de conferir
+com quem está lá.
+
+O que ficou no sistema depois da conferência: **futsal masculino, futsal
+feminino e jiu-jitsu**. Balé e dança existem e ficaram de fora **a pedido
+deles** — nessas turmas o contato com as famílias já acontece pelo grupo de
+WhatsApp e o controle de frequência não fazia falta agora. Anotei o pedido e
+não entreguei tela que ninguém pediu.
+
+A correção puxou três consertos que eu não teria feito sem ela:
+
+- **O futsal tem 5 em quadra, não 11.** A escalação mostrava zagueiro e
+  volante numa quadra de 40 metros. O `escalacao.py` ganhou o losango do
+  futsal: goleiro, fixo, dois alas e pivô.
+- **Quadra não é gramado.** O desenho do campo era listrado de verde; futsal é
+  piso pintado. Quem joga percebe antes de ler qualquer texto.
+- **O renomear automático plantou uma armadilha.** Troquei `futebol-` por
+  `futsal-` no projeto inteiro de uma vez, e o mapa de posições ficou com a
+  chave `futsal-masculino` DUAS vezes — o Python aceita chave repetida sem
+  reclamar e fica com a última, então o futsal voltou a carregar as 11 posições
+  do campo. Só vi porque abri o arquivo pra conferir o resultado. Replace em
+  massa economiza digitação e cobra em silêncio.
+
+A lição que fica pro relatório e pra mim: **fonte é quem está lá, não a minha
+lembrança da visita.** Eu construí um sistema inteiro em cima de uma lista que
+nunca tinha sido lida em voz alta pra pessoa certa perguntar "é isso mesmo?".
 
 ## 7. Limites conhecidos
 

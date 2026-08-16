@@ -1,4 +1,4 @@
--- Banco do Centro de Cultura e Esporte — Jardim Elizabete
+-- Banco do Centro de Cultura e Esportes — Jardim Elizabete
 -- Extensão Curricularizada UniFECAF / Análise e Desenvolvimento de Sistemas
 --
 -- A tabela mensalidade eu TIREI de propósito. O projeto é um grupo comunitário
@@ -8,14 +8,14 @@
 -- A mudança mais importante do banco foi separar PESSOA de MATRÍCULA.
 -- Na primeira versão cada linha de aluno pertencia a uma modalidade só. Só que
 -- metade das crianças do Centro faz mais de uma atividade: o Samuel joga
--- futebol e basquete, a Cris faz vôlei e karatê. Do jeito antigo, o Samuel
+-- futsal e jiu-jitsu, e outra criança faz só o futsal. Do jeito antigo, quem
 -- virava duas pessoas no banco, com telefone repetido e a ficha médica
 -- preenchida em uma e vazia na outra. Era exatamente o problema do caderno de
 -- papel, que eu tinha copiado sem perceber.
 --
 -- Agora pessoa e turma se ligam por matricula, que é uma tabela associativa.
 -- A presença passa a ser da matrícula, não da pessoa, porque a frequência é
--- por modalidade: dá pra ser assíduo no futebol e estar sumindo do basquete.
+-- por modalidade: dá pra ser assíduo no futsal e estar sumindo do jiu-jitsu.
 
 PRAGMA foreign_keys = ON;
 
@@ -40,9 +40,9 @@ DROP TABLE IF EXISTS pessoa;
 DROP TABLE IF EXISTS turma;
 DROP TABLE IF EXISTS modalidade;
 
--- As atividades do Centro. O futebol aparece duas vezes,
+-- As atividades do Centro. O futsal aparece duas vezes,
 -- uma no masculino e outra no feminino, porque competem em categorias
--- separadas e treinam em dias diferentes. Karatê e balé são mistos.
+-- separadas e treinam em dias diferentes. O jiu-jitsu é misto.
 CREATE TABLE modalidade (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     slug            TEXT    NOT NULL UNIQUE,
@@ -50,7 +50,7 @@ CREATE TABLE modalidade (
     genero          TEXT    NOT NULL CHECK (genero IN ('Masculino','Feminino','Misto')),
     descricao       TEXT    NOT NULL,
 
-    -- A cor é do esporte, não do gênero. Futebol masculino e feminino usam o
+    -- A cor é do esporte, não do gênero. Futsal masculino e feminino usam o
     -- mesmo verde e se diferenciam pela faixa listrada no cartão.
     cor             TEXT    NOT NULL,
     icone           TEXT    NOT NULL,
@@ -62,7 +62,8 @@ CREATE TABLE modalidade (
     tem_convocacao  INTEGER NOT NULL DEFAULT 1 CHECK (tem_convocacao IN (0,1)),
 
     -- Como cada modalidade chama as coisas, pra eu não escrever "treino" na
-    -- tela do balé. O artigo entra junto porque senão sai "uma treino".
+    -- tela de quem chama de "aula". O artigo entra junto porque senão sai
+    -- "uma treino".
     termo_aluno     TEXT    NOT NULL DEFAULT 'atleta',
     termo_aula      TEXT    NOT NULL DEFAULT 'treino',
     termo_aula_pl   TEXT    NOT NULL DEFAULT 'treinos',
@@ -71,8 +72,8 @@ CREATE TABLE modalidade (
     ordem           INTEGER NOT NULL DEFAULT 0
 );
 
--- As turmas de cada modalidade: categorias por idade no futebol, faixas no
--- karatê, níveis no balé.
+-- As turmas de cada modalidade: categorias por idade no futsal, faixas de
+-- graduação no jiu-jitsu.
 CREATE TABLE turma (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
     modalidade_id  INTEGER NOT NULL REFERENCES modalidade (id) ON DELETE CASCADE,
@@ -84,7 +85,7 @@ CREATE TABLE turma (
 
 -- A PESSOA. Uma linha por ser humano, não importa em quantas atividades ele
 -- esteja. É aqui que mora a ficha médica, e é isso que resolve o problema de
--- a alergia estar anotada só no caderno do futebol.
+-- a alergia estar anotada só na folha do futsal.
 CREATE TABLE pessoa (
     id                      INTEGER PRIMARY KEY AUTOINCREMENT,
     nome                    TEXT    NOT NULL,
@@ -119,8 +120,8 @@ CREATE TABLE matricula (
     status         TEXT    NOT NULL DEFAULT 'ativa' CHECK (status IN ('ativa','encerrada')),
 
     -- O número da camisa fica na MATRÍCULA, não na pessoa: ele é do time, não
-    -- do ser humano. A mesma criança pode ser 10 no futebol e 7 no basquete, e
-    -- no karatê não usar número nenhum.
+    -- do ser humano. A mesma criança pode ser 10 no futsal masculino e 7 no
+    -- feminino, e no jiu-jitsu não usar número nenhum.
     numero         INTEGER CHECK (numero IS NULL OR numero BETWEEN 1 AND 99),
 
     -- A mesma pessoa não pode estar duas vezes na mesma turma.
@@ -139,7 +140,7 @@ CREATE UNIQUE INDEX idx_matricula_numero
     ON matricula (turma_id, numero) WHERE numero IS NOT NULL;
 
 -- Presença numa aula. Aponta pra matrícula e não pra pessoa, porque a
--- frequência é por modalidade: dá pra ser assíduo no futebol e estar sumindo
+-- frequência é por modalidade: dá pra ser assíduo no futsal e estar sumindo
 -- do basquete ao mesmo tempo.
 CREATE TABLE presenca (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,

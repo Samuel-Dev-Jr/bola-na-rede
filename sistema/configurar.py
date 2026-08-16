@@ -25,11 +25,22 @@ import db
 # e ordem. Ela fica registrada aqui porque é a regra que a coordenação usa pra
 # dizer em que turma uma criança entra, e o importador de CSV vai precisar dela
 # pra recusar matrícula em turma que não corresponde à idade.
+# As três atividades que o Centro tem hoje e que entraram no sistema. O futsal
+# conta duas vezes porque masculino e feminino treinam em dias diferentes e
+# competem separados.
+#
+# O Centro também oferece BALÉ e DANÇA, e eles não estão aqui de propósito: os
+# professores me disseram que nessas turmas o contato com as famílias já
+# acontece direto pelo grupo de WhatsApp, e que controle de frequência ali não
+# fazia falta agora. Preferi respeitar isso a entregar tela que ninguém pediu.
+# Quando quiserem, entra sem mexer em código nenhum.
+#
+# Já teve VÔLEI e BASQUETE. O basquete acabou e o vôlei está sem professor.
 MODALIDADES = [
     {
-        "slug": "futebol-masculino", "nome": "Futebol", "genero": "Masculino",
-        "descricao": "Categorias de base e várzea",
-        "cor": "#0f7a3d", "icone": "futebol",
+        "slug": "futsal-masculino", "nome": "Futsal", "genero": "Masculino",
+        "descricao": "Categorias de base, na quadra coberta",
+        "cor": "#0f7a3d", "icone": "futsal",
         "dias_aula": "1,3,5", "horario": "Ter e Qui, 18h às 20h · Sáb, 8h às 11h",
         "tem_convocacao": 1,
         "termo_aluno": "atleta", "termo_aula": "treino",
@@ -40,9 +51,9 @@ MODALIDADES = [
         ],
     },
     {
-        "slug": "futebol-feminino", "nome": "Futebol", "genero": "Feminino",
+        "slug": "futsal-feminino", "nome": "Futsal", "genero": "Feminino",
         "descricao": "Time feminino de base",
-        "cor": "#0f7a3d", "icone": "futebol",
+        "cor": "#0f7a3d", "icone": "futsal",
         "dias_aula": "0,2", "horario": "Seg e Qua, 18h às 20h",
         "tem_convocacao": 1,
         "termo_aluno": "atleta", "termo_aula": "treino",
@@ -50,33 +61,22 @@ MODALIDADES = [
         "turmas": [("Sub-13", (10, 13)), ("Sub-15", (14, 15)), ("Sub-17", (16, 17))],
     },
     {
-        "slug": "karate", "nome": "Karatê", "genero": "Misto",
-        "descricao": "Turmas por faixa, do branco ao verde",
-        "cor": "#6d28d9", "icone": "karate",
+        # Estava cadastrado como karatê, e está errado desde o começo: o que
+        # acontece no Centro é jiu-jitsu. Descobri olhando a foto do treino —
+        # tatame, trabalho de solo e imobilização, nada de golpe em pé. Karatê
+        # e jiu-jitsu não se organizam igual: um gradua por faixa etária e
+        # kata, o outro por faixa de graduação mesmo, e o adulto treina junto.
+        "slug": "jiu-jitsu", "nome": "Jiu-Jitsu", "genero": "Misto",
+        "descricao": "Turmas por faixa, em parceria com a ABOA",
+        "cor": "#6d28d9", "icone": "jiu-jitsu",
         "dias_aula": "0,2,4", "horario": "Seg, Qua e Sex, 17h às 18h30",
         "tem_convocacao": 0,
-        "termo_aluno": "aluno", "termo_aula": "aula",
-        "termo_aula_pl": "aulas", "artigo_aula": "uma",
+        "termo_aluno": "atleta", "termo_aula": "treino",
+        "termo_aula_pl": "treinos", "artigo_aula": "um",
         "turmas": [
-            ("Faixa branca", (8, 12)), ("Faixa amarela", (10, 14)),
-            ("Faixa laranja", (12, 16)), ("Faixa verde", (14, 17)),
+            ("Faixa branca", (8, 12)), ("Faixa cinza", (10, 14)),
+            ("Faixa amarela", (12, 16)), ("Faixa laranja", (14, 17)),
         ],
-    },
-    {
-        # O horário daqui eu ainda não confirmei com a professora. Deixo um
-        # valor plausível pra tela não subir vazia e corrijo pela tela de
-        # horário, que agora existe justamente pra isso — sem mexer em código.
-        "slug": "bale", "nome": "Balé", "genero": "Misto",
-        "descricao": "Turmas infantis, em parceria com a ABOA",
-        "cor": "#a1216b", "icone": "bale",
-        "dias_aula": "1,3", "horario": "Ter e Qui, 14h às 16h",
-        "tem_convocacao": 0,
-        "termo_aluno": "aluno", "termo_aula": "aula",
-        "termo_aula_pl": "aulas", "artigo_aula": "uma",
-        # Duas turmas, e não três: eu tinha aberto uma "Iniciação" de 5 a 8 anos
-        # e ela nasceu sem ninguém, porque a base de demonstração não tem
-        # criança dessa idade. Turma vazia na vitrine parece defeito do sistema.
-        "turmas": [("Infantil", (7, 12)), ("Juvenil", (13, 16))],
     },
 ]
 

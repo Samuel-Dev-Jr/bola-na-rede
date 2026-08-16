@@ -1,86 +1,84 @@
 ﻿nome,data_nascimento,responsavel_nome,responsavel_parentesco,responsavel_telefone,emergencia_nome,emergencia_telefone,alergias,condicoes,medicacao_continua,plano_saude,observacoes_medicas,autoriza_imagem,modalidade_slug,turma,data_matricula,numero,status
-Gael Machado Pereira,2013-10-11,Márcia Pereira,Mãe,(11) 97828-6322,Regina Alves,(11) 99063-4882,Amendoim,,,SUS,,1,futebol-masculino,Sub-13,2026-07-02,19,ativa
-João Cardoso Dias,2013-04-06,Terezinha Dias,Avó,(11) 92590-4107,Jorge Alves,(11) 95633-8860,,,Ritalina pela manhã,Convênio pelo trabalho,,1,futebol-masculino,Sub-13,2026-07-02,1,ativa
-Davi Soares Ferreira,2013-07-03,Marcos Ferreira,Pai,(11) 96665-7715,,,,Epilepsia controlada,Ritalina pela manhã,Convênio pelo trabalho,,0,futebol-masculino,Sub-13,2026-07-08,35,ativa
-Miguel Lima Rocha,2013-12-28,Marcos Rocha,Avô,(11) 96775-2989,Nelson Oliveira,(11) 99393-6537,Lactose,,,SUS,,0,futebol-masculino,Sub-13,2026-07-06,4,ativa
-Miguel Lima Rocha,2013-12-28,Marcos Rocha,Avô,(11) 96775-2989,Nelson Oliveira,(11) 99393-6537,Lactose,,,SUS,,0,karate,Faixa branca,2026-07-09,,ativa
-Heitor Silva Lopes,2014-05-16,Luiz Lopes,Mãe,(11) 96338-5208,,,,,,SUS,,1,futebol-masculino,Sub-13,2026-07-08,22,ativa
-Heitor Silva Lopes,2014-05-16,Luiz Lopes,Mãe,(11) 96338-5208,,,,,,SUS,,1,karate,Faixa branca,2026-07-03,,ativa
-Noah Silva Nunes,2012-08-24,Lourdes Nunes,Mãe,(11) 96781-1430,,,,,,SUS,,0,futebol-masculino,Sub-13,2026-07-03,20,ativa
-Henrique Rocha Ferreira,2012-10-13,Márcia Ferreira,Tia,(11) 95606-6476,Antônio Machado,(11) 99061-3676,,,,SUS,,1,futebol-masculino,Sub-13,2026-07-05,42,ativa
-Erick Oliveira Costa,2013-11-08,Neusa Costa,Pai,(11) 93261-2699,Márcia Ribeiro,(11) 93457-3471,,,,SUS,,1,futebol-masculino,Sub-13,2026-07-05,8,ativa
-Henrique Silva Barbosa,2012-09-05,Cleide Barbosa,Pai,(11) 99706-9666,Sandra Gomes,(11) 92063-1835,Frutos do mar,,,SUS,,1,futebol-masculino,Sub-13,2026-07-13,37,encerrada
-João Cardoso Costa,2013-01-14,Valdir Costa,Mãe,(11) 95345-9691,Sérgio Marques,(11) 99201-5564,,,,SUS,,1,futebol-masculino,Sub-13,2026-07-08,32,ativa
-Benjamim Cardoso Silva,2013-05-27,Sandra Silva,Tia,(11) 93838-6403,Marcos Moreira,(11) 95842-7862,,Asma,,Convênio pelo trabalho,,1,futebol-masculino,Sub-13,2026-07-07,38,ativa
-João Barbosa Carvalho,2013-03-27,Adriana Carvalho,Pai,(11) 97796-7566,Valdir Alves,(11) 92892-5235,,,,SUS,,1,futebol-masculino,Sub-13,2026-07-04,25,encerrada
-Erick Barbosa Lima,2014-03-01,Rosana Lima,Tia,(11) 98747-2204,Eliane Marques,(11) 96986-9195,,,,SUS,,1,futebol-masculino,Sub-13,2026-07-04,29,ativa
-Davi Barbosa Moreira,2014-07-23,Rosana Moreira,Tia,(11) 91891-6576,,,,,,Convênio pelo trabalho,,1,futebol-masculino,Sub-13,2026-07-08,30,ativa
-Davi Barbosa Moreira,2014-07-23,Rosana Moreira,Tia,(11) 91891-6576,,,,,,Convênio pelo trabalho,,0,karate,Faixa branca,2026-07-13,,encerrada
-Gabriel Silva Rodrigues,2014-02-17,Eliane Rodrigues,Tia,(11) 96561-4257,,,Poeira,,,SUS,,1,futebol-masculino,Sub-13,2026-07-13,2,ativa
-Gabriel Silva Rodrigues,2014-02-17,Eliane Rodrigues,Tia,(11) 96561-4257,,,Poeira,,,SUS,,1,karate,Faixa branca,2026-07-09,,ativa
-Theo Souza Rocha,2014-01-24,Vera Rocha,Avô,(11) 94609-4284,,,,,,SUS,,0,futebol-masculino,Sub-13,2026-07-11,51,ativa
-Theo Souza Rocha,2014-01-24,Vera Rocha,Avô,(11) 94609-4284,,,,,,SUS,,1,karate,Faixa amarela,2026-07-01,,ativa
-Benjamim Cardoso Lopes,2010-12-01,Cleide Lopes,Mãe,(11) 93928-8565,,,,,Ritalina pela manhã,SUS,,0,futebol-masculino,Sub-15,2026-07-06,27,ativa
-Gabriel Ribeiro Vieira,2011-04-24,Cleide Vieira,Avó,(11) 99829-5694,Vera Marques,(11) 94446-5085,,,,SUS,,1,futebol-masculino,Sub-15,2026-07-09,18,ativa
-Gabriel Ribeiro Vieira,2011-04-24,Cleide Vieira,Avó,(11) 99829-5694,Vera Marques,(11) 94446-5085,,,,SUS,,1,karate,Faixa laranja,2026-07-09,,ativa
-Pedro Rodrigues Martins,2011-09-15,Sônia Martins,Pai,(11) 98630-6458,,,,,,SUS,,1,futebol-masculino,Sub-15,2026-07-09,19,ativa
-Pedro Martins Lopes,2011-06-04,Márcia Lopes,Tia,(11) 92738-6925,Sônia Gomes,(11) 94772-5650,,,,SUS,,1,futebol-masculino,Sub-15,2026-07-04,42,ativa
-Pedro Martins Lopes,2011-06-04,Márcia Lopes,Tia,(11) 92738-6925,Sônia Gomes,(11) 94772-5650,,,,SUS,,0,karate,Faixa laranja,2026-07-12,,ativa
-Lucas Fernandes Machado,2012-02-09,José Machado,Pai,(11) 96897-4703,,,,,,SUS,,0,futebol-masculino,Sub-15,2026-07-10,4,ativa
-Heitor Silva Moreira,2011-12-15,Cláudia Moreira,Mãe,(11) 97315-6862,,,,,,SUS,,1,futebol-masculino,Sub-15,2026-07-05,31,ativa
-Heitor Silva Moreira,2011-12-15,Cláudia Moreira,Mãe,(11) 97315-6862,,,,,,SUS,,1,karate,Faixa amarela,2026-07-11,,ativa
-Heitor Moreira Dias,2011-07-26,Sônia Dias,Mãe,(11) 95473-9677,Marcos Nascimento,(11) 99479-9214,,Rinite alérgica,,SUS,,0,futebol-masculino,Sub-15,2026-07-07,44,ativa
-Heitor Moreira Dias,2011-07-26,Sônia Dias,Mãe,(11) 95473-9677,Marcos Nascimento,(11) 99479-9214,,Rinite alérgica,,SUS,,0,karate,Faixa laranja,2026-07-05,,ativa
-Caio Soares Costa,2012-03-12,Fátima Costa,Avô,(11) 96122-5559,Antônio Pereira,(11) 95791-8031,,,,SUS,,0,futebol-masculino,Sub-15,2026-07-13,41,ativa
-Bruno Rocha Teixeira,2011-05-06,Sandra Teixeira,Avó,(11) 96083-4193,,,,,,SUS,Já teve entorse no tornozelo direito.,0,futebol-masculino,Sub-15,2026-07-09,13,ativa
-Matheus Souza Dias,2017-05-12,Sônia Dias,Pai,(11) 97141-4669,,,,,,Convênio pelo trabalho,,0,futebol-masculino,Sub-11,2026-07-13,21,ativa
-Samuel Souza Martins,2016-03-26,Neusa Martins,Responsável legal,(11) 99919-8783,Antônio Santos,(11) 92849-9856,Amendoim,,,SUS,,1,futebol-masculino,Sub-11,2026-07-09,30,ativa
-Samuel Souza Martins,2016-03-26,Neusa Martins,Responsável legal,(11) 99919-8783,Antônio Santos,(11) 92849-9856,Amendoim,,,SUS,,1,karate,Faixa branca,2026-07-12,,ativa
-Otávio Teixeira Lopes,2016-01-26,Lourdes Lopes,Tia,(11) 97493-7107,,,,Epilepsia controlada,Ritalina pela manhã,SUS,,0,futebol-masculino,Sub-11,2026-07-05,32,ativa
-Pedro Machado Santos,2014-10-18,Rosana Santos,Avô,(11) 92830-7767,Lourdes Pereira,(11) 96692-5480,,Rinite alérgica,,SUS,,0,futebol-masculino,Sub-11,2026-07-02,33,ativa
-Pedro Machado Santos,2014-10-18,Rosana Santos,Avô,(11) 92830-7767,Lourdes Pereira,(11) 96692-5480,,Rinite alérgica,,SUS,,0,karate,Faixa amarela,2026-07-01,,ativa
-Gael Almeida Teixeira,2015-10-14,Regina Teixeira,Avó,(11) 93580-6359,Edson Vieira,(11) 94131-8916,Lactose,,Ritalina pela manhã,SUS,"Usa óculos, cuidado com bolada no rosto.",1,futebol-masculino,Sub-11,2026-07-04,5,ativa
-Erick Pereira Vieira,2015-01-23,Sônia Vieira,Pai,(11) 95330-3661,Vera Oliveira,(11) 92256-1272,,,,Convênio pelo trabalho,,0,futebol-masculino,Sub-11,2026-07-10,4,ativa
-Manuela Fernandes Machado,2015-05-03,Márcia Machado,Avó,(11) 91426-7390,Sérgio Ribeiro,(11) 94757-7066,,,,SUS,,1,futebol-feminino,Sub-13,2026-07-10,33,ativa
-Clara Martins Costa,2015-11-04,Wilson Costa,Avó,(11) 93845-6543,Vera Rocha,(11) 91315-9786,,,,Convênio pelo trabalho,Já teve entorse no tornozelo direito.,1,futebol-feminino,Sub-13,2026-07-07,29,ativa
-Elisa Ribeiro Rodrigues,2012-12-26,Cleide Rodrigues,Avô,(11) 96493-7376,,,,,Bombinha de asma quando necessário,SUS,,1,futebol-feminino,Sub-13,2026-07-10,28,ativa
-Elisa Ribeiro Rodrigues,2012-12-26,Cleide Rodrigues,Avô,(11) 96493-7376,,,,,Bombinha de asma quando necessário,SUS,,1,bale,Juvenil,2026-07-03,,ativa
-Helena Ferreira Dias,2016-04-23,Carlos Dias,Avô,(11) 94967-6630,Roberto Lima,(11) 98398-1747,,,,Convênio pelo trabalho,,1,futebol-feminino,Sub-13,2026-07-10,6,ativa
-Laura Nunes Gomes,2013-11-12,Jorge Gomes,Tia,(11) 97532-4019,Jorge Martins,(11) 98433-7587,,,,SUS,,0,futebol-feminino,Sub-13,2026-07-11,16,ativa
-Luiza Nunes Santos,2015-02-08,Vera Santos,Responsável legal,(11) 93667-1821,,,,,,SUS,,0,futebol-feminino,Sub-13,2026-07-06,21,ativa
-Luiza Nunes Santos,2015-02-08,Vera Santos,Responsável legal,(11) 93667-1821,,,,,,SUS,,0,karate,Faixa branca,2026-07-13,,ativa
-Esther Dias Barbosa,2014-10-05,José Barbosa,Responsável legal,(11) 99678-6598,,,,Bronquite,,SUS,,1,futebol-feminino,Sub-13,2026-07-05,35,ativa
-Esther Dias Barbosa,2014-10-05,José Barbosa,Responsável legal,(11) 99678-6598,,,,Bronquite,,SUS,,0,karate,Faixa amarela,2026-07-08,,ativa
-Maria Rocha Lopes,2013-10-01,Edson Lopes,Avô,(11) 95047-3767,Vera Soares,(11) 97484-3088,,,,SUS,,1,futebol-feminino,Sub-13,2026-07-11,47,ativa
-Maria Rocha Lopes,2013-10-01,Edson Lopes,Avô,(11) 95047-3767,Vera Soares,(11) 97484-3088,,,,SUS,,1,bale,Infantil,2026-07-02,,ativa
-Esther Teixeira Martins,2014-05-05,Sônia Martins,Mãe,(11) 95654-8015,Rosana Fernandes,(11) 94730-9556,,,,SUS,,0,futebol-feminino,Sub-13,2026-07-05,25,ativa
-Esther Teixeira Martins,2014-05-05,Sônia Martins,Mãe,(11) 95654-8015,Rosana Fernandes,(11) 94730-9556,,,,SUS,,0,karate,Faixa branca,2026-07-01,,ativa
-Luiza Soares Lima,2014-01-28,Sérgio Lima,Avô,(11) 95556-8234,,,,Bronquite,,Convênio pelo trabalho,,0,futebol-feminino,Sub-13,2026-07-11,34,ativa
-Luiza Soares Lima,2014-01-28,Sérgio Lima,Avô,(11) 95556-8234,,,,Bronquite,,Convênio pelo trabalho,,0,bale,Infantil,2026-07-11,,ativa
-Antonella Freitas Dias,2015-02-05,Terezinha Dias,Avô,(11) 91067-7640,,,,,,SUS,,1,futebol-feminino,Sub-13,2026-07-07,20,ativa
-Antonella Freitas Dias,2015-02-05,Terezinha Dias,Avô,(11) 91067-7640,,,,,,SUS,,0,karate,Faixa branca,2026-07-10,,ativa
-Antonella Lima Lopes,2013-01-19,Sérgio Lopes,Avô,(11) 98844-1315,Regina Carvalho,(11) 95605-3075,,,,SUS,,1,futebol-feminino,Sub-13,2026-07-06,22,ativa
-Antonella Lima Lopes,2013-01-19,Sérgio Lopes,Avô,(11) 98844-1315,Regina Carvalho,(11) 95605-3075,,,,SUS,,1,bale,Juvenil,2026-07-08,,ativa
-Valentina Carvalho Almeida,2015-06-03,Terezinha Almeida,Mãe,(11) 92898-4553,Rosana Silva,(11) 95346-7832,,Bronquite,,SUS,,1,futebol-feminino,Sub-13,2026-07-13,13,ativa
-Valentina Carvalho Almeida,2015-06-03,Terezinha Almeida,Mãe,(11) 92898-4553,Rosana Silva,(11) 95346-7832,,Bronquite,,SUS,,0,karate,Faixa branca,2026-07-01,,ativa
-Isabella Nascimento Nunes,2016-05-19,Marcos Nunes,Pai,(11) 96509-5900,,,,,,SUS,,0,futebol-feminino,Sub-13,2026-07-05,51,encerrada
-Ayla Martins Machado,2011-11-01,Cleide Machado,Pai,(11) 97060-3283,,,Lactose,,,Convênio pelo trabalho,,1,karate,Faixa amarela,2026-07-03,,ativa
-Sarah Cardoso Teixeira,2013-01-17,Sandra Teixeira,Avó,(11) 98340-5878,Cleide Nascimento,(11) 92899-2408,,,,SUS,,1,bale,Juvenil,2026-07-01,,ativa
-Sarah Cardoso Teixeira,2013-01-17,Sandra Teixeira,Avó,(11) 98340-5878,Cleide Nascimento,(11) 92899-2408,,,,SUS,,1,futebol-feminino,Sub-13,2026-07-06,1,ativa
-Sarah Cardoso Teixeira,2013-01-17,Sandra Teixeira,Avó,(11) 98340-5878,Cleide Nascimento,(11) 92899-2408,,,,SUS,,1,karate,Faixa amarela,2026-07-11,,ativa
-Alice Lima Ferreira,2012-12-25,Silvana Ferreira,Tia,(11) 99519-3569,Vera Teixeira,(11) 97168-4548,,,,SUS,,1,bale,Juvenil,2026-07-12,,ativa
-Alice Lima Ferreira,2012-12-25,Silvana Ferreira,Tia,(11) 99519-3569,Vera Teixeira,(11) 97168-4548,,,,SUS,,1,karate,Faixa amarela,2026-07-05,,ativa
-Lívia Lima Pereira,2014-12-02,Cleide Pereira,Tia,(11) 93103-2050,Neusa Martins,(11) 96456-7159,,Epilepsia controlada,,SUS,,0,bale,Infantil,2026-07-09,,ativa
-Antônio Nunes Martins,1995-01-03,Antônio Nunes Martins,A própria pessoa,(11) 94626-8453,,,,,,SUS,,1,karate,Faixa verde,2026-07-04,,ativa
-Luiz Teixeira Silva,1986-09-24,Luiz Teixeira Silva,A própria pessoa,(11) 97702-7351,Cleide Marques,(11) 98318-4951,Picada de abelha,,,SUS,,1,futebol-masculino,Sub-17,2026-07-09,1,ativa
-Valdir Machado Costa,1987-04-05,Valdir Machado Costa,A própria pessoa,(11) 95710-9476,Adriana Freitas,(11) 95871-7666,,,,SUS,,0,karate,Faixa verde,2026-07-03,,ativa
-Paulo Nunes Soares,2006-07-15,Paulo Nunes Soares,A própria pessoa,(11) 99330-7090,Adriana Teixeira,(11) 98988-5039,,,,SUS,,0,futebol-masculino,Sub-17,2026-07-07,2,ativa
-Sérgio Freitas Dias,1985-07-15,Sérgio Freitas Dias,A própria pessoa,(11) 97849-4818,,,,,,SUS,,1,karate,Faixa verde,2026-07-08,,ativa
-Wilson Ferreira Souza,1969-04-20,Wilson Ferreira Souza,A própria pessoa,(11) 92177-2650,Roberto Silva,(11) 95027-8105,,,,SUS,,0,futebol-masculino,Sub-17,2026-07-03,3,ativa
-Paulo Pereira Marques,1974-05-14,Paulo Pereira Marques,A própria pessoa,(11) 99649-3201,,,,,,SUS,,1,karate,Faixa verde,2026-07-03,,ativa
-Nicolas Martins Santos,2010-02-25,Carlos Santos,Responsável legal,(11) 91513-2657,Márcia Vieira,(11) 94576-3838,,,Anti-histamínico no inverno,SUS,,1,futebol-masculino,Sub-17,2026-07-11,4,ativa
-João Vieira Almeida,2009-02-01,Cleide Almeida,Avó,(11) 94077-4911,Vera Lima,(11) 99393-9014,,,,SUS,Não pode fazer esforço no calor sem pausa.,1,karate,Faixa verde,2026-07-04,,ativa
-Enzo Souza Costa,2010-07-07,Sandra Costa,Avó,(11) 93485-4174,Marcos Carvalho,(11) 95630-9953,,,,SUS,,1,futebol-masculino,Sub-17,2026-07-03,5,ativa
-Pedro Cardoso Teixeira,2009-01-16,Cláudia Teixeira,Avó,(11) 93781-6148,Sérgio Machado,(11) 91143-2927,,,,SUS,Não pode fazer esforço no calor sem pausa.,1,karate,Faixa verde,2026-07-05,,ativa
-Helena Vieira Costa,2011-11-12,Vera Costa,Avó,(11) 91624-4287,Jorge Freitas,(11) 95063-5947,,,,SUS,,0,futebol-feminino,Sub-15,2026-07-04,1,ativa
-Manuela Soares Pereira,2015-03-07,Fátima Pereira,Avó,(11) 92621-2237,Cleide Santos,(11) 96632-7750,,,,SUS,,0,bale,Infantil,2026-07-07,,ativa
+Gael Machado Pereira,2013-10-11,Márcia Pereira,Mãe,(11) 97828-6322,Regina Alves,(11) 99063-4882,Amendoim,,,SUS,,1,futsal-masculino,Sub-13,2026-07-02,19,ativa
+João Cardoso Dias,2013-04-06,Terezinha Dias,Avó,(11) 92590-4107,Jorge Alves,(11) 95633-8860,,,Ritalina pela manhã,Convênio pelo trabalho,,1,futsal-masculino,Sub-13,2026-07-02,1,ativa
+Davi Soares Ferreira,2013-07-03,Marcos Ferreira,Pai,(11) 96665-7715,,,,Epilepsia controlada,Ritalina pela manhã,Convênio pelo trabalho,,0,futsal-masculino,Sub-13,2026-07-08,35,ativa
+Miguel Lima Rocha,2013-12-28,Marcos Rocha,Avô,(11) 96775-2989,Nelson Oliveira,(11) 99393-6537,Lactose,,,SUS,,0,futsal-masculino,Sub-13,2026-07-06,4,ativa
+Miguel Lima Rocha,2013-12-28,Marcos Rocha,Avô,(11) 96775-2989,Nelson Oliveira,(11) 99393-6537,Lactose,,,SUS,,0,jiu-jitsu,Faixa branca,2026-07-09,,ativa
+Heitor Silva Lopes,2014-05-16,Luiz Lopes,Mãe,(11) 96338-5208,,,,,,SUS,,1,futsal-masculino,Sub-13,2026-07-08,22,ativa
+Heitor Silva Lopes,2014-05-16,Luiz Lopes,Mãe,(11) 96338-5208,,,,,,SUS,,1,jiu-jitsu,Faixa branca,2026-07-03,,ativa
+Noah Silva Nunes,2012-08-24,Lourdes Nunes,Mãe,(11) 96781-1430,,,,,,SUS,,0,futsal-masculino,Sub-13,2026-07-03,20,ativa
+Henrique Rocha Ferreira,2012-10-13,Márcia Ferreira,Tia,(11) 95606-6476,Antônio Machado,(11) 99061-3676,,,,SUS,,1,futsal-masculino,Sub-13,2026-07-05,42,ativa
+Erick Oliveira Costa,2013-11-08,Neusa Costa,Pai,(11) 93261-2699,Márcia Ribeiro,(11) 93457-3471,,,,SUS,,1,futsal-masculino,Sub-13,2026-07-05,8,ativa
+Henrique Silva Barbosa,2012-09-05,Cleide Barbosa,Pai,(11) 99706-9666,Sandra Gomes,(11) 92063-1835,Frutos do mar,,,SUS,,1,futsal-masculino,Sub-13,2026-07-13,37,encerrada
+João Cardoso Costa,2013-01-14,Valdir Costa,Mãe,(11) 95345-9691,Sérgio Marques,(11) 99201-5564,,,,SUS,,1,futsal-masculino,Sub-13,2026-07-08,32,ativa
+Benjamim Cardoso Silva,2013-05-27,Sandra Silva,Tia,(11) 93838-6403,Marcos Moreira,(11) 95842-7862,,Asma,,Convênio pelo trabalho,,1,futsal-masculino,Sub-13,2026-07-07,38,ativa
+João Barbosa Carvalho,2013-03-27,Adriana Carvalho,Pai,(11) 97796-7566,Valdir Alves,(11) 92892-5235,,,,SUS,,1,futsal-masculino,Sub-13,2026-07-04,25,encerrada
+Erick Barbosa Lima,2014-03-01,Rosana Lima,Tia,(11) 98747-2204,Eliane Marques,(11) 96986-9195,,,,SUS,,1,futsal-masculino,Sub-13,2026-07-04,29,ativa
+Davi Barbosa Moreira,2014-07-23,Rosana Moreira,Tia,(11) 91891-6576,,,,,,Convênio pelo trabalho,,1,futsal-masculino,Sub-13,2026-07-08,30,ativa
+Davi Barbosa Moreira,2014-07-23,Rosana Moreira,Tia,(11) 91891-6576,,,,,,Convênio pelo trabalho,,0,jiu-jitsu,Faixa branca,2026-07-13,,encerrada
+Gabriel Silva Rodrigues,2014-02-17,Eliane Rodrigues,Tia,(11) 96561-4257,,,Poeira,,,SUS,,1,futsal-masculino,Sub-13,2026-07-13,2,ativa
+Gabriel Silva Rodrigues,2014-02-17,Eliane Rodrigues,Tia,(11) 96561-4257,,,Poeira,,,SUS,,1,jiu-jitsu,Faixa branca,2026-07-09,,ativa
+Theo Souza Rocha,2014-01-24,Vera Rocha,Avô,(11) 94609-4284,,,,,,SUS,,0,futsal-masculino,Sub-13,2026-07-11,51,ativa
+Theo Souza Rocha,2014-01-24,Vera Rocha,Avô,(11) 94609-4284,,,,,,SUS,,1,jiu-jitsu,Faixa cinza,2026-07-01,,ativa
+Benjamim Cardoso Lopes,2010-12-01,Cleide Lopes,Mãe,(11) 93928-8565,,,,,Ritalina pela manhã,SUS,,0,futsal-masculino,Sub-15,2026-07-06,27,ativa
+Gabriel Ribeiro Vieira,2011-04-24,Cleide Vieira,Avó,(11) 99829-5694,Vera Marques,(11) 94446-5085,,,,SUS,,1,futsal-masculino,Sub-15,2026-07-09,18,ativa
+Gabriel Ribeiro Vieira,2011-04-24,Cleide Vieira,Avó,(11) 99829-5694,Vera Marques,(11) 94446-5085,,,,SUS,,1,jiu-jitsu,Faixa amarela,2026-07-09,,ativa
+Pedro Rodrigues Martins,2011-09-15,Sônia Martins,Pai,(11) 98630-6458,,,,,,SUS,,1,futsal-masculino,Sub-15,2026-07-09,19,ativa
+Pedro Martins Lopes,2011-06-04,Márcia Lopes,Tia,(11) 92738-6925,Sônia Gomes,(11) 94772-5650,,,,SUS,,1,futsal-masculino,Sub-15,2026-07-04,42,ativa
+Pedro Martins Lopes,2011-06-04,Márcia Lopes,Tia,(11) 92738-6925,Sônia Gomes,(11) 94772-5650,,,,SUS,,0,jiu-jitsu,Faixa amarela,2026-07-12,,ativa
+Lucas Fernandes Machado,2012-02-09,José Machado,Pai,(11) 96897-4703,,,,,,SUS,,0,futsal-masculino,Sub-15,2026-07-10,4,ativa
+Heitor Silva Moreira,2011-12-15,Cláudia Moreira,Mãe,(11) 97315-6862,,,,,,SUS,,1,futsal-masculino,Sub-15,2026-07-05,31,ativa
+Heitor Silva Moreira,2011-12-15,Cláudia Moreira,Mãe,(11) 97315-6862,,,,,,SUS,,1,jiu-jitsu,Faixa cinza,2026-07-11,,ativa
+Heitor Moreira Dias,2011-07-26,Sônia Dias,Mãe,(11) 95473-9677,Marcos Nascimento,(11) 99479-9214,,Rinite alérgica,,SUS,,0,futsal-masculino,Sub-15,2026-07-07,44,ativa
+Heitor Moreira Dias,2011-07-26,Sônia Dias,Mãe,(11) 95473-9677,Marcos Nascimento,(11) 99479-9214,,Rinite alérgica,,SUS,,0,jiu-jitsu,Faixa amarela,2026-07-05,,ativa
+Caio Soares Costa,2012-03-12,Fátima Costa,Avô,(11) 96122-5559,Antônio Pereira,(11) 95791-8031,,,,SUS,,0,futsal-masculino,Sub-15,2026-07-13,41,ativa
+Bruno Rocha Teixeira,2011-05-06,Sandra Teixeira,Avó,(11) 96083-4193,,,,,,SUS,Já teve entorse no tornozelo direito.,0,futsal-masculino,Sub-15,2026-07-09,13,ativa
+Matheus Souza Dias,2017-05-12,Sônia Dias,Pai,(11) 97141-4669,,,,,,Convênio pelo trabalho,,0,futsal-masculino,Sub-11,2026-07-13,21,ativa
+Samuel Souza Martins,2016-03-26,Neusa Martins,Responsável legal,(11) 99919-8783,Antônio Santos,(11) 92849-9856,Amendoim,,,SUS,,1,futsal-masculino,Sub-11,2026-07-09,30,ativa
+Samuel Souza Martins,2016-03-26,Neusa Martins,Responsável legal,(11) 99919-8783,Antônio Santos,(11) 92849-9856,Amendoim,,,SUS,,1,jiu-jitsu,Faixa branca,2026-07-12,,ativa
+Otávio Teixeira Lopes,2016-01-26,Lourdes Lopes,Tia,(11) 97493-7107,,,,Epilepsia controlada,Ritalina pela manhã,SUS,,0,futsal-masculino,Sub-11,2026-07-05,32,ativa
+Pedro Machado Santos,2014-10-18,Rosana Santos,Avô,(11) 92830-7767,Lourdes Pereira,(11) 96692-5480,,Rinite alérgica,,SUS,,0,futsal-masculino,Sub-11,2026-07-02,33,ativa
+Pedro Machado Santos,2014-10-18,Rosana Santos,Avô,(11) 92830-7767,Lourdes Pereira,(11) 96692-5480,,Rinite alérgica,,SUS,,0,jiu-jitsu,Faixa cinza,2026-07-01,,ativa
+Gael Almeida Teixeira,2015-10-14,Regina Teixeira,Avó,(11) 93580-6359,Edson Vieira,(11) 94131-8916,Lactose,,Ritalina pela manhã,SUS,"Usa óculos, cuidado com bolada no rosto.",1,futsal-masculino,Sub-11,2026-07-04,5,ativa
+Erick Pereira Vieira,2015-01-23,Sônia Vieira,Pai,(11) 95330-3661,Vera Oliveira,(11) 92256-1272,,,,Convênio pelo trabalho,,0,futsal-masculino,Sub-11,2026-07-10,4,ativa
+Manuela Fernandes Machado,2015-05-03,Márcia Machado,Avó,(11) 91426-7390,Sérgio Ribeiro,(11) 94757-7066,,,,SUS,,1,futsal-feminino,Sub-13,2026-07-10,33,ativa
+Clara Martins Costa,2015-11-04,Wilson Costa,Avó,(11) 93845-6543,Vera Rocha,(11) 91315-9786,,,,Convênio pelo trabalho,Já teve entorse no tornozelo direito.,1,futsal-feminino,Sub-13,2026-07-07,29,ativa
+Elisa Ribeiro Rodrigues,2012-12-26,Cleide Rodrigues,Avô,(11) 96493-7376,,,,,Bombinha de asma quando necessário,SUS,,1,futsal-feminino,Sub-13,2026-07-10,28,ativa
+Elisa Ribeiro Rodrigues,2012-12-26,Cleide Rodrigues,Avô,(11) 96493-7376,,,,,Bombinha de asma quando necessário,SUS,,1,jiu-jitsu,Faixa cinza,2026-07-03,,ativa
+Helena Ferreira Dias,2016-04-23,Carlos Dias,Avô,(11) 94967-6630,Roberto Lima,(11) 98398-1747,,,,Convênio pelo trabalho,,1,futsal-feminino,Sub-13,2026-07-10,6,ativa
+Laura Nunes Gomes,2013-11-12,Jorge Gomes,Tia,(11) 97532-4019,Jorge Martins,(11) 98433-7587,,,,SUS,,0,futsal-feminino,Sub-13,2026-07-11,16,ativa
+Luiza Nunes Santos,2015-02-08,Vera Santos,Responsável legal,(11) 93667-1821,,,,,,SUS,,0,futsal-feminino,Sub-13,2026-07-06,21,ativa
+Luiza Nunes Santos,2015-02-08,Vera Santos,Responsável legal,(11) 93667-1821,,,,,,SUS,,0,jiu-jitsu,Faixa branca,2026-07-13,,ativa
+Esther Dias Barbosa,2014-10-05,José Barbosa,Responsável legal,(11) 99678-6598,,,,Bronquite,,SUS,,1,futsal-feminino,Sub-13,2026-07-05,35,ativa
+Esther Dias Barbosa,2014-10-05,José Barbosa,Responsável legal,(11) 99678-6598,,,,Bronquite,,SUS,,0,jiu-jitsu,Faixa cinza,2026-07-08,,ativa
+Maria Rocha Lopes,2013-10-01,Edson Lopes,Avô,(11) 95047-3767,Vera Soares,(11) 97484-3088,,,,SUS,,1,futsal-feminino,Sub-13,2026-07-11,47,ativa
+Maria Rocha Lopes,2013-10-01,Edson Lopes,Avô,(11) 95047-3767,Vera Soares,(11) 97484-3088,,,,SUS,,1,jiu-jitsu,Faixa branca,2026-07-02,,ativa
+Esther Teixeira Martins,2014-05-05,Sônia Martins,Mãe,(11) 95654-8015,Rosana Fernandes,(11) 94730-9556,,,,SUS,,0,futsal-feminino,Sub-13,2026-07-05,25,ativa
+Esther Teixeira Martins,2014-05-05,Sônia Martins,Mãe,(11) 95654-8015,Rosana Fernandes,(11) 94730-9556,,,,SUS,,0,jiu-jitsu,Faixa branca,2026-07-01,,ativa
+Luiza Soares Lima,2014-01-28,Sérgio Lima,Avô,(11) 95556-8234,,,,Bronquite,,Convênio pelo trabalho,,0,futsal-feminino,Sub-13,2026-07-11,34,ativa
+Luiza Soares Lima,2014-01-28,Sérgio Lima,Avô,(11) 95556-8234,,,,Bronquite,,Convênio pelo trabalho,,0,jiu-jitsu,Faixa branca,2026-07-11,,ativa
+Antonella Freitas Dias,2015-02-05,Terezinha Dias,Avô,(11) 91067-7640,,,,,,SUS,,1,futsal-feminino,Sub-13,2026-07-07,20,ativa
+Antonella Freitas Dias,2015-02-05,Terezinha Dias,Avô,(11) 91067-7640,,,,,,SUS,,0,jiu-jitsu,Faixa branca,2026-07-10,,ativa
+Antonella Lima Lopes,2013-01-19,Sérgio Lopes,Avô,(11) 98844-1315,Regina Carvalho,(11) 95605-3075,,,,SUS,,1,futsal-feminino,Sub-13,2026-07-06,22,ativa
+Antonella Lima Lopes,2013-01-19,Sérgio Lopes,Avô,(11) 98844-1315,Regina Carvalho,(11) 95605-3075,,,,SUS,,1,jiu-jitsu,Faixa cinza,2026-07-08,,ativa
+Valentina Carvalho Almeida,2015-06-03,Terezinha Almeida,Mãe,(11) 92898-4553,Rosana Silva,(11) 95346-7832,,Bronquite,,SUS,,1,futsal-feminino,Sub-13,2026-07-13,13,ativa
+Valentina Carvalho Almeida,2015-06-03,Terezinha Almeida,Mãe,(11) 92898-4553,Rosana Silva,(11) 95346-7832,,Bronquite,,SUS,,0,jiu-jitsu,Faixa branca,2026-07-01,,ativa
+Isabella Nascimento Nunes,2016-05-19,Marcos Nunes,Pai,(11) 96509-5900,,,,,,SUS,,0,futsal-feminino,Sub-13,2026-07-05,51,encerrada
+Ayla Martins Machado,2011-11-01,Cleide Machado,Pai,(11) 97060-3283,,,Lactose,,,Convênio pelo trabalho,,1,jiu-jitsu,Faixa cinza,2026-07-03,,ativa
+Sarah Cardoso Teixeira,2013-01-17,Sandra Teixeira,Avó,(11) 98340-5878,Cleide Nascimento,(11) 92899-2408,,,,SUS,,1,futsal-feminino,Sub-13,2026-07-06,1,ativa
+Sarah Cardoso Teixeira,2013-01-17,Sandra Teixeira,Avó,(11) 98340-5878,Cleide Nascimento,(11) 92899-2408,,,,SUS,,1,jiu-jitsu,Faixa cinza,2026-07-11,,ativa
+Alice Lima Ferreira,2012-12-25,Silvana Ferreira,Tia,(11) 99519-3569,Vera Teixeira,(11) 97168-4548,,,,SUS,,1,jiu-jitsu,Faixa cinza,2026-07-05,,ativa
+Lívia Lima Pereira,2014-12-02,Cleide Pereira,Tia,(11) 93103-2050,Neusa Martins,(11) 96456-7159,,Epilepsia controlada,,SUS,,0,jiu-jitsu,Faixa branca,2026-07-09,,ativa
+Antônio Nunes Martins,1995-01-03,Antônio Nunes Martins,A própria pessoa,(11) 94626-8453,,,,,,SUS,,1,jiu-jitsu,Faixa laranja,2026-07-04,,ativa
+Luiz Teixeira Silva,1986-09-24,Luiz Teixeira Silva,A própria pessoa,(11) 97702-7351,Cleide Marques,(11) 98318-4951,Picada de abelha,,,SUS,,1,futsal-masculino,Sub-17,2026-07-09,1,ativa
+Valdir Machado Costa,1987-04-05,Valdir Machado Costa,A própria pessoa,(11) 95710-9476,Adriana Freitas,(11) 95871-7666,,,,SUS,,0,jiu-jitsu,Faixa laranja,2026-07-03,,ativa
+Paulo Nunes Soares,2006-07-15,Paulo Nunes Soares,A própria pessoa,(11) 99330-7090,Adriana Teixeira,(11) 98988-5039,,,,SUS,,0,futsal-masculino,Sub-17,2026-07-07,2,ativa
+Sérgio Freitas Dias,1985-07-15,Sérgio Freitas Dias,A própria pessoa,(11) 97849-4818,,,,,,SUS,,1,jiu-jitsu,Faixa laranja,2026-07-08,,ativa
+Wilson Ferreira Souza,1969-04-20,Wilson Ferreira Souza,A própria pessoa,(11) 92177-2650,Roberto Silva,(11) 95027-8105,,,,SUS,,0,futsal-masculino,Sub-17,2026-07-03,3,ativa
+Paulo Pereira Marques,1974-05-14,Paulo Pereira Marques,A própria pessoa,(11) 99649-3201,,,,,,SUS,,1,jiu-jitsu,Faixa laranja,2026-07-03,,ativa
+Nicolas Martins Santos,2010-02-25,Carlos Santos,Responsável legal,(11) 91513-2657,Márcia Vieira,(11) 94576-3838,,,Anti-histamínico no inverno,SUS,,1,futsal-masculino,Sub-17,2026-07-11,4,ativa
+João Vieira Almeida,2009-02-01,Cleide Almeida,Avó,(11) 94077-4911,Vera Lima,(11) 99393-9014,,,,SUS,Não pode fazer esforço no calor sem pausa.,1,jiu-jitsu,Faixa laranja,2026-07-04,,ativa
+Enzo Souza Costa,2010-07-07,Sandra Costa,Avó,(11) 93485-4174,Marcos Carvalho,(11) 95630-9953,,,,SUS,,1,futsal-masculino,Sub-17,2026-07-03,5,ativa
+Pedro Cardoso Teixeira,2009-01-16,Cláudia Teixeira,Avó,(11) 93781-6148,Sérgio Machado,(11) 91143-2927,,,,SUS,Não pode fazer esforço no calor sem pausa.,1,jiu-jitsu,Faixa laranja,2026-07-05,,ativa
+Helena Vieira Costa,2011-11-12,Vera Costa,Avó,(11) 91624-4287,Jorge Freitas,(11) 95063-5947,,,,SUS,,0,futsal-feminino,Sub-15,2026-07-04,1,ativa
+Manuela Soares Pereira,2015-03-07,Fátima Pereira,Avó,(11) 92621-2237,Cleide Santos,(11) 96632-7750,,,,SUS,,0,jiu-jitsu,Faixa branca,2026-07-07,,ativa

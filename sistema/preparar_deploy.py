@@ -65,19 +65,19 @@ def criar_eventos(conexao) -> int:
     # parecia defeito do sistema. Depois de conferir a base, os dois jogos de
     # futebol vão pro Sub-13, que é onde os times fecham.
     jogos = [
-        ("futebol-masculino", "Sub-13", "Copa Regional de Base — 1ª rodada",
+        ("futsal-masculino", "Sub-13", "Copa Regional de Base — 1ª rodada",
          "Grêmio do Jardim Maria Rosa", hoje + timedelta(days=9),
-         "Campo do Centro de Cultura e Esporte",
+         "Campo do Centro de Cultura e Esportes",
          "Chegar 40 minutos antes, uniforme completo."),
-        ("futebol-feminino", "Sub-13", "Amistoso de preparação",
+        ("futsal-feminino", "Sub-13", "Amistoso de preparação",
          "Meninas do Parque Pinheiros", hoje + timedelta(days=16),
          "Quadra da Escola Estadual Jardim Record", None),
         # Sub-13 e não Sub-15: só o Sub-13 tem 11 pessoas pra fechar o time. Com
         # o Sub-15 o próprio preparar_deploy avisava "9 elegíveis para 11
         # posições" e a tela de escalação subia com buraco no campo.
-        ("futebol-masculino", "Sub-13", "Torneio interbairros",
+        ("futsal-masculino", "Sub-13", "Torneio interbairros",
          "União Taboão", hoje - timedelta(days=5),
-         "Campo do Centro de Cultura e Esporte",
+         "Campo do Centro de Cultura e Esportes",
          "Levar documento com foto."),
     ]
 
@@ -156,30 +156,30 @@ def criar_planos(conexao) -> int:
     Planos de treino de exemplo, pelo mesmo motivo dos eventos: senão a tela
     sobe vazia e o módulo não mostra pra que serve.
 
-    Pus um de cada tipo — da modalidade inteira, de uma turma só, e um de karatê
-    pra aparecer o "aula" no lugar de "treino". Datas relativas a hoje, senão
-    plano da semana passada parece sistema abandonado.
+    Pus um de cada tipo: da modalidade inteira e de uma turma só, pra dar pra ver
+    que o filtro de turma existe. Datas relativas a hoje, senão plano da semana
+    passada parece sistema abandonado.
     """
     hoje = date.today()
 
     planos = [
-        ("futebol-masculino", "Sub-13", hoje + timedelta(days=1),
+        ("futsal-masculino", "Sub-13", hoje + timedelta(days=1),
          "Finalização e jogo coletivo",
          "Aquecimento e corrida leve — 15min\n"
          "Passe em duplas, dois toques\n"
          "Finalização de fora da área\n"
          "Coletivo 20min",
          "Caneleira e garrafa de água"),
-        ("futebol-masculino", None, hoje + timedelta(days=3),
+        ("futsal-masculino", None, hoje + timedelta(days=3),
          "Treino físico",
          "Circuito de resistência\nTiros de 30m\nAlongamento",
          None),
-        ("bale", None, hoje,
+        ("jiu-jitsu", None, hoje,
          "Barra e alongamento",
          "Aquecimento no chão\nExercícios de barra\n"
          "Posições de pés\nAlongamento",
          "Sapatilha e meia-calça"),
-        ("karate", "Faixa branca", hoje + timedelta(days=2),
+        ("jiu-jitsu", "Faixa branca", hoje + timedelta(days=2),
          "Kihon — base e postura",
          "Aquecimento\nZenkutsu-dachi, repetição\n"
          "Oi-zuki descendo o dojo\nAlongamento e meditação",

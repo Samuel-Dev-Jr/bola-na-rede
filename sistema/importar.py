@@ -10,8 +10,8 @@ Feito pra transcrever o caderno de papel da escolinha. São dois arquivos:
                   matrícula funcionando na entrada de dados.
 
                   A coluna `numero` é o número da camisa, opcional, de 1 a 99.
-                  Ele é da matrícula e não da pessoa: dá pra ser 10 no futebol e
-                  7 no basquete. Repetido dentro da mesma turma é recusado.
+                  Ele é da matrícula e não da pessoa: dá pra ser 10 no futsal
+                  masculino e 7 no feminino. Repetido na mesma turma é recusado.
 
   presencas.csv   formato largo, igual ao caderno: nome na vertical, uma coluna
                   por data, e P / F / J na célula. Célula vazia significa que

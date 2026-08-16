@@ -12,9 +12,9 @@ Dois detalhes que mudam tudo por aqui:
    modalidade. A tela da pessoa é o único lugar que junta tudo de novo.
 
 2. Cada modalidade tem dias de aula diferentes, então a tirinha de presença de
-   quem faz karatê é montada contra o calendário do karatê. Se eu usasse um
-   calendário só, quem joga vôlei apareceria faltando na terça, dia em que o
-   vôlei nem abre.
+   quem faz jiu-jitsu é montada contra o calendário do jiu-jitsu. Se eu usasse
+   um calendário só, quem joga futsal feminino apareceria faltando na terça, dia
+   em que aquela turma nem abre.
 """
 
 import os
@@ -906,7 +906,7 @@ def mensagem_whatsapp(evento: dict) -> str:
     partes += [
         "",
         "Responsáveis, confirmem a presença respondendo aqui no grupo.",
-        "_Centro de Cultura e Esporte — Jardim Elizabete_",
+        "_Centro de Cultura e Esportes — Jardim Elizabete_",
     ]
     return "\n".join(partes)
 

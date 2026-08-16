@@ -9,10 +9,10 @@ import _acesso
 BASE = "http://127.0.0.1:5000"
 ROTAS = [
     "/", "/pessoas", "/pessoas/1", "/pessoas/1/editar", "/pessoas/nova",
-    "/m/futebol-masculino", "/m/futebol-feminino", "/m/bale", "/m/karate",
-    "/m/futebol-masculino/alunos", "/m/futebol-masculino/matricular",
-    "/m/futebol-masculino/chamada", "/m/karate/agenda",
-    "/m/futebol-masculino/convocacao", "/convocacao/1",
+    "/m/futsal-masculino", "/m/futsal-feminino", "/m/jiu-jitsu", "/m/jiu-jitsu",
+    "/m/futsal-masculino/alunos", "/m/futsal-masculino/matricular",
+    "/m/futsal-masculino/chamada", "/m/jiu-jitsu/agenda",
+    "/m/futsal-masculino/convocacao", "/convocacao/1",
     "/configuracoes", "/entrar", "/minha-area", "/usuarios",
 ]
 LARGURAS = [(390, "mobile"), (768, "tablet"), (1440, "desktop")]

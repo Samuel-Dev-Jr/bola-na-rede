@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "_trilha.html" as nav %}
 
-{% block titulo %}Matrícula de {{ matricula.nome }} — Centro de Cultura e Esporte{% endblock %}
+{% block titulo %}Matrícula de {{ matricula.nome }} — Centro de Cultura e Esportes{% endblock %}
 
 {% set volta = url_for('pessoa_detalhe', pessoa_id=matricula.pessoa_id) %}
 
