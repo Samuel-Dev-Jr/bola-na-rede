@@ -11,7 +11,7 @@ import hmac
 import os
 import secrets
 import unicodedata
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import flash, g, redirect, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -40,6 +40,9 @@ VARIAVEL_CHAVE = "CENTRO_CHAVE"
 # rede local do Centro e a senha vai ser digitada por criança no celular. Está
 # anotado como limite conhecido na seção 4 do DECISOES.md.
 MINIMO_SENHA = 8
+
+# Depois de quantos dias sem participar o acesso de jogador é desativado.
+DIAS_INATIVIDADE = 30
 
 
 def chave_secreta() -> str:
@@ -326,6 +329,44 @@ def definir_ativo(conexao, usuario_id: int, ativo: bool) -> str | None:
                     (1 if ativo else 0, usuario_id))
     conexao.commit()
     return None
+
+
+def desativar_por_inatividade(conexao, hoje, dias: int = DIAS_INATIVIDADE) -> list[str]:
+    """
+    Desativa o acesso de jogador de quem está há mais de `dias` sem participar.
+
+    Participar = presença ou falta justificada numa matrícula ativa. Quem nunca
+    teve chamada conta a partir da data da matrícula, senão o recém-chegado
+    cairia antes da primeira aula. Sem matrícula ativa nenhuma, desativa
+    direto. Admin nunca entra na varredura. Devolve os logins desativados.
+    """
+    limite = (hoje - timedelta(days=dias)).isoformat()
+    parados = conexao.execute(
+        """
+        SELECT u.id, u.login
+        FROM usuario u
+        WHERE u.papel = 'jogador' AND u.ativo = 1 AND u.pessoa_id IS NOT NULL
+          AND (
+            NOT EXISTS (SELECT 1 FROM matricula ma
+                        WHERE ma.pessoa_id = u.pessoa_id AND ma.status = 'ativa')
+            OR COALESCE(
+                 (SELECT MAX(pr.data) FROM presenca pr
+                  JOIN matricula ma ON ma.id = pr.matricula_id
+                  WHERE ma.pessoa_id = u.pessoa_id AND ma.status = 'ativa'
+                    AND pr.status IN ('presente', 'justificada')),
+                 (SELECT MAX(ma.data_matricula) FROM matricula ma
+                  WHERE ma.pessoa_id = u.pessoa_id AND ma.status = 'ativa')
+               ) < ?
+          )
+        """,
+        (limite,),
+    ).fetchall()
+
+    if parados:
+        conexao.executemany("UPDATE usuario SET ativo = 0 WHERE id = ?",
+                            [(p["id"],) for p in parados])
+        conexao.commit()
+    return [p["login"] for p in parados]
 
 
 def definir_senha(conexao, usuario_id: int, senha: str) -> str | None:

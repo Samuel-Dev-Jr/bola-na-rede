@@ -1106,6 +1106,15 @@ def usuarios():
               "erro" if erro else "sucesso")
         return redirect(url_for("usuarios"))
 
+    # A varredura de inatividade roda ao abrir esta tela: o plano grátis do
+    # Render não tem agendador, e é aqui que o resultado aparece de qualquer
+    # jeito. Quem cair é reativável no botão do cartão.
+    parados = autenticacao.desativar_por_inatividade(g.conexao, consultas.hoje())
+    if parados:
+        flash(f"{len(parados)} acesso(s) desativado(s) por inatividade — mais de "
+              f"{autenticacao.DIAS_INATIVIDADE} dias sem participar: "
+              f"{', '.join(parados)}.", "sucesso")
+
     return render_template(
         "usuarios.html",
         usuarios=autenticacao.listar_usuarios(g.conexao),
