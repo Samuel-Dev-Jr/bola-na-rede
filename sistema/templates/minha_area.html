@@ -54,6 +54,31 @@
     </section>
   {% endif %}
 
+  {# O que mudou desde a última visita. O selo "novo" vem da rota, comparando
+     com a data da visita anterior. #}
+  {% if meus_avisos %}
+    <section class="secao">
+      <h2 class="secao__titulo">Avisos</h2>
+      <div class="lista-pessoas">
+        {% for a in meus_avisos %}
+          <div class="pessoa-cartao">
+            <div class="pessoa-cartao__topo">
+              <span class="pessoa-cartao__nome">{{ a.titulo }}</span>
+              {% if a.novo %}
+                <span class="selo selo--info">novo</span>
+              {% endif %}
+            </div>
+            <p class="pessoa-cartao__texto">{{ a.corpo }}</p>
+            <p class="pessoa-cartao__responsavel">
+              {{ a.quando }} · {{ a.modalidade_nome }}
+              {%- if a.turma_nome %} · só {{ a.turma_nome }}{% endif %}
+            </p>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
   {# O que vai ser feito no treino. Vem logo depois dos jogos porque é a segunda
      pergunta do atleta e, pra quem faltou, é a única forma de saber o que
      perdeu. Mostro uma semana pra trás junto, por isso a marcação de "Hoje". #}

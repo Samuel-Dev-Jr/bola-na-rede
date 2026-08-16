@@ -40,6 +40,7 @@ from flask import (
 )
 
 import autenticacao
+import avisos
 import consultas
 import correio
 import db
@@ -257,11 +258,26 @@ def modalidade_horario(slug: str):
                   "erro")
             return redirect(url_for("modalidade_horario", slug=slug))
 
+        dias_texto = ",".join(str(d) for d in dias)
+        mudou = (dias_texto != modalidade["dias_aula"]
+                 or horario != modalidade["horario"])
+
         g.conexao.execute(
             "UPDATE modalidade SET dias_aula = ?, horario = ? WHERE id = ?",
-            (",".join(str(d) for d in dias), horario, modalidade["id"]),
+            (dias_texto, horario, modalidade["id"]),
         )
         g.conexao.commit()
+
+        # Aviso só quando mudou de verdade: salvar a tela sem alterar nada não
+        # pode encher a área de todo mundo de "horário novo".
+        if mudou:
+            avisos.registrar(
+                g.conexao, modalidade["id"], None,
+                f"{modalidade['nome']}: horário novo",
+                f"O horário agora é {', '.join(DIAS_DA_SEMANA[d] for d in dias)}"
+                f" — {horario}.",
+            )
+
         flash("Horário atualizado.", "sucesso")
         return redirect(url_for("painel", slug=slug))
 
@@ -741,6 +757,19 @@ def plano_novo(slug: str):
         if erro:
             flash(erro, "erro")
             return redirect(url_for("plano_novo", slug=slug))
+
+        dia = _data_do_form("data")
+        material = request.form.get("material", "").strip()
+        avisos.registrar(
+            g.conexao, modalidade["id"], _inteiro_do_form("turma_id"),
+            f"{modalidade['nome']}: {modalidade['termo_aula']} de "
+            f"{dia.strftime('%d/%m')} publicado",
+            f"{request.form.get('titulo', '').strip()} — "
+            f"{dia.strftime('%d/%m/%Y')}."
+            + (f" Levar: {material}." if material else "")
+            + " O conteúdo completo está na sua área.",
+        )
+
         flash("Plano publicado. Já aparece pra quem treina.", "sucesso")
         return redirect(url_for("planos", slug=slug))
 
@@ -888,6 +917,10 @@ def convocacao_nova(slug: str):
             flash("Data inválida.", "erro")
             return redirect(url_for("convocacao_nova", slug=slug))
 
+        adversario = request.form.get("adversario", "").strip() or None
+        local = (request.form.get("local", "").strip()
+                 or "Centro de Cultura e Esportes — Jardim Elizabete")
+
         cursor = g.conexao.execute(
             """
             INSERT INTO evento (modalidade_id, turma_id, nome, adversario,
@@ -895,15 +928,21 @@ def convocacao_nova(slug: str):
             VALUES (?,?,?,?,?,?,?)
             """,
             (
-                modalidade["id"], turma_id, nome,
-                request.form.get("adversario", "").strip() or None,
-                dia,
-                request.form.get("local", "").strip()
-                or "Centro de Cultura e Esportes — Jardim Elizabete",
+                modalidade["id"], turma_id, nome, adversario, dia, local,
                 request.form.get("observacoes", "").strip() or None,
             ),
         )
         g.conexao.commit()
+
+        avisos.registrar(
+            g.conexao, modalidade["id"], turma_id,
+            f"{modalidade['nome']}: {nome} em {dia.strftime('%d/%m')}",
+            f"A coordenação marcou {nome}"
+            + (f" contra {adversario}" if adversario else "")
+            + f" no dia {dia.strftime('%d/%m/%Y')}, em {local}. "
+            "Veja na sua área se você foi convocado.",
+        )
+
         flash("Evento criado. Agora selecione os convocados.", "sucesso")
         return redirect(url_for("convocacao_detalhe", evento_id=cursor.lastrowid))
 
@@ -1078,16 +1117,30 @@ def minha_area():
     usuario = autenticacao.usuario_atual()
 
     if usuario["pessoa_id"] is None:
-        return render_template("minha_area.html", pessoa=None, eventos=[], planos=[])
+        return render_template("minha_area.html", pessoa=None, eventos=[],
+                               planos=[], meus_avisos=[])
 
     pessoa = consultas.obter_pessoa(g.conexao, usuario["pessoa_id"])
     if pessoa is None:
-        return render_template("minha_area.html", pessoa=None, eventos=[], planos=[])
+        return render_template("minha_area.html", pessoa=None, eventos=[],
+                               planos=[], meus_avisos=[])
+
+    # O selo "novo" compara com a última visita; a visita de agora vira a marca
+    # da próxima.
+    meus_avisos = avisos.da_pessoa(g.conexao, usuario["pessoa_id"])
+    visto_em = usuario["avisos_vistos_em"]
+    for a in meus_avisos:
+        a["novo"] = visto_em is None or a["criado_em"] > visto_em
+    g.conexao.execute("UPDATE usuario SET avisos_vistos_em = "
+                      "datetime('now','localtime') WHERE id = ?",
+                      (usuario["id"],))
+    g.conexao.commit()
 
     return render_template(
         "minha_area.html", pessoa=pessoa,
         eventos=consultas.eventos_da_pessoa(g.conexao, usuario["pessoa_id"]),
         planos=consultas.planos_da_pessoa(g.conexao, usuario["pessoa_id"]),
+        meus_avisos=meus_avisos,
     )
 
 

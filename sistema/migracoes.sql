@@ -41,3 +41,19 @@ CREATE TABLE IF NOT EXISTS plano_treino (
 
 CREATE INDEX IF NOT EXISTS idx_plano_data       ON plano_treino (data);
 CREATE INDEX IF NOT EXISTS idx_plano_modalidade ON plano_treino (modalidade_id);
+
+-- O AVISO: o que o participante precisa ficar sabendo sem depender de alguém
+-- repassar no grupo. O sistema registra sozinho quando a coordenação cria um
+-- evento, publica um plano de treino ou muda o horário.
+--
+-- Turma nula = aviso pra modalidade inteira, mesmo desenho do plano_treino.
+CREATE TABLE IF NOT EXISTS aviso (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    modalidade_id  INTEGER NOT NULL REFERENCES modalidade (id) ON DELETE CASCADE,
+    turma_id       INTEGER          REFERENCES turma (id) ON DELETE SET NULL,
+    titulo         TEXT    NOT NULL,
+    corpo          TEXT    NOT NULL,
+    criado_em      TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_aviso_modalidade ON aviso (modalidade_id);

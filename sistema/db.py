@@ -55,6 +55,7 @@ def tabelas_extras() -> list[str]:
 # SQLite, então o aplicar_migracoes confere o PRAGMA antes de alterar.
 COLUNAS_NOVAS = [
     ("pessoa", "email", "TEXT"),
+    ("usuario", "avisos_vistos_em", "TEXT"),
 ]
 
 
