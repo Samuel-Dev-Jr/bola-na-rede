@@ -366,14 +366,23 @@ def obter_pessoa(conexao: sqlite3.Connection, pessoa_id: int) -> Optional[dict]:
                 else f"{linha['modalidade_nome']} {linha['modalidade_genero']}"
             ),
             "total_presencas": sum(1 for r in registros if r.status == "presente"),
+            "total_faltas": sum(1 for r in registros if r.status == "falta"),
+            "total_justificadas": sum(1 for r in registros if r.status == "justificada"),
             "total_aulas": len(registros),
+            "percentual": (round(100 * sum(1 for r in registros if r.status == "presente")
+                                 / len(registros)) if registros else None),
             "ultimas_presencas": list(reversed(registros[-MARCAS_VISIVEIS:])),
         })
+
+    aulas_geral = sum(m["total_aulas"] for m in matriculas)
+    presencas_geral = sum(m["total_presencas"] for m in matriculas)
 
     return {
         **dict(pessoa),
         "idade": idade(pessoa["data_nascimento"]),
         "matriculas": matriculas,
+        "frequencia_geral": (round(100 * presencas_geral / aulas_geral)
+                             if aulas_geral else None),
         # O pior nível entre as matrículas: é o que decide o alerta no topo.
         "pior_nivel": min(
             (m["avaliacao"].nivel for m in matriculas),

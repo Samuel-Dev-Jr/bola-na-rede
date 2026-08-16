@@ -34,6 +34,14 @@
 <section>
   <h2 class="secao__titulo">Atividades</h2>
 
+  {% if not pessoa.matriculas %}
+    <div class="aviso aviso--erro">
+      {{ pessoa.nome.split()[0] }} ainda não está em nenhuma atividade.
+      A matrícula se faz pela página da modalidade, em
+      <a href="{{ url_for('centro') }}">Modalidades</a>.
+    </div>
+  {% endif %}
+
   <div class="atividades">
     {% for m in pessoa.matriculas %}
       <div class="atividade" style="--modalidade: {{ m.modalidade_cor }}">
@@ -82,8 +90,56 @@
     {% endfor %}
   </div>
 
-  {{ marcas.legenda() }}
+  {% if pessoa.matriculas %}
+    {{ marcas.legenda() }}
+  {% endif %}
 </section>
+
+{% if pessoa.matriculas %}
+<section class="secao">
+  <h2 class="secao__titulo">Frequência</h2>
+
+  <div class="cartao tabela-envolucro" style="padding: 0;">
+    <table>
+      <thead>
+        <tr>
+          <th>Atividade</th>
+          <th>Presenças</th>
+          <th>Faltas</th>
+          <th>Justificadas</th>
+          <th>Presença</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in pessoa.matriculas %}
+          <tr>
+            <td>{{ m.nome_exibicao }} · {{ m.turma_nome }}</td>
+            <td>{{ m.total_presencas }}</td>
+            <td>{{ m.total_faltas }}</td>
+            <td>{{ m.total_justificadas }}</td>
+            <td>
+              {% if m.percentual is none %}
+                <span class="celula-secundaria">sem chamada ainda</span>
+              {% else %}
+                <strong>{{ m.percentual }}%</strong>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        {% if pessoa.matriculas|length > 1 and pessoa.frequencia_geral is not none %}
+          <tr>
+            <td><strong>Todas as atividades</strong></td>
+            <td>{{ pessoa.matriculas|sum(attribute='total_presencas') }}</td>
+            <td>{{ pessoa.matriculas|sum(attribute='total_faltas') }}</td>
+            <td>{{ pessoa.matriculas|sum(attribute='total_justificadas') }}</td>
+            <td><strong>{{ pessoa.frequencia_geral }}%</strong></td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
 
 {# Ficha médica: uma só, da pessoa. Antes ela era copiada em cada modalidade e
    vivia preenchida em uma e vazia na outra. #}
