@@ -72,9 +72,12 @@ def criar_eventos(conexao) -> int:
         ("futebol-feminino", "Sub-13", "Amistoso de preparação",
          "Meninas do Parque Pinheiros", hoje + timedelta(days=16),
          "Quadra da Escola Estadual Jardim Record", None),
-        ("volei-masculino", None, "Torneio interbairros — fase de grupos",
+        # Sub-13 e não Sub-15: só o Sub-13 tem 11 pessoas pra fechar o time. Com
+        # o Sub-15 o próprio preparar_deploy avisava "9 elegíveis para 11
+        # posições" e a tela de escalação subia com buraco no campo.
+        ("futebol-masculino", "Sub-13", "Torneio interbairros",
          "União Taboão", hoje - timedelta(days=5),
-         "Ginásio Municipal de Taboão da Serra",
+         "Campo do Centro de Cultura e Esporte",
          "Levar documento com foto."),
     ]
 
@@ -171,11 +174,11 @@ def criar_planos(conexao) -> int:
          "Treino físico",
          "Circuito de resistência\nTiros de 30m\nAlongamento",
          None),
-        ("volei-masculino", None, hoje,
-         "Saque e recepção",
-         "Aquecimento de ombro\nSaque viagem — 20 séries\n"
-         "Recepção em duplas\nJogo treino",
-         None),
+        ("bale", None, hoje,
+         "Barra e alongamento",
+         "Aquecimento no chão\nExercícios de barra\n"
+         "Posições de pés\nAlongamento",
+         "Sapatilha e meia-calça"),
         ("karate", "Faixa branca", hoje + timedelta(days=2),
          "Kihon — base e postura",
          "Aquecimento\nZenkutsu-dachi, repetição\n"

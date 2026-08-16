@@ -44,7 +44,7 @@ Não precisa de Node, nem de servidor de banco, nem de internet. O banco é um
 arquivo só (`centro.db`) e as fontes são as que já vêm no computador,
 porque o técnico usa o sistema na beira do campo, onde às vezes não pega sinal.
 
-O `configurar.py` cria o banco com as 8 modalidades e as 24 turmas do Centro, e
+O `configurar.py` cria o banco com as 4 modalidades e as 13 turmas do Centro, e
 **sem nenhuma pessoa**. O cadastro entra de duas formas: pela tela, uma pessoa
 por vez, ou em lote a partir de planilha:
 

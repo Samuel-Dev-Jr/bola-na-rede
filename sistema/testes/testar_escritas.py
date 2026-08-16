@@ -63,7 +63,7 @@ con.execute("PRAGMA foreign_keys = ON")
 
 # ------------------------------------------------------------------ chamada
 print("\n1. POST /m/<slug>/chamada")
-for slug, dia in [("karate", "2026-08-12"), ("volei-feminino", "2026-08-12")]:
+for slug, dia in [("karate", "2026-08-12"), ("bale", "2026-08-12")]:
     turma = con.execute(
         """SELECT t.id FROM turma t JOIN modalidade m ON m.id = t.modalidade_id
            WHERE m.slug = ? ORDER BY t.ordem LIMIT 1""", (slug,)).fetchone()

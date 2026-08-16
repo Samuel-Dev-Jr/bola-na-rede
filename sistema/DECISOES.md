@@ -19,8 +19,8 @@ Essa foi a mudança mais importante do banco, e ela veio de um erro meu.
 
 Na primeira versão cada linha de aluno pertencia a uma modalidade só. Parecia
 óbvio: uma tabela `atleta`, com uma coluna apontando pra turma. Só que mais da
-metade das crianças do Centro faz mais de uma atividade — hoje são 32 de 58.
-Do jeito antigo, quem jogava futebol e basquete virava **duas pessoas** no
+metade das crianças do Centro faz mais de uma atividade. Do jeito antigo, quem
+fazia futebol e karatê virava **duas pessoas** no
 banco, com o telefone digitado duas vezes e a ficha médica preenchida em uma e
 vazia na outra.
 
@@ -39,7 +39,7 @@ turma   ──┘
 
 `matricula` é tabela associativa entre pessoa e turma. E a **presença é da
 matrícula, não da pessoa** — porque frequência é por modalidade: dá para ser
-assíduo no futebol e estar sumindo do basquete, e a coordenação precisa ver as
+assíduo no futebol e estar sumindo do karatê, e a coordenação precisa ver as
 duas coisas separadas para saber com quem falar.
 
 Consequência prática nas rotas: a ficha da pessoa vive em `/pessoas/<id>`, fora
@@ -49,7 +49,7 @@ da modalidade, porque ela junta todas as atividades dela. O resto vive em
 **O número da camisa mostrou que a separação estava certa.** Quando fui
 acrescentar número de camisa, o campo caiu na `matricula` sem discussão: número
 é do time, não do ser humano. A mesma criança pode ser 10 no futebol e 7 no
-basquete, e no karatê não usar número nenhum. Se a tabela ainda fosse a `atleta`
+karatê, e no balé não usar número nenhum. Se a tabela ainda fosse a `atleta`
 da primeira versão, isso funcionaria por acidente — porque lá cada linha já era
 uma modalidade — e quebraria na primeira vez que alguém tentasse consertar a
 duplicação de cadastro.
@@ -174,7 +174,9 @@ propriedade da convocação: quem foi chamado e onde joga. **Convocado sem posi�
 
 Cada esporte tem geometria própria, em `escalacao.py`: 11 no futebol num 4-4-2,
 6 no vôlei na rotação numerada de 1 a 6, 5 no basquete por função. Karatê e
-pilates não escalam, e nem têm convocação.
+balé não escalam, e nem têm convocação. As posições de vôlei e basquete
+continuam no escalacao.py: o Centro teve as duas modalidades e pode voltar a
+ter, e apagar o mapa não devolve tempo nenhum.
 
 **Toque, não arrastar.** Arrastar é o que parece natural num editor de escalação,
 e eu não fiz assim de propósito: arrastar em celular é frágil, não tem caminho

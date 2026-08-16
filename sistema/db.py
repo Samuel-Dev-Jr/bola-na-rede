@@ -26,13 +26,37 @@ def conectar() -> sqlite3.Connection:
 
 
 def recriar_schema() -> None:
-    """Apaga tudo e cria as tabelas de novo. Só o configurar.py usa isso."""
+    """
+    Apaga tudo e cria as tabelas de novo. Só o configurar.py usa isso.
+
+    Desligo a chave estrangeira aqui, e não é preguiça. O schema.sql só conhece
+    as tabelas originais; a plano_treino nasceu no migracoes.sql e aponta pra
+    turma. Com a chave ligada, o DROP TABLE turma era recusado — "no such table:
+    main.turma" — e o configurar.py parava de rodar em qualquer banco que já
+    tivesse migração aplicada. Ou seja: quanto mais o sistema evoluía, menos ele
+    conseguia se recriar.
+
+    A alternativa seria listar as tabelas novas no schema.sql, mas aí os dois
+    arquivos passariam a depender um do outro e eu teria que lembrar de mexer
+    nos dois a cada tabela nova. Desligar a checagem enquanto derrubo tudo é o
+    que essa operação significa de verdade.
+    """
     conexao = conectar()
     try:
+        conexao.execute("PRAGMA foreign_keys = OFF")
+        for tabela in tabelas_extras():
+            conexao.execute(f"DROP TABLE IF EXISTS {tabela}")
         conexao.executescript(CAMINHO_SCHEMA.read_text(encoding="utf-8"))
         conexao.commit()
     finally:
         conexao.close()
+
+
+def tabelas_extras() -> list[str]:
+    """As tabelas criadas pelo migracoes.sql, lidas do próprio arquivo."""
+    import re
+    texto = CAMINHO_MIGRACOES.read_text(encoding="utf-8")
+    return re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)", texto)
 
 
 def aplicar_migracoes() -> None:

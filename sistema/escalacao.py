@@ -72,7 +72,7 @@ def para_modalidade(slug: str):
     """
     (tipo_de_quadra, posições) da modalidade, ou (None, []) se ela não escala.
 
-    Karatê e pilates caem no segundo caso: não têm time em campo, e por isso
+    Karatê e balé caem no segundo caso: não têm time em campo, e por isso
     também não têm convocação. Devolver lista vazia deixa a tela decidir sem
     precisar saber quais esportes são coletivos.
     """

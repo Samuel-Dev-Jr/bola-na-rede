@@ -53,10 +53,15 @@ DESKTOP = [
 CELULAR = [
     ("celular-01-centro", "/", True),
     ("celular-02-painel", "/m/futebol-masculino", True),
-    ("celular-03-pessoas", "/pessoas", True),
+    # Só a viewport, e não a página inteira: as 62 pessoas a 390px com escala 3
+    # viram uma imagem de mais de 20 mil pixels de altura. O Chrome estoura o
+    # limite tentando montar isso, e mesmo que montasse a tira ficaria ilegível
+    # no relatório. O que a imagem precisa mostrar é como a lista se comporta no
+    # celular, e isso a primeira tela já mostra.
+    ("celular-03-pessoas", "/pessoas", False),
     ("celular-04-pessoa", "/pessoas/1", True),
     ("celular-05-chamada", "/m/futebol-masculino/chamada", False),
-    ("celular-06-agenda", "/m/karate/agenda", True),
+    ("celular-06-agenda", "/m/bale/agenda", True),
     ("celular-07-matricular", "/m/futebol-masculino/matricular", True),
     ("celular-08-planos", "/m/futebol-masculino/planos", True),
 ]

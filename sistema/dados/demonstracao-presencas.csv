@@ -22,15 +22,15 @@ futebol-masculino,Sub-13,Theo Souza Rocha,,P,,J,,P,,P,,P,,P,,F,,F,,P,,P,,P,,P,,P
 karate,Faixa amarela,Theo Souza Rocha,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,
 futebol-masculino,Sub-15,Benjamim Cardoso Lopes,,P,,P,,P,,P,,P,,P,,P,,P,,J,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P
 futebol-masculino,Sub-15,Gabriel Ribeiro Vieira,,P,,P,,P,,P,,P,,J,,P,,P,,F,,P,,P,,J,,F,,F,,P,,F,,P,,P,,P
-basquete-masculino,Sub-16,Gabriel Ribeiro Vieira,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,J,,,,P,,P,,,,P,,P,
+karate,Faixa laranja,Gabriel Ribeiro Vieira,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,J,,,,P,,P,,,,P,,P,
 futebol-masculino,Sub-15,Pedro Rodrigues Martins,,P,,P,,P,,P,,P,,P,,P,,P,,F,,P,,P,,P,,P,,F,,P,,P,,F,,F,,P
 futebol-masculino,Sub-15,Pedro Martins Lopes,,P,,P,,P,,F,,P,,P,,P,,F,,P,,F,,P,,F,,F,,F,,P,,P,,F,,F,,F
-basquete-masculino,Sub-16,Pedro Martins Lopes,P,,,,F,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,F,,J,,,,P,,P,
+karate,Faixa laranja,Pedro Martins Lopes,P,,,,F,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,F,,J,,,,P,,P,
 futebol-masculino,Sub-15,Lucas Fernandes Machado,,P,,P,,P,,P,,P,,P,,P,,P,,P,,J,,P,,P,,J,,P,,P,,P,,P,,P,,P
 futebol-masculino,Sub-15,Heitor Silva Moreira,,P,,P,,P,,P,,P,,J,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P
 karate,Faixa amarela,Heitor Silva Moreira,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,
 futebol-masculino,Sub-15,Heitor Moreira Dias,,F,,F,,P,,F,,F,,F,,F,,F,,F,,P,,F,,P,,P,,P,,P,,F,,F,,F,,F
-basquete-masculino,Sub-16,Heitor Moreira Dias,P,,,,P,,F,,,,F,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,
+karate,Faixa laranja,Heitor Moreira Dias,P,,,,P,,F,,,,F,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,
 futebol-masculino,Sub-15,Caio Soares Costa,,P,,P,,P,,F,,F,,F,,F,,F,,F,,F,,F,,F,,F,,F,,F,,F,,F,,F,,F
 futebol-masculino,Sub-15,Bruno Rocha Teixeira,,P,,F,,P,,P,,F,,P,,P,,P,,P,,P,,P,,P,,P,,F,,F,,P,,F,,F,,F
 futebol-masculino,Sub-11,Matheus Souza Dias,,P,,P,,F,,P,,P,,P,,P,,P,,P,,P,,F,,P,,P,,P,,P,,F,,P,,P,,P
@@ -44,49 +44,43 @@ futebol-masculino,Sub-11,Erick Pereira Vieira,,F,,F,,P,,P,,P,,P,,F,,P,,F,,P,,P,,
 futebol-feminino,Sub-13,Manuela Fernandes Machado,P,,,,P,,P,,,,P,,P,,,,F,,F,,,,F,,F,,,,P,,F,,,,F,,F,
 futebol-feminino,Sub-13,Clara Martins Costa,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,F,,,,F,,F,
 futebol-feminino,Sub-13,Elisa Ribeiro Rodrigues,P,,,,P,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,F,
-basquete-feminino,Sub-14,Elisa Ribeiro Rodrigues,,P,,,,P,,P,,,,P,,J,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
+bale,Juvenil,Elisa Ribeiro Rodrigues,,P,,,,P,,P,,,,P,,J,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
 futebol-feminino,Sub-13,Helena Ferreira Dias,P,,,,J,,J,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
 futebol-feminino,Sub-13,Laura Nunes Gomes,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,J,,P,,,,P,,P,
 futebol-feminino,Sub-13,Luiza Nunes Santos,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,F,
-basquete-feminino,Sub-14,Luiza Nunes Santos,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,J,,J,,,,J,,P
+karate,Faixa branca,Luiza Nunes Santos,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,J,,J,,,,J,,P
 futebol-feminino,Sub-13,Esther Dias Barbosa,F,,,,F,,F,,,,F,,P,,,,F,,F,,,,P,,P,,,,P,,F,,,,F,,F,
 karate,Faixa amarela,Esther Dias Barbosa,P,,P,,P,,P,,P,,F,,P,,P,,P,,F,,P,,P,,P,,P,,P,,P,,F,,P,,P,
 futebol-feminino,Sub-13,Maria Rocha Lopes,P,,,,P,,P,,,,P,,P,,,,P,,F,,,,P,,F,,,,P,,P,,,,P,,P,
-volei-feminino,Sub-14,Maria Rocha Lopes,P,,,,F,,P,,,,P,,P,,,,P,,J,,,,J,,J,,,,P,,P,,,,P,,P,
+bale,Infantil,Maria Rocha Lopes,P,,,,F,,P,,,,P,,P,,,,P,,J,,,,J,,J,,,,P,,P,,,,P,,P,
 futebol-feminino,Sub-13,Esther Teixeira Martins,P,,,,P,,P,,,,P,,P,,,,P,,F,,,,P,,P,,,,J,,J,,,,J,,P,
-volei-feminino,Sub-14,Esther Teixeira Martins,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
+karate,Faixa branca,Esther Teixeira Martins,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
 futebol-feminino,Sub-13,Luiza Soares Lima,F,,,,P,,P,,,,F,,P,,,,P,,F,,,,F,,P,,,,F,,F,,,,F,,F,
-volei-feminino,Sub-14,Luiza Soares Lima,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
+bale,Infantil,Luiza Soares Lima,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
 futebol-feminino,Sub-13,Antonella Freitas Dias,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,F,,,,P,,F,,,,F,,F,
-volei-feminino,Sub-14,Antonella Freitas Dias,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
+karate,Faixa branca,Antonella Freitas Dias,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
 futebol-feminino,Sub-13,Antonella Lima Lopes,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,P,,,,F,,F,
-basquete-feminino,Sub-14,Antonella Lima Lopes,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
+bale,Juvenil,Antonella Lima Lopes,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
 futebol-feminino,Sub-13,Valentina Carvalho Almeida,P,,,,P,,P,,,,J,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,P,
 karate,Faixa branca,Valentina Carvalho Almeida,J,,P,,P,,F,,P,,P,,P,,P,,F,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,
 futebol-feminino,Sub-13,Isabella Nascimento Nunes,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,J,,,,P,,P,,,,P,,P,
-volei-feminino,Sub-14,Ayla Martins Machado,F,,,,F,,P,,,,J,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,J,
-volei-feminino,Sub-14,Sarah Cardoso Teixeira,P,,,,P,,J,,,,J,,J,,,,P,,P,,,,P,,P,,,,P,,J,,,,P,,P,
-basquete-feminino,Sub-14,Sarah Cardoso Teixeira,,P,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F
+karate,Faixa amarela,Ayla Martins Machado,F,,,,F,,P,,,,J,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,J,
+bale,Juvenil,Sarah Cardoso Teixeira,P,,,,P,,J,,,,J,,J,,,,P,,P,,,,P,,P,,,,P,,J,,,,P,,P,
+futebol-feminino,Sub-13,Sarah Cardoso Teixeira,,P,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F
 karate,Faixa amarela,Sarah Cardoso Teixeira,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,
-volei-feminino,Sub-14,Alice Lima Ferreira,J,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,F,,,,J,,P,,,,P,,P,
-basquete-feminino,Sub-14,Alice Lima Ferreira,,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,F
-volei-feminino,Sub-14,Lívia Lima Pereira,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,J,,P,,,,P,,P,,,,P,,P,
-volei-masculino,Adulto,Antônio Nunes Martins,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,F
-pilates,Turma da manhã,Antônio Nunes Martins,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,J,,P,,F,,P,,F,,J,
-volei-masculino,Adulto,Luiz Teixeira Silva,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,P,,,,P,,P
-pilates,Turma da manhã,Luiz Teixeira Silva,F,,P,,F,,F,,P,,P,,F,,P,,P,,P,,F,,P,,P,,P,,F,,P,,P,,F,,F,
-volei-masculino,Adulto,Valdir Machado Costa,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
-pilates,Turma da manhã,Valdir Machado Costa,F,,P,,P,,F,,P,,P,,F,,P,,P,,P,,P,,P,,F,,P,,P,,F,,P,,F,,F,
-volei-masculino,Adulto,Paulo Nunes Soares,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
-volei-masculino,Adulto,Sérgio Freitas Dias,,F,,,,F,,P,,,,P,,P,,,,F,,F,,,,P,,P,,,,P,,P,,,,F,,F
-pilates,Turma da manhã,Sérgio Freitas Dias,P,,J,,P,,P,,P,,P,,F,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,
-volei-masculino,Adulto,Wilson Ferreira Souza,,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,F
-pilates,Turma da manhã,Wilson Ferreira Souza,P,,P,,P,,P,,F,,P,,P,,P,,P,,P,,P,,P,,P,,J,,P,,P,,P,,P,,F,
-volei-masculino,Adulto,Paulo Pereira Marques,,P,,,,F,,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,F
-pilates,Turma da manhã,Paulo Pereira Marques,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,P,,J,,J,,J,,P,,P,,P,,P,
-basquete-masculino,Sub-16,Nicolas Martins Santos,P,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,
-basquete-masculino,Sub-16,João Vieira Almeida,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
-basquete-masculino,Sub-16,Enzo Souza Costa,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
-basquete-masculino,Sub-16,Pedro Cardoso Teixeira,F,,,,F,,F,,,,P,,F,,,,F,,P,,,,P,,P,,,,F,,F,,,,F,,F,
-basquete-feminino,Sub-14,Helena Vieira Costa,,P,,,,P,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,F
-basquete-feminino,Sub-14,Manuela Soares Pereira,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
+bale,Juvenil,Alice Lima Ferreira,J,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,F,,,,J,,P,,,,P,,P,
+karate,Faixa amarela,Alice Lima Ferreira,,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,F
+bale,Infantil,Lívia Lima Pereira,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,J,,P,,,,P,,P,,,,P,,P,
+karate,Faixa verde,Antônio Nunes Martins,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,F
+futebol-masculino,Sub-17,Luiz Teixeira Silva,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,P,,,,P,,P
+karate,Faixa verde,Valdir Machado Costa,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
+futebol-masculino,Sub-17,Paulo Nunes Soares,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P
+karate,Faixa verde,Sérgio Freitas Dias,,F,,,,F,,P,,,,P,,P,,,,F,,F,,,,P,,P,,,,P,,P,,,,F,,F
+futebol-masculino,Sub-17,Wilson Ferreira Souza,,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,F
+karate,Faixa verde,Paulo Pereira Marques,,P,,,,F,,F,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,F
+futebol-masculino,Sub-17,Nicolas Martins Santos,P,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,,,,F,,F,
+karate,Faixa verde,João Vieira Almeida,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
+futebol-masculino,Sub-17,Enzo Souza Costa,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,
+karate,Faixa verde,Pedro Cardoso Teixeira,F,,,,F,,F,,,,P,,F,,,,F,,P,,,,P,,P,,,,F,,F,,,,F,,F,
+futebol-feminino,Sub-15,Helena Vieira Costa,,P,,,,P,,P,,,,F,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,F,,F
+bale,Infantil,Manuela Soares Pereira,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P,,,,P,,P

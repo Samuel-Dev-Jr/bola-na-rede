@@ -9,7 +9,7 @@ import _acesso
 BASE = "http://127.0.0.1:5000"
 ROTAS = [
     "/", "/pessoas", "/pessoas/1", "/pessoas/1/editar", "/pessoas/nova",
-    "/m/futebol-masculino", "/m/futebol-feminino", "/m/pilates", "/m/karate",
+    "/m/futebol-masculino", "/m/futebol-feminino", "/m/bale", "/m/karate",
     "/m/futebol-masculino/alunos", "/m/futebol-masculino/matricular",
     "/m/futebol-masculino/chamada", "/m/karate/agenda",
     "/m/futebol-masculino/convocacao", "/convocacao/1",

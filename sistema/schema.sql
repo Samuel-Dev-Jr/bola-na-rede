@@ -40,9 +40,9 @@ DROP TABLE IF EXISTS pessoa;
 DROP TABLE IF EXISTS turma;
 DROP TABLE IF EXISTS modalidade;
 
--- As atividades do Centro. Futebol, vôlei e basquete aparecem duas vezes cada,
+-- As atividades do Centro. O futebol aparece duas vezes,
 -- uma no masculino e outra no feminino, porque competem em categorias
--- separadas e treinam em dias diferentes. Karatê e pilates são mistos.
+-- separadas e treinam em dias diferentes. Karatê e balé são mistos.
 CREATE TABLE modalidade (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     slug            TEXT    NOT NULL UNIQUE,
@@ -62,7 +62,7 @@ CREATE TABLE modalidade (
     tem_convocacao  INTEGER NOT NULL DEFAULT 1 CHECK (tem_convocacao IN (0,1)),
 
     -- Como cada modalidade chama as coisas, pra eu não escrever "treino" na
-    -- tela do pilates. O artigo entra junto porque senão sai "uma treino".
+    -- tela do balé. O artigo entra junto porque senão sai "uma treino".
     termo_aluno     TEXT    NOT NULL DEFAULT 'atleta',
     termo_aula      TEXT    NOT NULL DEFAULT 'treino',
     termo_aula_pl   TEXT    NOT NULL DEFAULT 'treinos',
@@ -72,7 +72,7 @@ CREATE TABLE modalidade (
 );
 
 -- As turmas de cada modalidade: categorias por idade no futebol, faixas no
--- karatê, horários no pilates.
+-- karatê, níveis no balé.
 CREATE TABLE turma (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
     modalidade_id  INTEGER NOT NULL REFERENCES modalidade (id) ON DELETE CASCADE,

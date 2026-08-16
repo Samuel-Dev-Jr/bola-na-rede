@@ -434,11 +434,18 @@ a { color: var(--verde); }
   font-variant-numeric: tabular-nums;
 }
 
-/* Dia com aula: fundo na cor da modalidade. */
+/* Dia com aula: fundo na cor da modalidade.
+
+   O número do dia leva 12% de preto na cor. Sem isso ele ficava em 4.47:1
+   contra o fundo tingido, e o mínimo do WCAG AA é 4.5 — reprovava por 0.03,
+   que é o tipo de margem que não dá pra ver no olho e o teste de contraste
+   pega. O verde do futebol era o pior caso; o roxo do karatê e o rosa do balé
+   passavam. Escurecer só o texto resolve sem mudar a cor da modalidade, que é
+   o que identifica a atividade na tela inteira. */
 .calendario__dia--aula {
   background: color-mix(in srgb, var(--modalidade, var(--verde)) 12%, transparent);
   border-color: color-mix(in srgb, var(--modalidade, var(--verde)) 30%, transparent);
-  color: var(--modalidade, var(--verde));
+  color: color-mix(in srgb, var(--modalidade, var(--verde)) 88%, #000);
 }
 
 .calendario__dia--aula:hover {

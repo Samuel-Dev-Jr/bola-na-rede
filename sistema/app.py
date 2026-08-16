@@ -4,9 +4,10 @@ Centro de Cultura e Esporte - sistema de gestão da escolinha comunitária.
 Projeto de Extensão Curricularizada - UniFECAF
 Análise e Desenvolvimento de Sistemas
 
-O projeto começou só com futebol, em 2019, e hoje são cinco esportes no mesmo
-espaço. Como futebol, vôlei e basquete têm turma masculina e feminina com dias
-de treino diferentes, cada uma é uma modalidade separada: oito no total.
+O projeto começou só com futebol, em 2019, e hoje tem também karatê e balé, os
+dois em parceria com a ONG ABOA. O futebol tem turma masculina e feminina, que
+treinam em dias diferentes, então cada uma é uma modalidade separada: quatro
+no total.
 
 O sistema trabalha com PESSOA e MATRÍCULA. Uma pessoa pode estar matriculada em
 várias modalidades, e mais da metade do Centro está. As rotas de dentro de uma

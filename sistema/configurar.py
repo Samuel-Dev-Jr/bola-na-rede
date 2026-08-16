@@ -50,46 +50,6 @@ MODALIDADES = [
         "turmas": [("Sub-13", (10, 13)), ("Sub-15", (14, 15)), ("Sub-17", (16, 17))],
     },
     {
-        "slug": "volei-masculino", "nome": "Vôlei", "genero": "Masculino",
-        "descricao": "Quadra coberta, base e adulto",
-        "cor": "#1d5fbf", "icone": "volei",
-        "dias_aula": "1,3", "horario": "Ter e Qui, 19h às 21h",
-        "tem_convocacao": 1,
-        "termo_aluno": "atleta", "termo_aula": "treino",
-        "termo_aula_pl": "treinos", "artigo_aula": "um",
-        "turmas": [("Sub-14", (11, 14)), ("Sub-16", (15, 16)), ("Adulto", (18, 60))],
-    },
-    {
-        "slug": "volei-feminino", "nome": "Vôlei", "genero": "Feminino",
-        "descricao": "Quadra coberta, base e adulto",
-        "cor": "#1d5fbf", "icone": "volei",
-        "dias_aula": "0,2", "horario": "Seg e Qua, 19h às 21h",
-        "tem_convocacao": 1,
-        "termo_aluno": "atleta", "termo_aula": "treino",
-        "termo_aula_pl": "treinos", "artigo_aula": "um",
-        "turmas": [("Sub-14", (11, 14)), ("Sub-16", (15, 16)), ("Adulto", (18, 60))],
-    },
-    {
-        "slug": "basquete-masculino", "nome": "Basquete", "genero": "Masculino",
-        "descricao": "Iniciação e categorias de base",
-        "cor": "#c2410c", "icone": "basquete",
-        "dias_aula": "0,2", "horario": "Seg e Qua, 16h às 18h",
-        "tem_convocacao": 1,
-        "termo_aluno": "atleta", "termo_aula": "treino",
-        "termo_aula_pl": "treinos", "artigo_aula": "um",
-        "turmas": [("Sub-14", (11, 14)), ("Sub-16", (15, 17))],
-    },
-    {
-        "slug": "basquete-feminino", "nome": "Basquete", "genero": "Feminino",
-        "descricao": "Iniciação e categorias de base",
-        "cor": "#c2410c", "icone": "basquete",
-        "dias_aula": "1,3", "horario": "Ter e Qui, 16h às 18h",
-        "tem_convocacao": 1,
-        "termo_aluno": "atleta", "termo_aula": "treino",
-        "termo_aula_pl": "treinos", "artigo_aula": "um",
-        "turmas": [("Sub-14", (11, 14)), ("Sub-16", (15, 17))],
-    },
-    {
         "slug": "karate", "nome": "Karatê", "genero": "Misto",
         "descricao": "Turmas por faixa, do branco ao verde",
         "cor": "#6d28d9", "icone": "karate",
@@ -103,17 +63,20 @@ MODALIDADES = [
         ],
     },
     {
-        "slug": "pilates", "nome": "Pilates", "genero": "Misto",
-        "descricao": "Mães, pais e terceira idade do bairro",
-        "cor": "#0e7490", "icone": "pilates",
-        "dias_aula": "0,2,4", "horario": "Seg, Qua e Sex, manhã e noite",
+        # O horário daqui eu ainda não confirmei com a professora. Deixo um
+        # valor plausível pra tela não subir vazia e corrijo pela tela de
+        # horário, que agora existe justamente pra isso — sem mexer em código.
+        "slug": "bale", "nome": "Balé", "genero": "Misto",
+        "descricao": "Turmas infantis, em parceria com a ABOA",
+        "cor": "#a1216b", "icone": "bale",
+        "dias_aula": "1,3", "horario": "Ter e Qui, 14h às 16h",
         "tem_convocacao": 0,
         "termo_aluno": "aluno", "termo_aula": "aula",
         "termo_aula_pl": "aulas", "artigo_aula": "uma",
-        "turmas": [
-            ("Turma da manhã", (30, 78)), ("Turma da tarde", (30, 78)),
-            ("Turma da noite", (30, 60)),
-        ],
+        # Duas turmas, e não três: eu tinha aberto uma "Iniciação" de 5 a 8 anos
+        # e ela nasceu sem ninguém, porque a base de demonstração não tem
+        # criança dessa idade. Turma vazia na vitrine parece defeito do sistema.
+        "turmas": [("Infantil", (7, 12)), ("Juvenil", (13, 16))],
     },
 ]
 
