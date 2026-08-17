@@ -32,14 +32,16 @@ já sei que ficou de fora está listado em
 
 **https://bola-na-rede.onrender.com**
 
-| | |
-|---|---|
-| Login | `demo` |
-| Senha | `demo2026` |
+O sistema exige login. **As credenciais de demonstração não ficam neste
+repositório** — eu as entrego diretamente a quem precisa avaliar o projeto.
+Senha escrita em arquivo versionado é senha pública, mesmo em repositório
+privado: basta o acesso mudar uma vez para ela deixar de ser segredo, e o git
+guarda para sempre o que entra.
 
-A conta de demonstração administra uma base **inventada** — 62 pessoas
-fictícias, com chamada e jogos de exemplo. Pode clicar em tudo: o que for
-digitado ali se apaga no reinício seguinte.
+A conta de demonstração enxerga apenas a base de exibição — 62 pessoas com
+dados inventados, chamada e jogos de exemplo. Ela não dá acesso a informação
+de ninguém do Centro. Pode-se clicar em tudo: o que for digitado ali se apaga
+no reinício seguinte.
 
 Duas ressalvas da hospedagem gratuita: a instância **hiberna** depois de uns 15
 minutos parada e leva perto de um minuto para acordar, então abra o link uma vez
