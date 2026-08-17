@@ -9,6 +9,14 @@ Análise e Desenvolvimento de Sistemas — 2026
 Centro de Cultura e Esportes — Jardim Elizabete
 R. Manoel Maria Fernandes, 580, Jardim Elizabete, Taboão da Serra/SP
 
+> Este é o manual de operação. A apresentação do projeto, a situação atual do
+> desenvolvimento e o endereço da vitrine estão no
+> [README da raiz](../README.md).
+>
+> **O desenvolvimento está em pausa aguardando o retorno da coordenação**, que
+> ficou de usar o sistema e me dizer o que precisa mudar. O que eu já sei que
+> ficou de fora está em [O que ficou de fora](#o-que-ficou-de-fora).
+
 ## Como rodar
 
 No Windows, é só dar dois cliques no `iniciar.bat`.
